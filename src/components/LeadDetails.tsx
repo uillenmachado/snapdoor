@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
-import { Building2, Mail, Phone, Linkedin, MessageSquare, Send, Calendar, Phone as PhoneIcon, Loader2, Sparkles, Edit, AlertCircle } from "lucide-react";
+import { Building2, Mail, Phone, Linkedin, MessageSquare, Send, Calendar, Phone as PhoneIcon, Loader2, Sparkles, Edit, AlertCircle, Eye } from "lucide-react";
 import { Lead } from "@/hooks/useLeads";
 import { useNotes, useCreateNote } from "@/hooks/useNotes";
 import { useActivities, useCreateActivity } from "@/hooks/useActivities";
@@ -266,14 +266,26 @@ export function LeadDetails({ lead, isOpen, onClose, userId }: LeadDetailsProps)
             <span>
               {lead.first_name} {lead.last_name}
             </span>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={openEditDialog}
-            >
-              <Edit className="h-4 w-4 mr-2" />
-              Editar
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  window.open(`/leads/${lead.id}`, '_blank');
+                }}
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Ver Tudo
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={openEditDialog}
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Editar
+              </Button>
+            </div>
           </SheetTitle>
           <SheetDescription>{lead.job_title || "Cargo não informado"}</SheetDescription>
         </SheetHeader>

@@ -14,6 +14,7 @@ import Activities from "./pages/Activities";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import Help from "./pages/Help";
+import LeadProfile from "./pages/LeadProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -77,6 +78,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Help />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/leads/:id"
+            element={
+              <ProtectedRoute>
+                <LeadProfile />
               </ProtectedRoute>
             }
           />

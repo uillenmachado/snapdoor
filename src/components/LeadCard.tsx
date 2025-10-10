@@ -1,6 +1,7 @@
 import { Lead } from "@/hooks/useLeads";
 import { useMarkLeadAsWon, useMarkLeadAsLost } from "@/hooks/useLeadHistory";
 import { useEnrichLead } from "@/hooks/useEnrichLead";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -19,7 +20,8 @@ import {
   Snowflake,
   Wind,
   Clock,
-  Sparkles
+  Sparkles,
+  Eye
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -49,6 +51,7 @@ interface LeadCardProps {
 }
 
 export function LeadCard({ lead, onClick }: LeadCardProps) {
+  const navigate = useNavigate();
   const [showWonDialog, setShowWonDialog] = useState(false);
   const [showLostDialog, setShowLostDialog] = useState(false);
   const [dealValue, setDealValue] = useState("");
@@ -300,6 +303,17 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>Ações do Lead</DropdownMenuLabel>
               <DropdownMenuSeparator />
+              
+              <DropdownMenuItem 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/leads/${lead.id}`);
+                }}
+                className="font-medium"
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Ver Todos os Dados
+              </DropdownMenuItem>
               
               <DropdownMenuItem 
                 onClick={handleEnrichLead}
