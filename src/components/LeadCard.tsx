@@ -1,5 +1,6 @@
 import { Lead } from "@/hooks/useLeads";
 import { useMarkLeadAsWon, useMarkLeadAsLost } from "@/hooks/useLeadHistory";
+import { useEnrichLead } from "@/hooks/useEnrichLead";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -17,7 +18,8 @@ import {
   Flame,
   Snowflake,
   Wind,
-  Clock
+  Clock,
+  Sparkles
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -56,6 +58,7 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
 
   const markAsWonMutation = useMarkLeadAsWon();
   const markAsLostMutation = useMarkLeadAsLost();
+  const enrichLeadMutation = useEnrichLead();
 
   // Calculate lead temperature based on last update
   const getLeadTemperature = () => {
@@ -120,6 +123,37 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
   const handleFollowUp = (e: React.MouseEvent) => {
     e.stopPropagation();
     toast.success("Follow-up agendado!");
+  };
+
+  const handleEnrichLead = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    // Extrai domínio do email se disponível
+    const extractDomain = (email: string): string | undefined => {
+      const match = email.match(/@([^@]+)$/);
+      return match ? match[1] : undefined;
+    };
+    
+    const companyDomain = lead.email 
+      ? extractDomain(lead.email)
+      : undefined;
+    
+    await enrichLeadMutation.mutateAsync({
+      leadId: lead.id,
+      leadData: {
+        first_name: lead.first_name || undefined,
+        last_name: lead.last_name || undefined,
+        email: lead.email || undefined,
+        company: lead.company || undefined,
+        company_domain: companyDomain,
+      },
+      options: {
+        findEmail: !lead.email, // Só busca email se não tiver
+        verifyEmail: !!lead.email, // Só verifica se já tiver email
+        enrichCompany: !!companyDomain,
+        enrichPerson: !!lead.email,
+      },
+    });
   };
 
   const confirmWon = async () => {
@@ -187,6 +221,21 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
           <Button
             size="sm"
             variant="ghost"
+            className="h-6 w-6 p-0 hover:bg-purple-100 hover:text-purple-700"
+            onClick={handleEnrichLead}
+            disabled={enrichLeadMutation.isPending}
+            title="Enriquecer Lead com IA"
+          >
+            {enrichLeadMutation.isPending ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : (
+              <Sparkles className="h-3 w-3" />
+            )}
+          </Button>
+
+          <Button
+            size="sm"
+            variant="ghost"
             className="h-6 w-6 p-0 hover:bg-green-100 hover:text-green-700"
             onClick={handleMarkAsWon}
             title="Marcar como Ganho"
@@ -215,8 +264,23 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
                 <MoreHorizontal className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>Ações do Lead</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              
+              <DropdownMenuItem 
+                onClick={handleEnrichLead}
+                disabled={enrichLeadMutation.isPending}
+                className="text-purple-700 font-medium"
+              >
+                {enrichLeadMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4 mr-2" />
+                )}
+                Enriquecer Lead com IA
+              </DropdownMenuItem>
+              
               <DropdownMenuSeparator />
               
               <DropdownMenuItem onClick={handleScheduleMeeting}>
