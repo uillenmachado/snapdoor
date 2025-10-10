@@ -114,27 +114,49 @@ class LeadEnrichmentService {
 
       // 2. Se temos email OU LinkedIn - enriquece informações da pessoa
       if (options.enrichPerson && (currentData.email || enrichedData.email || currentData.linkedin_url)) {
-        try {
-          // Prioriza LinkedIn se disponível (mais dados)
-          const identifier = currentData.linkedin_url || enrichedData.email || currentData.email!;
-          console.log(`🔍 Enriquecendo informações da pessoa: ${identifier}`);
-          
-          const personResult = await hunterClient.personEnrichment(identifier);
-
-          if (personResult) {
-            enrichedData.job_title = personResult.position || enrichedData.job_title;
-            enrichedData.phone = personResult.phone_number || enrichedData.phone;
-            enrichedData.linkedin_url = personResult.linkedin || enrichedData.linkedin_url;
-            enrichedData.twitter_url = personResult.twitter || enrichedData.twitter_url;
-            enrichedData.seniority = personResult.seniority || enrichedData.seniority;
-            enrichedData.department = personResult.department || enrichedData.department;
-            enrichedData.company = personResult.company || enrichedData.company;
-            totalCredits += CREDIT_COSTS.PERSON_ENRICHMENT;
-            sources.push('person_enrichment');
-            console.log(`✅ Pessoa enriquecida: ${personResult.position || 'N/A'}`);
+        let personResult = null;
+        
+        // Tenta primeiro com Email (mais confiável)
+        if (enrichedData.email || currentData.email) {
+          try {
+            const email = enrichedData.email || currentData.email!;
+            console.log(`🔍 Enriquecendo informações da pessoa via Email: ${email}`);
+            personResult = await hunterClient.personEnrichment(email);
+            
+            if (personResult) {
+              console.log(`✅ Pessoa enriquecida via Email: ${personResult.position || 'N/A'}`);
+            }
+          } catch (error) {
+            console.warn('❌ Email enrichment falhou:', error);
+            // Continua para tentar LinkedIn
           }
-        } catch (error) {
-          console.warn('Person enrichment não encontrou resultados:', error);
+        }
+        
+        // Se falhou com email, tenta com LinkedIn como fallback
+        if (!personResult && currentData.linkedin_url) {
+          try {
+            console.log(`🔄 Tentando enriquecer via LinkedIn: ${currentData.linkedin_url}`);
+            personResult = await hunterClient.personEnrichment(currentData.linkedin_url);
+            
+            if (personResult) {
+              console.log(`✅ Pessoa enriquecida via LinkedIn: ${personResult.position || 'N/A'}`);
+            }
+          } catch (error) {
+            console.warn('❌ LinkedIn enrichment também falhou:', error);
+          }
+        }
+        
+        // Aplica os dados se conseguiu enriquecer por qualquer método
+        if (personResult) {
+          enrichedData.job_title = personResult.position || enrichedData.job_title;
+          enrichedData.phone = personResult.phone_number || enrichedData.phone;
+          enrichedData.linkedin_url = personResult.linkedin || enrichedData.linkedin_url;
+          enrichedData.twitter_url = personResult.twitter || enrichedData.twitter_url;
+          enrichedData.seniority = personResult.seniority || enrichedData.seniority;
+          enrichedData.department = personResult.department || enrichedData.department;
+          enrichedData.company = personResult.company || enrichedData.company;
+          totalCredits += CREDIT_COSTS.PERSON_ENRICHMENT;
+          sources.push('person_enrichment');
         }
       }
 

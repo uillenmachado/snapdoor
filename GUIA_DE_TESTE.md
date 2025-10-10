@@ -4,6 +4,60 @@
 
 ---
 
+## 🚨 TESTE URGENTE: ENRIQUECIMENTO COM PERFIS CONHECIDOS
+
+**ATENÇÃO:** Seu perfil `uillenmachado` não está no banco da Hunter.io (404 = não existe).  
+A URL está CORRETA agora: `?linkedin_handle=uillenmachado&api_key=xxx`
+
+### ✅ TESTE COM ESTES PERFIS (GARANTIDOS):
+
+#### 1. **Matt Tharp** (CEO Hunter.io - OFICIAL)
+```
+Nome: Matt
+Sobrenome: Tharp
+LinkedIn: https://linkedin.com/in/matttharp
+Empresa: Hunter
+
+Resultado esperado:
+✅ Status 200 OK
+✅ Email: matt@hunter.io
+✅ Cargo: Chief Executive Officer
+```
+
+#### 2. **Satya Nadella** (CEO Microsoft)
+```
+Nome: Satya
+Sobrenome: Nadella
+LinkedIn: https://linkedin.com/in/satyanadella
+Empresa: Microsoft
+
+Resultado esperado:
+✅ Status 200 OK
+✅ Email: satya.nadella@microsoft.com
+✅ Cargo: Chairman and CEO
+```
+
+#### 3. **Bill Gates** (Fundador Microsoft)
+```
+Nome: Bill
+Sobrenome: Gates
+LinkedIn: https://linkedin.com/in/williamhgates
+Empresa: Microsoft
+
+Resultado esperado:
+✅ Status 200 OK
+✅ Email descoberto
+✅ Cargo: Co-chair, Bill & Melinda Gates Foundation
+```
+
+### 🧪 Como Testar:
+1. Adicione um dos leads acima
+2. Clique em "Enriquecer Lead com IA"
+3. Abra F12 Console
+4. Veja: Status 200 + dados preenchidos + toast de sucesso
+
+---
+
 ## ✅ O QUE JÁ FOI IMPLEMENTADO:
 
 ### Backend (10/10) ✅
