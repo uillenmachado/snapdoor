@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
@@ -17,6 +18,10 @@ import { Loader2, Search, Sparkles, Target, TrendingUp, Settings, Brain, Zap } f
 import { snapDoorAI, ProspectionFilters, ProspectionStatus } from '@/lib/snapDoorAI';
 import { useStages } from '@/hooks/usePipelines';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserCredits } from '@/hooks/useCredits';
+import { InsufficientCreditsDialog } from './InsufficientCreditsDialog';
+import { CreditPurchaseDialog } from './CreditPurchaseDialog';
+import { useToast } from '@/hooks/use-toast';
 
 interface SnapDoorAIDialogProps {
   open: boolean;
@@ -27,11 +32,15 @@ interface SnapDoorAIDialogProps {
 export function SnapDoorAIDialog({ open, onOpenChange, pipelineId }: SnapDoorAIDialogProps) {
   const { user } = useAuth();
   const { data: stages } = useStages(pipelineId);
+  const { data: userCredits } = useUserCredits(user?.id);
+  const { toast } = useToast();
   
   const [activeTab, setActiveTab] = useState('discover');
   const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState<ProspectionStatus | null>(null);
+  const [showInsufficientCredits, setShowInsufficientCredits] = useState(false);
+  const [showPurchaseDialog, setShowPurchaseDialog] = useState(false);
   
   const [filters, setFilters] = useState<ProspectionFilters>({
     industry: '',
@@ -67,7 +76,21 @@ export function SnapDoorAIDialog({ open, onOpenChange, pipelineId }: SnapDoorAID
 
   const handleRunAI = async () => {
     if (!selectedStage) {
-      alert('Selecione um estágio de destino');
+      toast({
+        title: "⚠️ Estágio não selecionado",
+        description: "Selecione um estágio de destino para os leads.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Calcular créditos necessários (5 créditos por lead)
+    const requiredCredits = maxLeads * 5;
+    const currentBalance = userCredits?.credits || 0;
+
+    // Verificar se tem créditos suficientes
+    if (currentBalance < requiredCredits) {
+      setShowInsufficientCredits(true);
       return;
     }
 
@@ -86,6 +109,24 @@ export function SnapDoorAIDialog({ open, onOpenChange, pipelineId }: SnapDoorAID
       setProgress(100);
 
       if (result.success) {
+        // Debitar créditos após sucesso usando a função SQL debit_credits
+        const { error: debitError } = await supabase.rpc('debit_credits', {
+          p_user_id: user!.id,
+          p_credits: requiredCredits,
+          p_operation_type: 'smart_prospection',
+          p_query_params: filters as any,
+          p_result_summary: { leads_found: maxLeads } as any,
+        });
+
+        if (debitError) {
+          console.error('Erro ao debitar créditos:', debitError);
+        }
+
+        toast({
+          title: "✅ Descoberta concluída!",
+          description: `${maxLeads} leads foram adicionados. ${requiredCredits} créditos debitados.`,
+        });
+
         setTimeout(() => {
           setProgress(0);
           setIsRunning(false);
@@ -95,6 +136,11 @@ export function SnapDoorAIDialog({ open, onOpenChange, pipelineId }: SnapDoorAID
       } else {
         setProgress(0);
         setIsRunning(false);
+        toast({
+          title: "❌ Erro na descoberta",
+          description: "Não foi possível completar a descoberta de leads.",
+          variant: "destructive",
+        });
       }
 
     } catch (error) {
@@ -428,6 +474,23 @@ export function SnapDoorAIDialog({ open, onOpenChange, pipelineId }: SnapDoorAID
           </TabsContent>
         </Tabs>
       </DialogContent>
+
+      {/* Dialogs de Créditos */}
+      <InsufficientCreditsDialog
+        open={showInsufficientCredits}
+        onOpenChange={setShowInsufficientCredits}
+        required={maxLeads * 5}
+        current={userCredits?.credits || 0}
+        onPurchase={() => {
+          setShowInsufficientCredits(false);
+          setShowPurchaseDialog(true);
+        }}
+      />
+
+      <CreditPurchaseDialog
+        open={showPurchaseDialog}
+        onOpenChange={setShowPurchaseDialog}
+      />
     </Dialog>
   );
 }
