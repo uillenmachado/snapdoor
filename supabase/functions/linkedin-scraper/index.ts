@@ -69,46 +69,73 @@ serve(async (req) => {
       throw new Error('Erro ao parsear HTML');
     }
 
-    // Extrai dados de meta tags Open Graph
+    // Extrai dados de meta tags Open Graph e outras tags
     const getMetaContent = (property: string): string | null => {
-      const meta = doc.querySelector(`meta[property="${property}"]`);
+      // Tenta property primeiro
+      let meta = doc.querySelector(`meta[property="${property}"]`);
+      if (meta) return meta.getAttribute('content');
+      
+      // Tenta name se property não funcionar
+      meta = doc.querySelector(`meta[name="${property}"]`);
       return meta ? meta.getAttribute('content') : null;
     };
 
-    const ogTitle = getMetaContent('og:title');
-    const ogDescription = getMetaContent('og:description');
-    const ogImage = getMetaContent('og:image');
+    const ogTitle = getMetaContent('og:title') || getMetaContent('title');
+    const ogDescription = getMetaContent('og:description') || getMetaContent('description');
+    const ogImage = getMetaContent('og:image') || getMetaContent('image');
+    
+    // Tenta extrair do <title> se og:title não existir
+    const pageTitle = doc.querySelector('title')?.textContent;
 
-    if (!ogTitle) {
+    const finalTitle = ogTitle || pageTitle || '';
+    
+    if (!finalTitle) {
       return new Response(
         JSON.stringify({ error: 'Não foi possível extrair dados do perfil' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    console.log('📄 Título extraído:', finalTitle);
+    console.log('📝 Descrição extraída:', ogDescription);
+
     // Parse do título: "Nome Completo - Cargo at Empresa | LinkedIn"
-    const name = ogTitle.split(' - ')[0].trim();
+    // ou "Nome Completo | LinkedIn"
+    const titleParts = finalTitle.split(/\s+-\s+|\s+\|\s+/);
+    const name = titleParts[0].trim();
     const nameParts = name.split(' ');
     const firstName = nameParts[0];
     const lastName = nameParts.slice(1).join(' ');
 
     // Parse da descrição: "Cargo at Empresa | Additional info"
-    const headline = ogDescription || '';
+    const headline = ogDescription || (titleParts.length > 1 ? titleParts[1].replace('LinkedIn', '').trim() : '');
     const positionCompany = headline.split('|')[0].trim();
     
-    // Extrai cargo e empresa
+    // Extrai cargo e empresa com múltiplos padrões
     let position: string | undefined;
     let company: string | undefined;
     
-    if (positionCompany.includes(' at ')) {
-      const parts = positionCompany.split(' at ');
-      position = parts[0].trim();
-      company = parts[1].trim();
-    } else if (positionCompany.includes(' | ')) {
-      const parts = positionCompany.split(' | ');
-      position = parts[0].trim();
-      company = parts[1].trim();
-    } else {
+    // Padrões: "at", "|", "-", "em", "na"
+    const patterns = [
+      { regex: /(.+?)\s+at\s+(.+)/i, posIdx: 1, compIdx: 2 },
+      { regex: /(.+?)\s+@\s+(.+)/i, posIdx: 1, compIdx: 2 },
+      { regex: /(.+?)\s+em\s+(.+)/i, posIdx: 1, compIdx: 2 },
+      { regex: /(.+?)\s+na\s+(.+)/i, posIdx: 1, compIdx: 2 },
+      { regex: /(.+?)\s+\|\s+(.+)/i, posIdx: 1, compIdx: 2 },
+      { regex: /(.+?)\s+-\s+(.+)/i, posIdx: 1, compIdx: 2 },
+    ];
+    
+    for (const pattern of patterns) {
+      const match = positionCompany.match(pattern.regex);
+      if (match) {
+        position = match[pattern.posIdx].trim();
+        company = match[pattern.compIdx].trim();
+        break;
+      }
+    }
+    
+    // Se não encontrou padrão, assume que tudo é position
+    if (!position && positionCompany) {
       position = positionCompany;
     }
 
