@@ -157,13 +157,13 @@ class HunterClient {
 
       const params = new URLSearchParams({
         domain,
-        api_key: this.apiKey,
         limit: options.limit?.toString() || '10',
         offset: options.offset?.toString() || '0',
         ...(options.type && { type: options.type }),
         ...(options.seniority && { seniority: options.seniority }),
         ...(options.department && { department: options.department }),
       });
+      params.append('api_key', this.apiKey);
     
       const response = await fetch(`${this.baseUrl}/domain-search?${params}`, {
         method: 'GET',
@@ -198,8 +198,8 @@ class HunterClient {
         domain,
         first_name: firstName,
         last_name: lastName,
-        api_key: this.apiKey,
       });
+      params.append('api_key', this.apiKey);
 
       const response = await fetch(`${this.baseUrl}/email-finder?${params}`, {
         method: 'GET',
@@ -232,8 +232,8 @@ class HunterClient {
 
       const params = new URLSearchParams({
         email,
-        api_key: this.apiKey,
       });
+      params.append('api_key', this.apiKey);
 
       const response = await fetch(`${this.baseUrl}/email-verifier?${params}`, {
         method: 'GET',
@@ -266,8 +266,8 @@ class HunterClient {
 
       const params = new URLSearchParams({
         domain,
-        api_key: this.apiKey,
       });
+      params.append('api_key', this.apiKey);
 
       const response = await fetch(`${this.baseUrl}/companies/find?${params}`, {
         method: 'GET',
@@ -300,9 +300,7 @@ class HunterClient {
       const isLinkedInUrl = emailOrLinkedIn.includes('linkedin.com');
       
       let cacheKey: string;
-      const params = new URLSearchParams({
-        api_key: this.apiKey,
-      });
+      const params = new URLSearchParams();
 
       if (isLinkedInUrl) {
         // Extrai handle do LinkedIn URL
@@ -326,6 +324,9 @@ class HunterClient {
         cacheKey = this.getCacheKey('person-enrichment-linkedin', { handle: emailOrLinkedIn });
         console.log(`🔍 Enriquecendo por LinkedIn handle: ${emailOrLinkedIn}`);
       }
+      
+      // API key sempre por último
+      params.append('api_key', this.apiKey);
 
       const cached = this.getFromCache(cacheKey);
       if (cached) return cached;
@@ -361,8 +362,8 @@ class HunterClient {
 
       const params = new URLSearchParams({
         email,
-        api_key: this.apiKey,
       });
+      params.append('api_key', this.apiKey);
 
       const response = await fetch(`${this.baseUrl}/combined/find?${params}`, {
         method: 'GET',
