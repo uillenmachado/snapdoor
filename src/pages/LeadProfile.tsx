@@ -31,6 +31,7 @@ import {
 import { useEnrichLead } from '@/hooks/useEnrichLead';
 import { useState } from 'react';
 import { AddLeadDialog } from '@/components/AddLeadDialog';
+import { EditableField } from '@/components/EditableField';
 
 // Tipo do database
 type DatabaseLead = {
@@ -45,6 +46,7 @@ type DatabaseLead = {
   linkedin_url: string | null;
   location?: string | null;
   headline?: string | null;
+  about?: string | null;
   education?: string | null;
   connections?: string | null;
   avatar_url?: string | null;
@@ -63,7 +65,7 @@ export default function LeadProfile() {
   const { mutate: enrichLead, isPending: isEnriching } = useEnrichLead();
 
   // Busca dados do lead
-  const { data: lead, isLoading } = useQuery({
+  const { data: lead, isLoading, refetch } = useQuery({
     queryKey: ['lead', id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -283,137 +285,118 @@ export default function LeadProfile() {
 
         {/* Coluna Direita - Detalhes */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Card de Contato */}
+          {/* Card de Contato - Campos Editáveis */}
           <Card>
             <CardHeader>
               <CardTitle>Informações de Contato</CardTitle>
-              <CardDescription>Dados de contato e comunicação</CardDescription>
+              <CardDescription>Clique no ícone de lápis para editar</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Mail className="w-4 h-4" />
-                    <span>Email</span>
-                  </div>
-                  <p className="font-medium">
-                    {lead.email || (
-                      <span className="text-muted-foreground italic">Não informado</span>
-                    )}
-                  </p>
-                </div>
-
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Phone className="w-4 h-4" />
-                    <span>Telefone</span>
-                  </div>
-                  <p className="font-medium">
-                    {lead.phone || (
-                      <span className="text-muted-foreground italic">Não informado</span>
-                    )}
-                  </p>
-                </div>
-
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Linkedin className="w-4 h-4" />
-                    <span>LinkedIn</span>
-                  </div>
-                  {lead.linkedin_url ? (
-                    <a
-                      href={lead.linkedin_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-medium text-primary hover:underline inline-flex items-center gap-1"
-                    >
-                      Ver perfil
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
-                  ) : (
-                    <p className="text-muted-foreground italic">Não informado</p>
-                  )}
-                </div>
-
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <MapPin className="w-4 h-4" />
-                    <span>Localização</span>
-                  </div>
-                  <p className="font-medium">
-                    {lead.location || (
-                      <span className="text-muted-foreground italic">Não informado</span>
-                    )}
-                  </p>
-                </div>
-              </div>
+              <EditableField
+                leadId={lead.id}
+                fieldName="email"
+                value={lead.email}
+                label="Email"
+                icon={<Mail className="w-4 h-4 text-muted-foreground" />}
+                type="email"
+                onUpdate={() => refetch()}
+              />
+              
+              <EditableField
+                leadId={lead.id}
+                fieldName="phone"
+                value={lead.phone}
+                label="Telefone"
+                icon={<Phone className="w-4 h-4 text-muted-foreground" />}
+                type="tel"
+                onUpdate={() => refetch()}
+              />
+              
+              <EditableField
+                leadId={lead.id}
+                fieldName="linkedin_url"
+                value={lead.linkedin_url}
+                label="LinkedIn URL"
+                icon={<Linkedin className="w-4 h-4 text-muted-foreground" />}
+                type="url"
+                onUpdate={() => refetch()}
+              />
+              
+              <EditableField
+                leadId={lead.id}
+                fieldName="location"
+                value={lead.location}
+                label="Localização"
+                icon={<MapPin className="w-4 h-4 text-muted-foreground" />}
+                onUpdate={() => refetch()}
+              />
             </CardContent>
           </Card>
 
-          {/* Card Profissional */}
+          {/* Card Profissional - Campos Editáveis */}
           <Card>
             <CardHeader>
               <CardTitle>Informações Profissionais</CardTitle>
               <CardDescription>Cargo, empresa e experiência</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Briefcase className="w-4 h-4" />
-                    <span>Cargo</span>
-                  </div>
-                  <p className="font-medium">
-                    {lead.job_title || (
-                      <span className="text-muted-foreground italic">Não informado</span>
-                    )}
-                  </p>
-                </div>
-
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Building2 className="w-4 h-4" />
-                    <span>Empresa</span>
-                  </div>
-                  <p className="font-medium">
-                    {lead.company || (
-                      <span className="text-muted-foreground italic">Não informado</span>
-                    )}
-                  </p>
-                </div>
-
-                {lead.seniority && (
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Users className="w-4 h-4" />
-                      <span>Senioridade</span>
-                    </div>
-                    <p className="font-medium">{lead.seniority}</p>
-                  </div>
-                )}
-
-                {lead.department && (
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Building2 className="w-4 h-4" />
-                      <span>Departamento</span>
-                    </div>
-                    <p className="font-medium">{lead.department}</p>
-                  </div>
-                )}
-              </div>
-
-              {lead.headline && (
-                <div className="space-y-1 pt-2">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Sparkles className="w-4 h-4" />
-                    <span>Sobre</span>
-                  </div>
-                  <p className="text-sm leading-relaxed">
-                    {lead.headline}
-                  </p>
-                </div>
-              )}
+              <EditableField
+                leadId={lead.id}
+                fieldName="job_title"
+                value={lead.job_title}
+                label="Cargo"
+                icon={<Briefcase className="w-4 h-4 text-muted-foreground" />}
+                onUpdate={() => refetch()}
+              />
+              
+              <EditableField
+                leadId={lead.id}
+                fieldName="company"
+                value={lead.company}
+                label="Empresa"
+                icon={<Building2 className="w-4 h-4 text-muted-foreground" />}
+                onUpdate={() => refetch()}
+              />
+              
+              <EditableField
+                leadId={lead.id}
+                fieldName="seniority"
+                value={lead.seniority}
+                label="Senioridade"
+                icon={<Users className="w-4 h-4 text-muted-foreground" />}
+                onUpdate={() => refetch()}
+              />
+              
+              <EditableField
+                leadId={lead.id}
+                fieldName="department"
+                value={lead.department}
+                label="Departamento"
+                icon={<Building2 className="w-4 h-4 text-muted-foreground" />}
+                onUpdate={() => refetch()}
+              />
+              
+              <Separator />
+              
+              <EditableField
+                leadId={lead.id}
+                fieldName="headline"
+                value={lead.headline}
+                label="Headline (Resumo do Cargo)"
+                icon={<Sparkles className="w-4 h-4 text-muted-foreground" />}
+                type="textarea"
+                onUpdate={() => refetch()}
+              />
+              
+              <EditableField
+                leadId={lead.id}
+                fieldName="about"
+                value={lead.about}
+                label="Sobre (Bio Completa)"
+                icon={<MessageSquare className="w-4 h-4 text-muted-foreground" />}
+                type="textarea"
+                onUpdate={() => refetch()}
+              />
             </CardContent>
           </Card>
 

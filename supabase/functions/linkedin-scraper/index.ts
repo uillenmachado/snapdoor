@@ -157,19 +157,32 @@ serve(async (req) => {
       const titlePosition = titleParts[1].replace('LinkedIn', '').replace('|', '').trim();
       if (titlePosition) {
         // Parse "Cargo at Empresa"
-        const posCompMatch = titlePosition.match(/(.+?)\s+at\s+(.+)/i);
+        const posCompMatch = titlePosition.match(/(.+?)\s+(?:at|na|em)\s+(.+)/i);
         if (posCompMatch) {
           position = posCompMatch[1].trim();
-          if (!company) {
+          // Só sobrescreve company se não foi extraído da Experience
+          if (!company || company === posCompMatch[2].trim()) {
             company = posCompMatch[2].trim();
           }
         } else {
+          // Se não tem "at", é só o cargo
           position = titlePosition;
         }
       }
     }
 
-    // Se não encontrou position, usa about como headline
+    // Se não encontrou position no título, tenta usar company da Experience como position
+    // (caso LinkedIn tenha colocado a empresa no lugar do cargo)
+    if (!position && company) {
+      // Verifica se company parece ser um cargo (contém palavras-chave)
+      const jobKeywords = /manager|specialist|director|engineer|developer|analyst|coordinator|lead|head|officer|designer|consultant|executive/i;
+      if (jobKeywords.test(company)) {
+        position = company;
+        company = undefined;
+      }
+    }
+
+    // Se não encontrou position, usa about como headline (mas NÃO como position)
     const headline = position || about || '';
 
     console.log('✅ Dados parseados:', {
@@ -212,7 +225,7 @@ serve(async (req) => {
     
     return new Response(
       JSON.stringify({ 
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Erro desconhecido',
         success: false 
       }),
       { 
