@@ -1,9 +1,11 @@
 // =====================================================
 // LEAD ENRICHMENT SERVICE
 // Enriquece leads com informações da API Hunter.io
+// + Fallback com LinkedIn Scraper para perfis públicos
 // =====================================================
 
 import { hunterClient, CREDIT_COSTS } from './hunterClient';
+import { linkedInScraperService } from './linkedinScraperService';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface EnrichmentResult {
@@ -132,21 +134,44 @@ class LeadEnrichmentService {
           }
         }
         
-        // Se falhou com email, tenta com LinkedIn como fallback
+        // Se falhou com email, tenta com LinkedIn via Hunter.io
         if (!personResult && currentData.linkedin_url) {
           try {
-            console.log(`🔄 Tentando enriquecer via LinkedIn: ${currentData.linkedin_url}`);
+            console.log(`🔄 Tentando enriquecer via LinkedIn (Hunter.io): ${currentData.linkedin_url}`);
             personResult = await hunterClient.personEnrichment(currentData.linkedin_url);
             
             if (personResult) {
-              console.log(`✅ Pessoa enriquecida via LinkedIn: ${personResult.position || 'N/A'}`);
+              console.log(`✅ Pessoa enriquecida via LinkedIn (Hunter.io): ${personResult.position || 'N/A'}`);
             }
           } catch (error) {
-            console.warn('❌ LinkedIn enrichment também falhou:', error);
+            console.warn('❌ LinkedIn enrichment (Hunter.io) também falhou:', error);
           }
         }
         
-        // Aplica os dados se conseguiu enriquecer por qualquer método
+        // ÚLTIMO FALLBACK: Se Hunter.io falhou completamente, extrai dados públicos do LinkedIn
+        if (!personResult && currentData.linkedin_url) {
+          try {
+            console.log(`🌐 FALLBACK: Extraindo dados públicos do LinkedIn: ${currentData.linkedin_url}`);
+            const linkedInData = await linkedInScraperService.extractProfileData(currentData.linkedin_url);
+            
+            if (linkedInData) {
+              // Preenche com dados extraídos do perfil público
+              enrichedData.first_name = linkedInData.firstName || enrichedData.first_name;
+              enrichedData.last_name = linkedInData.lastName || enrichedData.last_name;
+              enrichedData.job_title = linkedInData.position || enrichedData.job_title;
+              enrichedData.company = linkedInData.company || enrichedData.company;
+              enrichedData.linkedin_url = linkedInData.profileUrl;
+              
+              // NÃO cobra créditos pois é scraping público
+              sources.push('linkedin_scraper');
+              console.log(`✅ Dados extraídos do perfil público do LinkedIn: ${linkedInData.fullName} - ${linkedInData.headline}`);
+            }
+          } catch (error) {
+            console.warn('❌ LinkedIn scraper também falhou:', error);
+          }
+        }
+        
+        // Aplica os dados se conseguiu enriquecer por qualquer método (Hunter.io)
         if (personResult) {
           enrichedData.job_title = personResult.position || enrichedData.job_title;
           enrichedData.phone = personResult.phone_number || enrichedData.phone;
