@@ -167,7 +167,6 @@ class HunterClient {
     
       const response = await fetch(`${this.baseUrl}/domain-search?${params}`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) {
@@ -204,7 +203,6 @@ class HunterClient {
 
       const response = await fetch(`${this.baseUrl}/email-finder?${params}`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) {
@@ -239,7 +237,6 @@ class HunterClient {
 
       const response = await fetch(`${this.baseUrl}/email-verifier?${params}`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) {
@@ -274,7 +271,6 @@ class HunterClient {
 
       const response = await fetch(`${this.baseUrl}/companies/find?${params}`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) {
@@ -336,7 +332,6 @@ class HunterClient {
 
       const response = await fetch(`${this.baseUrl}/people/find?${params}`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) {
@@ -371,7 +366,6 @@ class HunterClient {
 
       const response = await fetch(`${this.baseUrl}/combined/find?${params}`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) {
