@@ -63,19 +63,34 @@ class LeadEnrichmentService {
       let confidence = 0;
       const sources: string[] = [];
 
+      // Se não temos company_domain mas temos company, tenta extrair
+      let workingDomain = currentData.company_domain;
+      if (!workingDomain && currentData.company) {
+        workingDomain = this.extractDomainFromCompany(currentData.company);
+        console.log(`🔍 Domínio extraído da empresa "${currentData.company}": ${workingDomain}`);
+      }
+
+      console.log(`📊 Dados disponíveis para enriquecimento:`, {
+        first_name: !!currentData.first_name,
+        last_name: !!currentData.last_name,
+        email: !!currentData.email,
+        company: !!currentData.company,
+        company_domain: !!workingDomain,
+      });
+
       // 1. Se temos nome + empresa, mas não temos email - tenta encontrar email
       if (
         options.findEmail &&
         currentData.first_name &&
         currentData.last_name &&
-        currentData.company_domain &&
+        workingDomain &&
         !currentData.email
       ) {
         try {
-          console.log(`🔍 Buscando email para ${currentData.first_name} ${currentData.last_name} @ ${currentData.company_domain}`);
+          console.log(`🔍 Buscando email para ${currentData.first_name} ${currentData.last_name} @ ${workingDomain}`);
           
           const emailResult = await hunterClient.emailFinder(
-            currentData.company_domain,
+            workingDomain,
             currentData.first_name,
             currentData.last_name
           );
@@ -122,11 +137,11 @@ class LeadEnrichmentService {
       }
 
       // 3. Se temos domínio da empresa - enriquece informações da empresa
-      if (options.enrichCompany && currentData.company_domain) {
+      if (options.enrichCompany && workingDomain) {
         try {
-          console.log(`🔍 Enriquecendo informações da empresa: ${currentData.company_domain}`);
+          console.log(`🔍 Enriquecendo informações da empresa: ${workingDomain}`);
           
-          const companyResult = await hunterClient.companyEnrichment(currentData.company_domain);
+          const companyResult = await hunterClient.companyEnrichment(workingDomain);
 
           if (companyResult) {
             enrichedData.company = companyResult.name || enrichedData.company;
@@ -173,11 +188,26 @@ class LeadEnrichmentService {
 
       // Se não encontramos nada novo
       if (Object.keys(enrichedData).length === 0) {
+        // Fornece feedback sobre o que está faltando
+        const missingInfo: string[] = [];
+        
+        if (!currentData.email && (!currentData.first_name || !currentData.last_name || !workingDomain)) {
+          missingInfo.push('Para buscar email: primeiro nome + sobrenome + empresa');
+        }
+        if (!currentData.email) {
+          missingInfo.push('Para enriquecer pessoa: email');
+        }
+        if (!workingDomain && !currentData.company) {
+          missingInfo.push('Para enriquecer empresa: nome da empresa ou domínio');
+        }
+        
+        console.warn('❌ Enriquecimento não possível. Faltam:', missingInfo);
+        
         return {
           success: false,
           creditsUsed: 0,
           enrichedData: {},
-          source: 'none',
+          source: 'insufficient_data',
           confidence: 0,
         };
       }
@@ -268,22 +298,64 @@ class LeadEnrichmentService {
 
   /**
    * Extrai domínio de um nome de empresa
+   * Exemplos:
+   * "Microsoft Corporation" → "microsoft.com"
+   * "Google LLC" → "google.com"
+   * "Stripe Inc." → "stripe.com"
+   * "Nubank S.A." → "nubank.com.br"
    */
   extractDomainFromCompany(company: string): string | null {
     try {
+      if (!company || company.trim().length === 0) return null;
+      
       // Remove espaços e converte para lowercase
-      const cleaned = company.trim().toLowerCase();
+      let cleaned = company.trim().toLowerCase();
       
-      // Remove palavras comuns
-      const cleaned2 = cleaned
-        .replace(/\s+(ltda|ltd|inc|corp|corporation|company|co|sa|s\.a\.|me|llc)\.?$/i, '')
-        .trim();
+      // Remove palavras comuns de sufixo corporativo
+      const corporateSuffixes = [
+        'ltda', 'ltd', 'limited',
+        'inc', 'incorporated',
+        'corp', 'corporation',
+        'company', 'co',
+        'sa', 's.a.', 's/a',
+        'me', 'mei',
+        'llc', 'l.l.c.',
+        'eireli',
+        'group', 'grupo',
+        'holding',
+        'internacional', 'international',
+        'brasil', 'brazil',
+      ];
       
-      // Substitui espaços por hífens
-      const domain = cleaned2.replace(/\s+/g, '-');
+      // Regex para remover sufixos (com ou sem pontos)
+      const suffixPattern = new RegExp(
+        `\\s+(${corporateSuffixes.join('|')})(\\.)?$`,
+        'gi'
+      );
+      cleaned = cleaned.replace(suffixPattern, '').trim();
       
-      // Adiciona .com se não tiver extensão
-      return domain.includes('.') ? domain : `${domain}.com`;
+      // Remove caracteres especiais exceto letras, números e hífens
+      cleaned = cleaned.replace(/[^a-z0-9\s-]/g, '');
+      
+      // Substitui múltiplos espaços por um único hífen
+      cleaned = cleaned.replace(/\s+/g, '-');
+      
+      // Remove hífens consecutivos
+      cleaned = cleaned.replace(/-+/g, '-');
+      
+      // Remove hífens no início e fim
+      cleaned = cleaned.replace(/^-+|-+$/g, '');
+      
+      if (cleaned.length === 0) return null;
+      
+      // Para empresas brasileiras conhecidas, adiciona .com.br
+      const brazilianCompanies = ['nubank', 'bradesco', 'itau', 'santander', 'caixa', 'bb', 'magazine-luiza', 'magalu'];
+      if (brazilianCompanies.some(br => cleaned.includes(br))) {
+        return cleaned.includes('.') ? cleaned : `${cleaned}.com.br`;
+      }
+      
+      // Para outras, adiciona .com
+      return cleaned.includes('.') ? cleaned : `${cleaned}.com`;
     } catch (error) {
       console.error('Erro ao extrair domínio:', error);
       return null;

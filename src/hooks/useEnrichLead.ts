@@ -129,9 +129,13 @@ export function useEnrichLead() {
           duration: 6000,
         });
       } else if (error.message.includes('Não foi possível enriquecer')) {
-        toast.warning('Enriquecimento Limitado', {
-          description: 'Não há informações adicionais disponíveis para este lead no momento.',
-          duration: 5000,
+        toast.warning('Dados Insuficientes para Enriquecimento', {
+          description: (
+            'Para enriquecer este lead, você precisa de:\n' +
+            '• Nome completo + Empresa (para buscar email)\n' +
+            '• OU Email válido (para buscar dados da pessoa e empresa)'
+          ),
+          duration: 8000,
         });
       } else {
         toast.error('Erro ao Enriquecer Lead', {
