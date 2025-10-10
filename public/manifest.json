@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Snapdoor CRM - LinkedIn Lead Capture",
+  "description": "Capture leads do LinkedIn e adicione ao seu pipeline Snapdoor com um clique",
+  "version": "1.0.0",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://www.linkedin.com/*"
+  ],
+  "action": {
+    "default_popup": "extension/popup.html",
+    "default_icon": {
+      "16": "extension/icon-16.png",
+      "48": "extension/icon-48.png",
+      "128": "extension/icon-128.png"
+    }
+  },
+  "options_page": "extension/setup.html",
+  "content_scripts": [
+    {
+      "matches": ["https://www.linkedin.com/*"],
+      "js": ["extension/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "extension/icon-16.png",
+    "48": "extension/icon-48.png",
+    "128": "extension/icon-128.png"
+  }
+}

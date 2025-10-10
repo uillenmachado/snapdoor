@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Snapdoor CRM - Transforme Leads do LinkedIn em Clientes</title>
+    <meta name="description" content="CRM especializado em capturar leads do LinkedIn. Pipeline visual Kanban, integração nativa e gestão completa de vendas." />
+    <meta name="author" content="Snapdoor CRM" />
+    <meta name="theme-color" content="#00A86B" />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/pwa-manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Snapdoor" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/placeholder.svg" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Snapdoor - CRM para LinkedIn" />
+    <meta property="og:description" content="CRM especializado em capturar leads do LinkedIn. Pipeline visual, integração nativa e gestão completa de vendas." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/placeholder.svg" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@snapdoor" />
+    <meta name="twitter:image" content="/placeholder.svg" />
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered:', registration);
+            })
+            .catch((error) => {
+              console.log('SW registration failed:', error);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>

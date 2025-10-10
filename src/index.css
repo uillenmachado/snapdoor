@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 0 0% 98%;
+    --foreground: 210 11% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 11% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 11% 15%;
+
+    /* Snapdoor Green */
+    --primary: 157 100% 33%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Snapdoor Purple for CTAs */
+    --secondary: 257 82% 61%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 157 76% 91%;
+    --accent-foreground: 157 100% 33%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 157 100% 33%;
+
+    --radius: 0.5rem;
+
+    /* Snapdoor Sidebar Dark */
+    --sidebar-background: 210 11% 10%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 157 100% 33%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 11% 15%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 210 11% 20%;
+    --sidebar-ring: 157 100% 33%;
+
+    /* Custom Snapdoor Colors */
+    --snapdoor-green-light: 157 76% 91%;
+    --snapdoor-purple: 257 82% 61%;
+    --snapdoor-gray: 210 11% 96%;
+    --snapdoor-dark: 210 11% 10%;
+  }
+
+  .dark {
+    --background: 210 11% 10%;
+    --foreground: 0 0% 98%;
+
+    --card: 210 11% 15%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 210 11% 15%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 157 100% 33%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 257 82% 61%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 210 11% 20%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 210 11% 20%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 210 11% 20%;
+    --input: 210 11% 20%;
+    --ring: 157 100% 33%;
+    
+    --sidebar-background: 210 11% 10%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 157 100% 33%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 11% 15%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 210 11% 20%;
+    --sidebar-ring: 157 100% 33%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}

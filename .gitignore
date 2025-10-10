@@ -1,0 +1,255 @@
+# ========================================
+# SNAPDOOR CRM - .gitignore
+# ========================================
+
+# ========================================
+# Environment Variables (NEVER COMMIT!)
+# ========================================
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+.env.*.local
+*.env
+**/node_modules/**/.env
+
+# ========================================
+# Node.js Dependencies
+# ========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.pnpm-store/
+.yarn/
+
+# ========================================
+# Build Output
+# ========================================
+dist/
+dist-ssr/
+build/
+out/
+.next/
+.nuxt/
+.vite/
+.cache/
+.parcel-cache/
+.turbo/
+
+# ========================================
+# Logs
+# ========================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ========================================
+# Editor and IDE
+# ========================================
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+*~
+.project
+.settings/
+.classpath
+
+# ========================================
+# OS Files
+# ========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ========================================
+# Testing
+# ========================================
+coverage/
+*.coveragerc
+.nyc_output/
+.jest/
+test-results/
+playwright-report/
+e2e-results/
+
+# ========================================
+# Temporary Files
+# ========================================
+*.local
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+*.diff
+*.patch
+*.swp
+*.swo
+*.swn
+*~
+.#*
+\#*#
+.\#*
+
+# ========================================
+# Database
+# ========================================
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# ========================================
+# Supabase
+# ========================================
+.supabase/
+supabase/.env
+supabase/.env.local
+
+# ========================================
+# Secrets & Sensitive Data (CRITICAL!)
+# ========================================
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+secrets/
+secret/
+private/
+.secrets/
+credentials/
+.credentials/
+*.env
+.env*
+config/secrets.json
+config/production.json
+
+# ========================================
+# Dependencies Lock Files (Optional)
+# ========================================
+# Uncomment if you want to ignore lock files
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+# bun.lockb
+
+# ========================================
+# Misc
+# ========================================
+.history/
+.vscode-test/
+.eslintcache
+.stylelintcache
+.prettiercache
+*.tsbuildinfo
+*.tgz
+
+# ========================================
+# macOS
+# ========================================
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# ========================================
+# Windows
+# ========================================
+$RECYCLE.BIN/
+Desktop.ini
+ehthumbs.db
+[Tt]humbs.db
+*.stackdump
+
+# ========================================
+# Linux
+# ========================================
+*~
+.directory
+.Trash-*
+.nfs*
+
+# ========================================
+# Python (if using Python scripts)
+# ========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+
+# ========================================
+# Stripe & Payment (NEVER COMMIT!)
+# ========================================
+stripe-cli/
+.stripe/
+stripe_*.json
+payment_secrets.json
+
+# ========================================
+# Hunter.io & API Keys (NEVER COMMIT!)
+# ========================================
+hunter_api_key.txt
+api_keys.json
+*.apikey
+
+# ========================================
+# Custom Project Files
+# ========================================
+# Add your custom ignore patterns here
+TODO.md
+NOTES.md
+PRIVATE.md
