@@ -162,9 +162,11 @@ export function AppSidebar() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Badge className={`${badgeColor} border-none mt-2 text-xs cursor-help`}>
-                  {isDevAccount ? "🚀 Acesso Total" : balance > 100 ? "✅ Saldo bom" : balance > 50 ? "⚠️ Saldo médio" : "🔴 Saldo baixo"}
-                </Badge>
+                <div className="w-fit">
+                  <Badge className={`${badgeColor} border-none mt-2 text-xs cursor-help`}>
+                    {isDevAccount ? "🚀 Acesso Total" : balance > 100 ? "✅ Saldo bom" : balance > 50 ? "⚠️ Saldo médio" : "🔴 Saldo baixo"}
+                  </Badge>
+                </div>
               </TooltipTrigger>
               <TooltipContent>
                 <p>{tooltip}</p>
