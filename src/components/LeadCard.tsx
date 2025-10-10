@@ -128,6 +128,38 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
   const handleEnrichLead = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
+    // Verifica se tem dados suficientes
+    const hasName = !!(lead.first_name && lead.last_name);
+    const hasCompany = !!lead.company;
+    const hasEmail = !!lead.email;
+    const hasLinkedIn = !!lead.linkedin_url;
+
+    let canEnrich = false;
+    let message = "";
+
+    if (hasLinkedIn) {
+      canEnrich = true;
+      message = `🚀 Enriquecendo via LinkedIn - a melhor fonte de dados!`;
+    } else if (hasEmail) {
+      canEnrich = true;
+      message = `📧 Enriquecendo via Email - buscando dados completos...`;
+    } else if (hasName && hasCompany) {
+      canEnrich = true;
+      message = `🔍 Buscando email profissional de ${lead.first_name} na ${lead.company}...`;
+    } else {
+      // Dados insuficientes
+      const missing = [];
+      if (!hasName) missing.push("Nome Completo");
+      if (!hasCompany && !hasEmail && !hasLinkedIn) missing.push("Empresa/Email/LinkedIn");
+      
+      toast.error("Dados Insuficientes", {
+        description: `Para enriquecer, adicione: ${missing.join(" + ")}. Clique no card e depois em Editar.`,
+      });
+      return;
+    }
+
+    toast.info(message);
+    
     // Extrai domínio do email se disponível
     const extractDomain = (email: string): string | undefined => {
       const match = email.match(/@([^@]+)$/);

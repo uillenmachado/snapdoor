@@ -122,7 +122,75 @@ export function LeadDetails({ lead, isOpen, onClose, userId }: LeadDetailsProps)
     }
   };
 
+  // Verifica o que é possível enriquecer
+  const getEnrichmentStatus = () => {
+    const hasName = !!(lead.first_name && lead.last_name);
+    const hasCompany = !!lead.company;
+    const hasEmail = !!lead.email;
+    const hasLinkedIn = !!lead.linkedin_url;
+
+    // Cenário 1: Nome + Empresa (pode buscar email)
+    if (hasName && hasCompany && !hasEmail && !hasLinkedIn) {
+      return {
+        canEnrich: true,
+        method: "name_company",
+        title: "✅ Pronto para buscar Email!",
+        description: `Temos Nome Completo + Empresa. Vamos buscar o email profissional de ${lead.first_name}.`,
+        credits: 3,
+      };
+    }
+
+    // Cenário 2: Email (pode enriquecer tudo)
+    if (hasEmail) {
+      return {
+        canEnrich: true,
+        method: "email",
+        title: "✅ Pronto para Enriquecer!",
+        description: "Com o email, vamos descobrir cargo, empresa, telefone e redes sociais.",
+        credits: hasCompany ? 7 : 5,
+      };
+    }
+
+    // Cenário 3: LinkedIn (melhor opção)
+    if (hasLinkedIn) {
+      return {
+        canEnrich: true,
+        method: "linkedin",
+        title: "✅ LinkedIn Detectado - Melhor Opção!",
+        description: "Com LinkedIn, vamos descobrir dados completos e atualizados do perfil.",
+        credits: 2,
+      };
+    }
+
+    // Cenário 4: Dados insuficientes
+    const missing = [];
+    if (!hasName) missing.push("Nome Completo");
+    if (!hasCompany && !hasEmail && !hasLinkedIn) missing.push("Empresa OU Email OU LinkedIn");
+
+    return {
+      canEnrich: false,
+      method: "insufficient",
+      title: "❌ Dados Insuficientes",
+      description: `Faltam: ${missing.join(" e ")}`,
+      suggestions: [
+        { icon: "✏️", text: "Clique em 'Editar' e adicione Nome + Empresa", priority: !hasName || !hasCompany },
+        { icon: "📧", text: "OU adicione o Email profissional", priority: !hasEmail },
+        { icon: "💼", text: "OU adicione o LinkedIn (melhor opção!)", priority: !hasLinkedIn },
+      ],
+      credits: 0,
+    };
+  };
+
   const handleEnrichLead = async () => {
+    const status = getEnrichmentStatus();
+    
+    if (!status.canEnrich) {
+      toast.error(status.title, {
+        description: status.description,
+      });
+      return;
+    }
+
     // Extrai domínio do email
     const extractDomain = (email: string): string | undefined => {
       const match = email.match(/@([^@]+)$/);
@@ -211,46 +279,78 @@ export function LeadDetails({ lead, isOpen, onClose, userId }: LeadDetailsProps)
         </SheetHeader>
 
         <div className="mt-6 space-y-6">
-          {/* Alertas de Dados Faltando + Enriquecimento */}
-          {missingFields.length > 0 && (
-            <Card className="border-orange-200 bg-orange-50/50">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2 text-orange-700">
-                  <AlertCircle className="h-5 w-5" />
-                  Informações Incompletas
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex flex-wrap gap-2">
-                  {missingFields.map((field) => (
-                    <Badge key={field} variant="outline" className="text-orange-700 border-orange-300">
-                      {field}
-                    </Badge>
-                  ))}
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Use o botão abaixo para enriquecer automaticamente este lead com dados da nossa API.
-                </p>
-                <Button
-                  onClick={handleEnrichLead}
-                  disabled={enrichLeadMutation.isPending}
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                >
-                  {enrichLeadMutation.isPending ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Enriquecendo...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      Enriquecer Lead com IA
-                    </>
+          {/* Missing Info Card */}
+          {missingFields.length > 0 && (() => {
+            const enrichStatus = getEnrichmentStatus();
+            const cardColor = enrichStatus.canEnrich ? "green" : "orange";
+            
+            return (
+              <Card className={`border-${cardColor}-200 bg-${cardColor}-50`}>
+                <CardHeader>
+                  <CardTitle className={`text-base flex items-center gap-2 text-${cardColor}-800`}>
+                    <AlertCircle className="h-4 w-4" />
+                    {enrichStatus.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {/* Campos faltando */}
+                  <div className="flex flex-wrap gap-2">
+                    {missingFields.map((field) => (
+                      <Badge key={field} variant="outline" className={`text-${cardColor}-700 border-${cardColor}-300`}>
+                        {field}
+                      </Badge>
+                    ))}
+                  </div>
+
+                  {/* Descrição do status */}
+                  <div className={`text-sm p-3 rounded-md ${enrichStatus.canEnrich ? 'bg-green-100 text-green-900' : 'bg-orange-100 text-orange-900'}`}>
+                    <p className="font-medium">{enrichStatus.description}</p>
+                    {enrichStatus.canEnrich && (
+                      <p className="text-xs mt-1 opacity-80">
+                        💎 Custo estimado: {enrichStatus.credits} créditos
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Sugestões (se dados insuficientes) */}
+                  {!enrichStatus.canEnrich && enrichStatus.suggestions && (
+                    <div className="space-y-2 mt-3">
+                      <p className="text-xs font-semibold text-orange-900 uppercase">
+                        Como obter dados:
+                      </p>
+                      {enrichStatus.suggestions
+                        .sort((a, b) => (b.priority ? 1 : 0) - (a.priority ? 1 : 0))
+                        .map((suggestion, idx) => (
+                          <div key={idx} className="flex items-start gap-2 text-sm text-orange-800">
+                            <span className="text-base">{suggestion.icon}</span>
+                            <span>{suggestion.text}</span>
+                          </div>
+                        ))}
+                    </div>
                   )}
-                </Button>
-              </CardContent>
-            </Card>
-          )}
+
+                  {/* Botão de enriquecimento */}
+                  <Button
+                    onClick={handleEnrichLead}
+                    disabled={enrichLeadMutation.isPending || !enrichStatus.canEnrich}
+                    className={`w-full ${enrichStatus.canEnrich ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-400'}`}
+                  >
+                    {enrichLeadMutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Enriquecendo...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        {enrichStatus.canEnrich ? 'Enriquecer Lead com IA' : 'Adicione Mais Dados Primeiro'}
+                      </>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })()}
 
           {/* Contact Info */}
           <Card>
