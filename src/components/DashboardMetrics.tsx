@@ -27,8 +27,13 @@ export const DashboardMetrics = ({ leads, stages }: DashboardMetricsProps) => {
     const leadsInLastStage = leads.filter(lead => lead.stage_id === lastStageId).length;
     const conversionRate = totalLeads > 0 ? ((leadsInLastStage / totalLeads) * 100).toFixed(1) : 0;
     
-    // Calculate estimated revenue (R$500 per lead in final stages)
-    const estimatedRevenue = leadsInLastStage * 500;
+    // Calculate REAL revenue from leads with revenue values (not estimated)
+    const totalRevenue = leads.reduce((sum, lead) => {
+      return sum + (lead.revenue || 0);
+    }, 0);
+    
+    // Count leads with revenue (won deals)
+    const leadsWithRevenue = leads.filter(lead => lead.revenue && lead.revenue > 0).length;
     
     // Calculate activity rate (leads with recent activity)
     const recentLeads = leads.filter(lead => {
@@ -43,7 +48,8 @@ export const DashboardMetrics = ({ leads, stages }: DashboardMetricsProps) => {
       totalLeads,
       activeLeads,
       conversionRate,
-      estimatedRevenue,
+      totalRevenue,
+      leadsWithRevenue,
       activityRate,
       recentLeads
     };
@@ -71,9 +77,11 @@ export const DashboardMetrics = ({ leads, stages }: DashboardMetricsProps) => {
       trendUp: true
     },
     {
-      title: "Receita Estimada",
-      value: `R$ ${(metrics.estimatedRevenue / 1000).toFixed(1)}k`,
-      subtitle: "Este mês",
+      title: "Receita Total",
+      value: metrics.totalRevenue >= 1000 
+        ? `R$ ${(metrics.totalRevenue / 1000).toFixed(1)}k`
+        : `R$ ${metrics.totalRevenue.toFixed(0)}`,
+      subtitle: `${metrics.leadsWithRevenue} negócios fechados`,
       icon: DollarSign,
       color: "text-purple-600",
       bgColor: "bg-purple-50 dark:bg-purple-950/20",

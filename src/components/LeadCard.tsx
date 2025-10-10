@@ -21,7 +21,8 @@ import {
   Wind,
   Clock,
   Sparkles,
-  Eye
+  Eye,
+  DollarSign
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -454,6 +455,14 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
                   <span className="truncate">{lead.education}</span>
                 </div>
               )}
+            </div>
+          )}
+          
+          {/* Revenue (Deal Value) - campo importante para relatórios */}
+          {lead.revenue && lead.revenue > 0 && (
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/20 px-2 py-1 rounded-md">
+              <DollarSign className="h-3.5 w-3.5" />
+              <span>R$ {lead.revenue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
           )}
           
