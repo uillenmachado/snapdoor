@@ -39,6 +39,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useAuth } from "@/hooks/useAuth";
 import { useUserCredits } from "@/hooks/useCredits";
 import { CreditPurchaseDialog } from "./CreditPurchaseDialog";
+import { getAccountStatus } from "@/lib/devAccount";
 
 const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
@@ -54,8 +55,9 @@ export function AppSidebar() {
   const { data: credits } = useUserCredits(user?.id);
   const [showPurchaseDialog, setShowPurchaseDialog] = useState(false);
 
-  const balance = credits?.credits || 0;
-  const badgeColor = balance > 100 ? "bg-green-500" : balance > 50 ? "bg-yellow-500" : "bg-red-500";
+  // Get account status (dev or regular)
+  const accountStatus = getAccountStatus(credits?.credits, user);
+  const { credits: balance, creditsDisplay, badgeColor, tooltip, isDevAccount } = accountStatus;
 
   return (
     <Sidebar className="border-r border-sidebar-border">
@@ -117,37 +119,58 @@ export function AppSidebar() {
 
       <SidebarFooter className="border-t border-sidebar-border p-4 space-y-3">
         {/* Indicador de Créditos */}
-        <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-200 dark:border-purple-800 rounded-lg p-3">
+        <div className={`rounded-lg p-3 border ${
+          isDevAccount 
+            ? "bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-200 dark:border-purple-800" 
+            : "bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-200 dark:border-purple-800"
+        }`}>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <Coins className="w-4 h-4 text-purple-600" />
-              <span className="text-sm font-medium text-sidebar-foreground">Meus Créditos</span>
+              <span className="text-sm font-medium text-sidebar-foreground">
+                {isDevAccount ? "Dev Account" : "Meus Créditos"}
+              </span>
             </div>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-6 w-6 p-0 hover:bg-purple-100 dark:hover:bg-purple-900/20"
-                    onClick={() => setShowPurchaseDialog(true)}
-                  >
-                    <Plus className="w-4 h-4 text-purple-600" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Comprar mais créditos</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            {!isDevAccount && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-6 w-6 p-0 hover:bg-purple-100 dark:hover:bg-purple-900/20"
+                      onClick={() => setShowPurchaseDialog(true)}
+                    >
+                      <Plus className="w-4 h-4 text-purple-600" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Comprar mais créditos</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-purple-600">{balance}</span>
-            <span className="text-xs text-muted-foreground">créditos disponíveis</span>
+            <span className={`text-2xl font-bold ${isDevAccount ? "text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600" : "text-purple-600"}`}>
+              {creditsDisplay}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {isDevAccount ? "ilimitados" : "créditos disponíveis"}
+            </span>
           </div>
-          <Badge className={`${badgeColor} text-white border-none mt-2 text-xs`}>
-            {balance > 100 ? "✅ Saldo bom" : balance > 50 ? "⚠️ Saldo médio" : "🔴 Saldo baixo"}
-          </Badge>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge className={`${badgeColor} border-none mt-2 text-xs cursor-help`}>
+                  {isDevAccount ? "🚀 Acesso Total" : balance > 100 ? "✅ Saldo bom" : balance > 50 ? "⚠️ Saldo médio" : "🔴 Saldo baixo"}
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{tooltip}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
 
         {/* Usuário */}

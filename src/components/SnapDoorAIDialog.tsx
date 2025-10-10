@@ -22,6 +22,7 @@ import { useUserCredits } from '@/hooks/useCredits';
 import { InsufficientCreditsDialog } from './InsufficientCreditsDialog';
 import { CreditPurchaseDialog } from './CreditPurchaseDialog';
 import { useToast } from '@/hooks/use-toast';
+import { hasEnoughCredits, isDevAccount } from '@/lib/devAccount';
 
 interface SnapDoorAIDialogProps {
   open: boolean;
@@ -87,9 +88,10 @@ export function SnapDoorAIDialog({ open, onOpenChange, pipelineId }: SnapDoorAID
     // Calcular créditos necessários (5 créditos por lead)
     const requiredCredits = maxLeads * 5;
     const currentBalance = userCredits?.credits || 0;
+    const isDev = isDevAccount(user);
 
-    // Verificar se tem créditos suficientes
-    if (currentBalance < requiredCredits) {
+    // Verificar se tem créditos suficientes (dev account sempre passa)
+    if (!hasEnoughCredits(requiredCredits, currentBalance, user)) {
       setShowInsufficientCredits(true);
       return;
     }
@@ -110,21 +112,29 @@ export function SnapDoorAIDialog({ open, onOpenChange, pipelineId }: SnapDoorAID
 
       if (result.success) {
         // Debitar créditos após sucesso usando a função SQL debit_credits
+        // (Para conta dev, a função não debita mas registra no histórico após aplicar Migration V3)
         const { error: debitError } = await supabase.rpc('debit_credits', {
           p_user_id: user!.id,
           p_credits: requiredCredits,
           p_operation_type: 'smart_prospection',
           p_query_params: filters as any,
-          p_result_summary: { leads_found: maxLeads } as any,
+          p_result_summary: { 
+            leads_found: maxLeads,
+            stage_id: selectedStage 
+          } as any,
         });
 
         if (debitError) {
           console.error('Erro ao debitar créditos:', debitError);
         }
 
+        const message = isDev 
+          ? `${maxLeads} leads foram adicionados. (Dev Account - FREE)`
+          : `${maxLeads} leads foram adicionados. ${requiredCredits} créditos debitados.`;
+
         toast({
           title: "✅ Descoberta concluída!",
-          description: `${maxLeads} leads foram adicionados. ${requiredCredits} créditos debitados.`,
+          description: message,
         });
 
         setTimeout(() => {
