@@ -13,10 +13,39 @@ export interface Lead {
   company: string | null;
   email: string | null;
   phone: string | null;
-  linkedin_url: string | null;
-  position: number;
+  linkedin_url?: string | null;
+  position?: number;
   created_at: string;
   updated_at: string;
+  
+  // Campos do banco de dados
+  activities_count?: number;
+  custom_fields?: any;
+  is_archived?: boolean;
+  last_contact_date?: string;
+  next_follow_up?: string | null;
+  notes_count?: number;
+  pipeline_id: string;
+  priority?: string;
+  revenue?: number;
+  source?: string;
+  tags?: string[];
+  temperature?: string;
+  
+  // Campos de enriquecimento
+  full_name?: string | null;
+  headline?: string | null;
+  about?: string | null;
+  location?: string | null;
+  education?: string | null;
+  connections?: string | null;
+  avatar_url?: string | null;
+  seniority?: string | null;
+  department?: string | null;
+  twitter_url?: string | null;
+  company_size?: string | null;
+  company_industry?: string | null;
+  company_location?: string | null;
 }
 
 // Fetch all leads for a user
@@ -66,6 +95,7 @@ export const useCreateLead = () => {
   return useMutation({
     mutationFn: async (newLead: {
       stage_id: string;
+      pipeline_id: string;
       user_id: string;
       first_name: string;
       last_name: string;
@@ -78,7 +108,7 @@ export const useCreateLead = () => {
     }) => {
       const { data, error } = await supabase
         .from("leads")
-        .insert(newLead)
+        .insert(newLead as any)
         .select()
         .single();
 

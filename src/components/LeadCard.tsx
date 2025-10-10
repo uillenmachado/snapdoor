@@ -252,8 +252,8 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
           </Button>
         </div>
 
-        {/* Ações rápidas - aparecem no hover */}
-        <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1">
+        {/* Ações rápidas - aparecem no hover com fundo para evitar sobreposição */}
+        <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1 bg-background/95 backdrop-blur-sm rounded-md px-1 py-0.5 shadow-sm border border-border/50 z-10">
           <Button
             size="sm"
             variant="ghost"
@@ -370,22 +370,46 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
         </div>
 
         {/* Conteúdo principal - sempre com espaço para estrela e ações */}
-        <div className="space-y-2 pl-6 pr-14 pt-1">
+        <div className="space-y-2.5 pl-6 pr-16 pt-1">
           {/* Avatar e Nome */}
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-sm font-semibold text-primary">
+            {/* Avatar com foto ou iniciais */}
+            {lead.avatar_url ? (
+              <img 
+                src={lead.avatar_url} 
+                alt={`${lead.first_name} ${lead.last_name}`}
+                className="flex-shrink-0 h-11 w-11 rounded-full object-cover border-2 border-primary/10"
+                onError={(e) => {
+                  // Fallback para iniciais se a imagem falhar
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                }}
+              />
+            ) : null}
+            <div 
+              className={`flex-shrink-0 h-11 w-11 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-sm font-semibold text-primary ${lead.avatar_url ? 'hidden' : ''}`}
+            >
               {getInitials()}
             </div>
+            
             <div className="flex-1 min-w-0">
-              {/* Nome completo - destaque principal */}
-              <h3 className="font-semibold text-foreground text-sm leading-tight">
-                {lead.first_name} {lead.last_name}
-              </h3>
+              {/* Nome completo com badge de enriquecimento */}
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-semibold text-foreground text-sm leading-tight">
+                  {lead.full_name || `${lead.first_name} ${lead.last_name}`}
+                </h3>
+                {/* Badge de enriquecimento */}
+                {(lead.avatar_url || lead.linkedin_url || lead.headline) && (
+                  <div className="flex-shrink-0 px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30">
+                    <Sparkles className="h-2.5 w-2.5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                )}
+              </div>
               
-              {/* Cargo - informação secundária importante */}
-              {lead.job_title && (
-                <p className="text-xs text-muted-foreground font-medium leading-tight mt-0.5">
-                  {lead.job_title}
+              {/* Cargo/Headline - informação secundária importante */}
+              {(lead.headline || lead.job_title) && (
+                <p className="text-xs text-muted-foreground font-medium leading-tight">
+                  {lead.headline || lead.job_title}
                 </p>
               )}
             </div>
@@ -396,6 +420,40 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <Building2 className="h-3 w-3 opacity-70 flex-shrink-0" />
               <span className="truncate font-medium">{lead.company}</span>
+            </div>
+          )}
+          
+          {/* Location - dados enriquecidos */}
+          {lead.location && (
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <svg className="h-3 w-3 opacity-70 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span className="truncate">{lead.location}</span>
+            </div>
+          )}
+          
+          {/* Connections e Education - informações adicionais enriquecidas */}
+          {(lead.connections || lead.education) && (
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              {lead.connections && (
+                <div className="flex items-center gap-1.5">
+                  <svg className="h-3 w-3 opacity-70 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                  <span>{lead.connections} conexões</span>
+                </div>
+              )}
+              {lead.education && (
+                <div className="flex items-center gap-1.5 truncate">
+                  <svg className="h-3 w-3 opacity-70 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                  </svg>
+                  <span className="truncate">{lead.education}</span>
+                </div>
+              )}
             </div>
           )}
           

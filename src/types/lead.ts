@@ -12,6 +12,25 @@ export interface Lead {
   activities: Activity[];
   createdAt: Date;
   updatedAt: Date;
+  
+  // Campos de enriquecimento (snake_case conforme database)
+  first_name?: string;
+  last_name?: string;
+  job_title?: string;
+  linkedin_url?: string;
+  full_name?: string;
+  headline?: string;
+  about?: string;
+  location?: string;
+  education?: string;
+  connections?: string;
+  avatar_url?: string;
+  seniority?: string;
+  department?: string;
+  twitter_url?: string;
+  company_size?: string;
+  company_industry?: string;
+  company_location?: string;
 }
 
 export interface Note {
