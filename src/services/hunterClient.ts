@@ -3,9 +3,15 @@
 // Sistema de créditos: cobra 3x o custo da API
 // =====================================================
 
-// Real Hunter.io API Key
-const HUNTER_API_KEY = 'c2e0acf158a10a3c0253b49c006a80979679cc5c';
+// Hunter.io API Configuration
+// IMPORTANT: API Key should come from environment variables
+const HUNTER_API_KEY = import.meta.env.VITE_HUNTER_API_KEY || '';
 const HUNTER_BASE_URL = 'https://api.hunter.io/v2';
+
+// Validate API Key on initialization
+if (!HUNTER_API_KEY && import.meta.env.MODE !== 'development') {
+  console.error('⚠️ HUNTER_API_KEY não configurada. Enriquecimento de leads não funcionará.');
+}
 
 // Credit costs (how much we charge the client)
 export const CREDIT_COSTS = {

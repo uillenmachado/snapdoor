@@ -71,13 +71,13 @@ class LeadDiscoveryService {
   private cacheExpiration = 3600000; // 1 hora
 
   private constructor() {
-    // Buscar API key das variáveis de ambiente ou usar a do hunterClient
-    this.apiKey = import.meta.env.VITE_DISCOVERY_API_KEY || 'c2e0acf158a10a3c0253b49c006a80979679cc5c';
+    // Buscar API key das variáveis de ambiente (prioriza VITE_DISCOVERY_API_KEY, fallback para VITE_HUNTER_API_KEY)
+    this.apiKey = import.meta.env.VITE_DISCOVERY_API_KEY || import.meta.env.VITE_HUNTER_API_KEY || '';
     
     if (!this.apiKey) {
-      console.warn('[SnapDoor Discovery] API key não configurada. Funcionalidade limitada.');
+      console.warn('[SnapDoor Discovery] ⚠️ API key não configurada. Configure VITE_DISCOVERY_API_KEY ou VITE_HUNTER_API_KEY no arquivo .env');
     } else {
-      console.log('[SnapDoor Discovery] API key configurada com sucesso.');
+      console.log('[SnapDoor Discovery] ✅ API key configurada com sucesso.');
     }
   }
 

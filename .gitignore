@@ -245,6 +245,8 @@ payment_secrets.json
 hunter_api_key.txt
 api_keys.json
 *.apikey
+**/apply-migration-direct.ts
+supabase/apply-migration-direct.ts
 
 # ========================================
 # Custom Project Files
