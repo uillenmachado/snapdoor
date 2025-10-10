@@ -155,16 +155,43 @@ class LeadEnrichmentService {
             const linkedInData = await linkedInScraperService.extractProfileData(currentData.linkedin_url);
             
             if (linkedInData) {
-              // Preenche com dados extraídos do perfil público
+              // Preenche com dados extraídos do perfil público (ORGANIZADO)
               enrichedData.first_name = linkedInData.firstName || enrichedData.first_name;
               enrichedData.last_name = linkedInData.lastName || enrichedData.last_name;
+              enrichedData.full_name = linkedInData.fullName || enrichedData.full_name;
+              
+              // Cargo e Empresa separados corretamente
               enrichedData.job_title = linkedInData.position || enrichedData.job_title;
               enrichedData.company = linkedInData.company || enrichedData.company;
+              
+              // Localização, Educação, Conexões
+              enrichedData.location = linkedInData.location || enrichedData.location;
+              enrichedData.education = linkedInData.education || enrichedData.education;
+              enrichedData.connections = linkedInData.connections || enrichedData.connections;
+              
+              // Headline (resumo curto do cargo)
+              enrichedData.headline = linkedInData.headline || enrichedData.headline;
+              
+              // About (sobre completo do perfil) - salvo em campo separado
+              if (linkedInData.about) {
+                enrichedData.about = linkedInData.about;
+              }
+              
+              // Avatar
+              if (linkedInData.imageUrl) {
+                enrichedData.avatar_url = linkedInData.imageUrl;
+              }
+              
               enrichedData.linkedin_url = linkedInData.profileUrl;
               
               // NÃO cobra créditos pois é scraping público
               sources.push('linkedin_scraper');
-              console.log(`✅ Dados extraídos do perfil público do LinkedIn: ${linkedInData.fullName} - ${linkedInData.headline}`);
+              
+              console.log(`✅ Dados extraídos do perfil público do LinkedIn: ${linkedInData.fullName} - ${linkedInData.position || 'Cargo não informado'}`);
+              console.log(`   📍 Local: ${linkedInData.location || 'N/A'}`);
+              console.log(`   🏢 Empresa: ${linkedInData.company || 'N/A'}`);
+              console.log(`   🎓 Educação: ${linkedInData.education || 'N/A'}`);
+              console.log(`   👥 Conexões: ${linkedInData.connections || 'N/A'}`);
             }
           } catch (error) {
             console.warn('❌ LinkedIn scraper também falhou:', error);

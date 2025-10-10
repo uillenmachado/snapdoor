@@ -9,13 +9,15 @@ export interface LinkedInProfileData {
   firstName: string;
   lastName: string;
   fullName: string;
-  headline: string; // Ex: "CEO at Company"
+  headline: string; // Ex: "CEO" or "CEO at Company"
   company?: string;
   position?: string;
   location?: string;
+  education?: string;
+  connections?: string;
+  about?: string; // Resumo "Sobre" do perfil
   profileUrl: string;
   imageUrl?: string;
-  about?: string;
 }
 
 /**

@@ -19,6 +19,9 @@ interface LinkedInData {
   company?: string;
   position?: string;
   location?: string;
+  education?: string;
+  connections?: string;
+  about?: string;
   profileUrl: string;
   imageUrl?: string;
 }
@@ -100,53 +103,96 @@ serve(async (req) => {
     console.log('📝 Descrição extraída:', ogDescription);
 
     // Parse do título: "Nome Completo - Cargo at Empresa | LinkedIn"
-    // ou "Nome Completo | LinkedIn"
-    const titleParts = finalTitle.split(/\s+-\s+|\s+\|\s+/);
-    const name = titleParts[0].trim();
+    const titleParts = finalTitle.split(/\s+-\s+/);
+    const name = titleParts[0].trim().replace(' | LinkedIn', '').replace(' - LinkedIn', '');
     const nameParts = name.split(' ');
     const firstName = nameParts[0];
     const lastName = nameParts.slice(1).join(' ');
 
-    // Parse da descrição: "Cargo at Empresa | Additional info"
-    const headline = ogDescription || (titleParts.length > 1 ? titleParts[1].replace('LinkedIn', '').trim() : '');
-    const positionCompany = headline.split('|')[0].trim();
-    
-    // Extrai cargo e empresa com múltiplos padrões
+    // Parse COMPLETO da descrição do LinkedIn
+    // Formato: "Sobre · Experience: Empresa · Education: Educação · Location: Local · Conexões"
     let position: string | undefined;
     let company: string | undefined;
-    
-    // Padrões: "at", "|", "-", "em", "na"
-    const patterns = [
-      { regex: /(.+?)\s+at\s+(.+)/i, posIdx: 1, compIdx: 2 },
-      { regex: /(.+?)\s+@\s+(.+)/i, posIdx: 1, compIdx: 2 },
-      { regex: /(.+?)\s+em\s+(.+)/i, posIdx: 1, compIdx: 2 },
-      { regex: /(.+?)\s+na\s+(.+)/i, posIdx: 1, compIdx: 2 },
-      { regex: /(.+?)\s+\|\s+(.+)/i, posIdx: 1, compIdx: 2 },
-      { regex: /(.+?)\s+-\s+(.+)/i, posIdx: 1, compIdx: 2 },
-    ];
-    
-    for (const pattern of patterns) {
-      const match = positionCompany.match(pattern.regex);
-      if (match) {
-        position = match[pattern.posIdx].trim();
-        company = match[pattern.compIdx].trim();
-        break;
+    let education: string | undefined;
+    let location: string | undefined;
+    let connections: string | undefined;
+    let about: string | undefined;
+
+    if (ogDescription) {
+      // Extrai "Sobre" (primeira parte antes do ·)
+      const aboutMatch = ogDescription.match(/^(.+?)(?:\s+·|$)/);
+      if (aboutMatch) {
+        about = aboutMatch[1].trim();
+        // Remove "…" ou "..." no final
+        about = about.replace(/[…\.]{1,3}$/, '').trim();
+      }
+
+      // Extrai Experience/Empresa
+      const experienceMatch = ogDescription.match(/Experience:\s*([^·]+)/i);
+      if (experienceMatch) {
+        company = experienceMatch[1].trim();
+      }
+
+      // Extrai Education
+      const educationMatch = ogDescription.match(/Education:\s*([^·]+)/i);
+      if (educationMatch) {
+        education = educationMatch[1].trim();
+      }
+
+      // Extrai Location
+      const locationMatch = ogDescription.match(/Location:\s*([^·]+)/i);
+      if (locationMatch) {
+        location = locationMatch[1].trim();
+      }
+
+      // Extrai Conexões
+      const connectionsMatch = ogDescription.match(/(\d+\+?)\s+connections/i);
+      if (connectionsMatch) {
+        connections = connectionsMatch[1];
       }
     }
-    
-    // Se não encontrou padrão, assume que tudo é position
-    if (!position && positionCompany) {
-      position = positionCompany;
+
+    // Extrai Position do título (se existir)
+    if (titleParts.length > 1) {
+      const titlePosition = titleParts[1].replace('LinkedIn', '').replace('|', '').trim();
+      if (titlePosition) {
+        // Parse "Cargo at Empresa"
+        const posCompMatch = titlePosition.match(/(.+?)\s+at\s+(.+)/i);
+        if (posCompMatch) {
+          position = posCompMatch[1].trim();
+          if (!company) {
+            company = posCompMatch[2].trim();
+          }
+        } else {
+          position = titlePosition;
+        }
+      }
     }
+
+    // Se não encontrou position, usa about como headline
+    const headline = position || about || '';
+
+    console.log('✅ Dados parseados:', {
+      name,
+      position,
+      company,
+      education,
+      location,
+      connections,
+      about: about?.substring(0, 50) + '...'
+    });
 
     const profileData: LinkedInData = {
       fullName: name,
       firstName,
       lastName,
-      headline: positionCompany,
+      headline,
       position,
       company,
-      location: undefined, // Não disponível em perfis públicos sem autenticação
+      location,
+      education,
+      connections,
+      about,
       profileUrl: linkedinUrl,
       imageUrl: ogImage || undefined,
     };
