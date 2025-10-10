@@ -32,6 +32,7 @@ import { useEnrichLead } from '@/hooks/useEnrichLead';
 import { useState } from 'react';
 import { AddLeadDialog } from '@/components/AddLeadDialog';
 import { EditableField } from '@/components/EditableField';
+import { MultipleContacts } from '@/components/MultipleContacts';
 
 // Tipo do database
 type DatabaseLead = {
@@ -285,32 +286,30 @@ export default function LeadProfile() {
 
         {/* Coluna Direita - Detalhes */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Card de Contato - Campos Editáveis */}
+          {/* Card de Contato - Múltiplos Emails e Telefones */}
           <Card>
             <CardHeader>
               <CardTitle>Informações de Contato</CardTitle>
-              <CardDescription>Clique no ícone de lápis para editar</CardDescription>
+              <CardDescription>Gerencie múltiplos emails e telefones</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <EditableField
+            <CardContent className="space-y-6">
+              <MultipleContacts
                 leadId={lead.id}
-                fieldName="email"
-                value={lead.email}
-                label="Email"
-                icon={<Mail className="w-4 h-4 text-muted-foreground" />}
                 type="email"
-                onUpdate={() => refetch()}
+                icon={<Mail className="w-4 h-4 text-muted-foreground" />}
+                title="Emails"
               />
               
-              <EditableField
+              <Separator />
+              
+              <MultipleContacts
                 leadId={lead.id}
-                fieldName="phone"
-                value={lead.phone}
-                label="Telefone"
+                type="phone"
                 icon={<Phone className="w-4 h-4 text-muted-foreground" />}
-                type="tel"
-                onUpdate={() => refetch()}
+                title="Telefones"
               />
+              
+              <Separator />
               
               <EditableField
                 leadId={lead.id}
