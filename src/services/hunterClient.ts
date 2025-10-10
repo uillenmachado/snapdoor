@@ -295,17 +295,44 @@ class HunterClient {
    * Person Enrichment - Get person information
    * Cost: 2 credits
    * GET https://api.hunter.io/v2/people/find?email=patrick@stripe.com&api_key=xxx
+   * OU usando LinkedIn: https://api.hunter.io/v2/people/find?linkedin_handle=matttharp&api_key=xxx
    */
-  async personEnrichment(email: string): Promise<PersonEnrichmentResult> {
+  async personEnrichment(emailOrLinkedIn: string): Promise<PersonEnrichmentResult> {
     try {
-      const cacheKey = this.getCacheKey('person-enrichment', { email });
-      const cached = this.getFromCache(cacheKey);
-      if (cached) return cached;
-
+      // Detecta se é email ou LinkedIn handle
+      const isEmail = emailOrLinkedIn.includes('@');
+      const isLinkedInUrl = emailOrLinkedIn.includes('linkedin.com');
+      
+      let cacheKey: string;
       const params = new URLSearchParams({
-        email,
         api_key: this.apiKey,
       });
+
+      if (isLinkedInUrl) {
+        // Extrai handle do LinkedIn URL
+        // Ex: https://linkedin.com/in/matttharp → matttharp
+        const handleMatch = emailOrLinkedIn.match(/linkedin\.com\/in\/([^/?]+)/);
+        if (handleMatch) {
+          const handle = handleMatch[1];
+          params.append('linkedin_handle', handle);
+          cacheKey = this.getCacheKey('person-enrichment-linkedin', { handle });
+          console.log(`🔍 Enriquecendo por LinkedIn handle: ${handle}`);
+        } else {
+          throw new Error('URL do LinkedIn inválida. Use o formato: https://linkedin.com/in/handle');
+        }
+      } else if (isEmail) {
+        params.append('email', emailOrLinkedIn);
+        cacheKey = this.getCacheKey('person-enrichment', { email: emailOrLinkedIn });
+        console.log(`🔍 Enriquecendo por email: ${emailOrLinkedIn}`);
+      } else {
+        // Assume que é um LinkedIn handle direto (sem URL)
+        params.append('linkedin_handle', emailOrLinkedIn);
+        cacheKey = this.getCacheKey('person-enrichment-linkedin', { handle: emailOrLinkedIn });
+        console.log(`🔍 Enriquecendo por LinkedIn handle: ${emailOrLinkedIn}`);
+      }
+
+      const cached = this.getFromCache(cacheKey);
+      if (cached) return cached;
 
       const response = await fetch(`${this.baseUrl}/people/find?${params}`, {
         method: 'GET',

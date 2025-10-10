@@ -18,6 +18,7 @@ interface EnrichLeadParams {
     email?: string;
     company?: string;
     company_domain?: string;
+    linkedin_url?: string;
   };
   options?: EnrichmentOptions;
 }

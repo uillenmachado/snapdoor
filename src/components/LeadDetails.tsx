@@ -139,12 +139,13 @@ export function LeadDetails({ lead, isOpen, onClose, userId }: LeadDetailsProps)
         email: lead.email || undefined,
         company: lead.company || undefined,
         company_domain: companyDomain,
+        linkedin_url: lead.linkedin_url || undefined,
       },
       options: {
         findEmail: !lead.email,
         verifyEmail: !!lead.email,
         enrichCompany: !!companyDomain,
-        enrichPerson: !!lead.email,
+        enrichPerson: !!(lead.email || lead.linkedin_url), // Enriquece se tiver email OU LinkedIn
       },
     });
   };

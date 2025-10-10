@@ -146,12 +146,13 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
         email: lead.email || undefined,
         company: lead.company || undefined,
         company_domain: companyDomain,
+        linkedin_url: lead.linkedin_url || undefined,
       },
       options: {
         findEmail: !lead.email, // Só busca email se não tiver
         verifyEmail: !!lead.email, // Só verifica se já tiver email
         enrichCompany: !!companyDomain,
-        enrichPerson: !!lead.email,
+        enrichPerson: !!(lead.email || lead.linkedin_url), // Enriquece se tiver email OU LinkedIn
       },
     });
   };

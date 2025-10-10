@@ -62,6 +62,25 @@ Após enriquecimento:
 
 **Total:** 5 créditos
 
+---
+
+### 🟢 CENÁRIO 2.5: Apenas LinkedIn URL ✨ NOVO!
+**Dados necessários:**
+- ✅ LinkedIn URL (ex: "https://linkedin.com/in/matttharp")
+
+**O que acontece:**
+1. Extrai LinkedIn handle da URL: "matttharp"
+2. Busca dados completos usando **Person Enrichment via LinkedIn** (2 créditos)
+3. Descobre: Nome, email, cargo, empresa, telefone, localização, redes sociais
+
+**Total:** 2 créditos
+
+**Vantagens:**
+- ✅ Mais dados disponíveis (LinkedIn profiles são públicos)
+- ✅ Não precisa de email inicial
+- ✅ Descobre email automaticamente
+- ✅ Informações geralmente mais atualizadas
+
 **Exemplo:**
 ```javascript
 Lead inicial:

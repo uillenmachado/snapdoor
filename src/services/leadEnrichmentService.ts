@@ -49,6 +49,7 @@ class LeadEnrichmentService {
       email?: string;
       company?: string;
       company_domain?: string;
+      linkedin_url?: string;
     },
     options: EnrichmentOptions = {
       findEmail: true,
@@ -111,13 +112,14 @@ class LeadEnrichmentService {
         }
       }
 
-      // 2. Se temos email - enriquece informações da pessoa
-      if (options.enrichPerson && (currentData.email || enrichedData.email)) {
+      // 2. Se temos email OU LinkedIn - enriquece informações da pessoa
+      if (options.enrichPerson && (currentData.email || enrichedData.email || currentData.linkedin_url)) {
         try {
-          const emailToUse = enrichedData.email || currentData.email!;
-          console.log(`🔍 Enriquecendo informações da pessoa: ${emailToUse}`);
+          // Prioriza LinkedIn se disponível (mais dados)
+          const identifier = currentData.linkedin_url || enrichedData.email || currentData.email!;
+          console.log(`🔍 Enriquecendo informações da pessoa: ${identifier}`);
           
-          const personResult = await hunterClient.personEnrichment(emailToUse);
+          const personResult = await hunterClient.personEnrichment(identifier);
 
           if (personResult) {
             enrichedData.job_title = personResult.position || enrichedData.job_title;
@@ -252,6 +254,7 @@ class LeadEnrichmentService {
       email?: string;
       company?: string;
       company_domain?: string;
+      linkedin_url?: string;
     },
     options: EnrichmentOptions = {
       findEmail: true,
