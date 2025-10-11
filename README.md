@@ -199,18 +199,49 @@ Este projeto possui documentação extensiva para facilitar o desenvolvimento, d
 - **[INICIO_RAPIDO.md](./INICIO_RAPIDO.md)** - Guia passo a passo para rodar localmente (40 min)
 - **[ENV_SETUP.md](./ENV_SETUP.md)** - Configuração de variáveis de ambiente
 
-### 📊 Status e Planejamento
-- **[STATUS_EXECUTIVO.md](./STATUS_EXECUTIVO.md)** - Resumo executivo do projeto
-- **[AUDITORIA_FINAL.md](./AUDITORIA_FINAL.md)** - Análise completa de qualidade e recomendações
-- **[PLANO_DE_ACAO.md](./PLANO_DE_ACAO.md)** - Próximos passos detalhados com cronograma
+## 📚 Documentação Completa
 
-### 🚢 Deploy e Evolução
-- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Guia completo de deploy em produção
-- **[ROADMAP.md](./ROADMAP.md)** - Plano de evolução e features futuras
-- **[IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md)** - Resumo das implementações
+> **👋 Novo no projeto?** Comece por **[docs/START_HERE.md](./docs/START_HERE.md)** - É o ponto de partida único!
 
-### 🔧 Guias Técnicos
-- **[public/extension/ICON_GUIDE.md](./public/extension/ICON_GUIDE.md)** - Como gerar ícones para extensão
+Toda a documentação do projeto está organizada em **`docs/`** com estrutura clara:
+
+### 🚀 **[Setup e Configuração](./docs/setup/)**
+- **[SUPABASE_SETUP_GUIDE.md](./docs/setup/SUPABASE_SETUP_GUIDE.md)** - Configuração completa do Supabase
+- **[DEV_ACCOUNT_SETUP.md](./docs/setup/DEV_ACCOUNT_SETUP.md)** - Configuração da conta de desenvolvedor
+- **[SETUP_SUMMARY.md](./docs/setup/SETUP_SUMMARY.md)** - Resumo das configurações
+
+### 📖 **[Guias de Uso](./docs/guides/)**
+- **[LEAD_ENRICHMENT_GUIDE.md](./docs/guides/LEAD_ENRICHMENT_GUIDE.md)** - Enriquecimento de leads
+- **[CREDIT_SYSTEM_GUIDE.md](./docs/guides/CREDIT_SYSTEM_GUIDE.md)** - Sistema de créditos
+- **[USER_ENRICHMENT_GUIDE.md](./docs/guides/USER_ENRICHMENT_GUIDE.md)** - Guia para usuários
+- **[GUIA_DE_TESTE.md](./docs/guides/GUIA_DE_TESTE.md)** - Testes e validações
+
+### 🏗️ **[Arquitetura](./docs/architecture/)**
+- **[ENRICHMENT_REQUIREMENTS.md](./docs/architecture/ENRICHMENT_REQUIREMENTS.md)** - Requisitos técnicos
+- **[SUPABASE_DOCS_INDEX.md](./docs/architecture/SUPABASE_DOCS_INDEX.md)** - Índice Supabase
+- **[MELHORIAS_IMPLEMENTADAS.md](./docs/architecture/MELHORIAS_IMPLEMENTADAS.md)** - Histórico
+
+### 🔄 **[Migrações](./docs/migrations/)**
+- **[MIGRATION_WALKTHROUGH.md](./docs/migrations/MIGRATION_WALKTHROUGH.md)** - Passo a passo
+- **[APPLY_MIGRATION_NOW.md](./docs/migrations/APPLY_MIGRATION_NOW.md)** - Como aplicar
+- **[QUICK_START_MIGRATION.md](./docs/migrations/QUICK_START_MIGRATION.md)** - Início rápido
+
+### 🧪 **[Testes](./docs/testing/)**
+- **[VALIDATION_CHECKLIST.md](./docs/testing/VALIDATION_CHECKLIST.md)** - Checklist de validação
+- **[FIX_LOG.md](./docs/testing/FIX_LOG.md)** - Log de correções
+
+### 📊 **[Auditorias](./docs/audits/)**
+- **[AUDITORIA_COMPLETA_PROJETO.md](./docs/audits/AUDITORIA_COMPLETA_PROJETO.md)** - Auditoria completa
+- **[AUDITORIA_SUPABASE_COMPLETA.md](./docs/audits/AUDITORIA_SUPABASE_COMPLETA.md)** - Auditoria DB
+
+### � **[Status e Relatórios](./docs/)**
+- **[EXECUTIVE_SUMMARY.md](./docs/EXECUTIVE_SUMMARY.md)** - Resumo executivo
+- **[VISUAL_STATUS_BOARD.md](./docs/VISUAL_STATUS_BOARD.md)** - Quadro visual
+- **[ROADMAP_TO_10.md](./docs/ROADMAP_TO_10.md)** - Roadmap completo
+
+> 📖 **Veja o índice completo em [docs/README.md](./docs/README.md)**
+
+### 🔧 Guias Técnicos Complementares
 - **[public/extension/README.md](./public/extension/README.md)** - Documentação da extensão
 - **[supabase/functions/STRIPE_FUNCTIONS_GUIDE.md](./supabase/functions/STRIPE_FUNCTIONS_GUIDE.md)** - Integração com Stripe
 
