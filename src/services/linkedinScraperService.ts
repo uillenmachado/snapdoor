@@ -43,19 +43,29 @@ export class LinkedInScraperService {
       const profileUrl = `https://www.linkedin.com/in/${handle}`;
       
       // Chama Edge Function do Supabase (Camada 3 - Gratuita)
-      console.log('📡 [LinkedIn Scraper] Chamando Edge Function...');
+      // Usando fetch direto para evitar problemas com supabase.functions.invoke()
+      console.log('📡 [LinkedIn Scraper] Chamando Edge Function via fetch...');
       
-      const { data, error } = await supabase.functions.invoke('linkedin-scraper', {
-        body: { linkedinUrl: profileUrl },
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/linkedin-scraper`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ linkedinUrl: profileUrl })
         }
-      });
+      );
       
-      if (error) {
-        console.error('❌ [LinkedIn Scraper] Erro na Edge Function:', error);
+      if (!response.ok) {
+        console.error('❌ [LinkedIn Scraper] HTTP Error:', response.status, response.statusText);
         return null;
       }
+      
+      const data = await response.json();
+      console.log('📦 [LinkedIn Scraper] Resposta recebida:', data);
       
       // Edge Function sempre retorna 200, mas com success: false em caso de erro
       if (!data?.success) {
