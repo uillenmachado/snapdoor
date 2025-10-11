@@ -165,20 +165,37 @@ serve(async (req) => {
             company = posCompMatch[2].trim();
           }
         } else {
-          // Se não tem "at", é só o cargo
-          position = titlePosition;
+          // Se não tem "at", pode ser só o nome da empresa (não o cargo)
+          // Verifica se parece com um cargo antes de assumir
+          const jobKeywords = /manager|specialist|director|engineer|developer|analyst|coordinator|lead|head|officer|designer|consultant|executive|founder|ceo|cto|cfo/i;
+          if (jobKeywords.test(titlePosition)) {
+            position = titlePosition;
+          } else {
+            // É só o nome da empresa, não o cargo
+            if (!company) {
+              company = titlePosition;
+            }
+          }
         }
       }
     }
 
-    // Se não encontrou position no título, tenta usar company da Experience como position
-    // (caso LinkedIn tenha colocado a empresa no lugar do cargo)
-    if (!position && company) {
-      // Verifica se company parece ser um cargo (contém palavras-chave)
-      const jobKeywords = /manager|specialist|director|engineer|developer|analyst|coordinator|lead|head|officer|designer|consultant|executive/i;
-      if (jobKeywords.test(company)) {
-        position = company;
-        company = undefined;
+    // Se não encontrou position ainda, tenta extrair do "about" (primeira parte da descrição)
+    if (!position && about) {
+      // Padrões comuns: "I am a [cargo]", "Experienced [cargo]", ou direto o cargo
+      const aboutPositionMatch = about.match(/(?:I am an?|I'm an?|Experienced?)\s+(.+?)(?:\s+(?:focused|specialized|with|at)|$)/i);
+      if (aboutPositionMatch) {
+        position = aboutPositionMatch[1].trim();
+      } else {
+        // Se não encontrou padrão, verifica se o about começa com palavras de cargo
+        const jobKeywords = /^(?:Senior|Junior|Lead|Principal|Staff|Head of|Director of|Manager|Specialist|Engineer|Developer|Designer|Analyst|Consultant|Coordinator)/i;
+        if (jobKeywords.test(about)) {
+          // Pega só a primeira frase/linha como cargo
+          const firstSentence = about.split(/[.!?]/)[0].trim();
+          if (firstSentence.length < 100) { // Evita pegar texto muito longo
+            position = firstSentence;
+          }
+        }
       }
     }
 
