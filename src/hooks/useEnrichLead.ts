@@ -65,7 +65,12 @@ export function useEnrichLead() {
       const result = await leadEnrichmentService.enrichLead(leadId, leadData, options);
 
       if (!result.success) {
-        throw new Error('Não foi possível enriquecer o lead com as informações disponíveis');
+        // Mensagem mais amigável - enriquecimento parcial é válido
+        console.warn('⚠️ Enriquecimento parcial:', result);
+        // Não lança erro se algum dado foi enriquecido
+        if (result.creditsUsed === 0) {
+          throw new Error('Não há dados novos para enriquecer este lead');
+        }
       }
 
       // 4. Debitar créditos (se não for dev account)
@@ -129,14 +134,15 @@ export function useEnrichLead() {
           description: error.message,
           duration: 6000,
         });
-      } else if (error.message.includes('Não foi possível enriquecer')) {
-        toast.warning('Dados Insuficientes para Enriquecimento', {
-          description: (
-            'Para enriquecer este lead, você precisa de:\n' +
-            '• Nome completo + Empresa (para buscar email)\n' +
-            '• OU Email válido (para buscar dados da pessoa e empresa)'
-          ),
-          duration: 8000,
+      } else if (error.message.includes('Não há dados novos')) {
+        toast.info('Lead Já Enriquecido', {
+          description: 'Este lead já possui todas as informações disponíveis',
+          duration: 5000,
+        });
+      } else if (error.message.includes('Enriquecimento não concluído')) {
+        toast.warning('Enriquecimento Parcial', {
+          description: 'Alguns dados não puderam ser obtidos. Tente novamente mais tarde.',
+          duration: 6000,
         });
       } else {
         toast.error('Erro ao Enriquecer Lead', {

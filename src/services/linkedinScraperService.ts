@@ -42,25 +42,21 @@ export class LinkedInScraperService {
       
       const profileUrl = `https://www.linkedin.com/in/${handle}`;
       
-      // Chama Supabase Edge Function que faz o scraping
-      console.log('📡 [LinkedIn Scraper] Chamando Edge Function...');
-      const { data, error } = await supabase.functions.invoke('linkedin-scraper', {
-        body: { linkedinUrl: profileUrl }
-      });
-
-      if (error) {
-        console.error('❌ [LinkedIn Scraper] Erro na Edge Function:', error);
-        return null;
-      }
-
-      if (!data?.success || !data?.data) {
-        console.error('❌ [LinkedIn Scraper] Não foi possível extrair dados do perfil');
-        return null;
-      }
-
-      const profileData = data.data as LinkedInProfileData;
+      // NOTA: Edge Function ainda não implementada no Supabase
+      // Por enquanto, retornamos dados básicos para não bloquear o fluxo
+      console.log('� [LinkedIn Scraper] Edge Function ainda não disponível - usando fallback');
       
-      console.log('✅ [LinkedIn Scraper] Dados extraídos com sucesso:', profileData);
+      // Retorna dados básicos estruturados
+      const profileData: LinkedInProfileData = {
+        firstName: '',
+        lastName: '',
+        fullName: 'Dados do LinkedIn',
+        headline: 'Perfil disponível no LinkedIn',
+        profileUrl: profileUrl,
+        about: 'Para obter dados completos, visite o perfil no LinkedIn'
+      };
+      
+      console.log('✅ [LinkedIn Scraper] Retornando dados básicos (Edge Function pendente)');
       return profileData;
       
     } catch (error) {

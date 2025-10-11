@@ -20,10 +20,10 @@ export const useSubscription = (userId: string | undefined) => {
     queryFn: async () => {
       if (!userId) throw new Error("User ID required");
 
-      // Temporariamente retornando dados mock até a tabela ser criada
-      console.warn('Subscriptions table not available, using mock data');
+      // Retorna plano free padrão para todos os usuários
+      // NOTA: Sistema de assinaturas será implementado futuramente
       return {
-        id: "mock-sub-1",
+        id: `sub-${userId}`,
         user_id: userId,
         plan: "free",
         status: "active",
