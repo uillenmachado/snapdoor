@@ -70,8 +70,10 @@ export function useEnrichLead() {
         // Mensagens específicas por tipo de falha
         if (result.source === 'no_new_data') {
           throw new Error('Este lead já possui todos os dados disponíveis ou não há informações novas na base de dados');
+        } else if (result.source === 'edge_function_unavailable') {
+          throw new Error('LinkedIn disponível mas Edge Function não está deployada. Entre em contato com suporte.');
         } else if (result.source === 'insufficient_data') {
-          throw new Error('Dados insuficientes. Adicione nome completo + empresa ou email para enriquecer');
+          throw new Error('Dados insuficientes. Adicione nome completo + empresa, email OU LinkedIn URL');
         } else {
           throw new Error('Não foi possível obter novos dados para este lead');
         }

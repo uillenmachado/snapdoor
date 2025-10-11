@@ -264,16 +264,28 @@ class LeadEnrichmentService {
         }
       }
 
-      // Se não encontramos nada novo
+      // Se não encontramos nada novo após tentar todas as camadas
       if (Object.keys(enrichedData).length === 0) {
+        // Se temos LinkedIn URL mas falhou, tenta explicar melhor
+        if (currentData.linkedin_url) {
+          console.warn('⚠️ LinkedIn disponível mas Edge Function não acessível. Deploy necessário.');
+          return {
+            success: false,
+            creditsUsed: 0,
+            enrichedData: {},
+            source: 'edge_function_unavailable',
+            confidence: 0,
+          };
+        }
+        
         // Fornece feedback sobre o que está faltando
         const missingInfo: string[] = [];
         
         if (!currentData.email && (!currentData.first_name || !currentData.last_name || !workingDomain)) {
           missingInfo.push('Para buscar email: primeiro nome + sobrenome + empresa');
         }
-        if (!currentData.email) {
-          missingInfo.push('Para enriquecer pessoa: email');
+        if (!currentData.email && !currentData.linkedin_url) {
+          missingInfo.push('Para enriquecer: email OU LinkedIn URL');
         }
         if (!workingDomain && !currentData.company) {
           missingInfo.push('Para enriquecer empresa: nome da empresa ou domínio');
