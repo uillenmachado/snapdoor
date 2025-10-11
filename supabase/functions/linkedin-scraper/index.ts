@@ -120,9 +120,15 @@ serve(async (req) => {
     // Tenta extrair do <title> se og:title não existir
     const pageTitle = doc.querySelector('title')?.textContent;
 
+    console.log('🔍 Meta tags extraídas:');
+    console.log('  og:title:', ogTitle);
+    console.log('  og:description:', ogDescription?.substring(0, 100));
+    console.log('  pageTitle:', pageTitle);
+
     const finalTitle = ogTitle || pageTitle || '';
     
     if (!finalTitle) {
+      console.error('❌ Nenhum título encontrado no HTML');
       return new Response(
         JSON.stringify({ error: 'Não foi possível extrair dados do perfil', success: false }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
