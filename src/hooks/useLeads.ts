@@ -2,50 +2,63 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-// Types
+// Types - Alinhado com schema do banco de dados
 export interface Lead {
   id: string;
-  stage_id: string;
   user_id: string;
-  first_name: string;
-  last_name: string;
-  job_title: string | null;
-  company: string | null;
-  email: string | null;
+  
+  // Informações básicas da PESSOA
+  name: string; // Nome completo
+  email: string;
   phone: string | null;
-  linkedin_url?: string | null;
-  position?: number;
+  position: string | null; // Cargo
+  company: string | null; // Empresa onde trabalha
+  
+  // Status e organização
+  status: string; // active, inactive, new, won, lost
+  source: string | null; // De onde veio o lead
+  tags: string[] | null;
+  
+  // Dados de enriquecimento (LinkedIn, Hunter.io)
+  enrichment_data: any;
+  last_interaction: string | null;
+  
+  // Campos de NEGÓCIO (Deal)
+  deal_value: number; // Valor do negócio em reais
+  expected_close_date: string | null; // Data prevista de fechamento
+  probability: number; // Probabilidade de fechamento (0-100)
+  deal_stage: string; // Etapa do negócio
+  
+  // Timestamps
   created_at: string;
   updated_at: string;
   
-  // Campos do banco de dados
-  activities_count?: number;
-  custom_fields?: any;
+  // Campos legacy (mantidos para retrocompatibilidade)
+  first_name?: string;
+  last_name?: string;
+  stage_id?: string;
+  pipeline_id?: string;
+  job_title?: string | null;
+  linkedin_url?: string | null;
   is_archived?: boolean;
-  last_contact_date?: string;
-  next_follow_up?: string | null;
-  notes_count?: number;
-  pipeline_id: string;
-  priority?: string;
-  revenue?: number;
-  source?: string;
-  tags?: string[];
   temperature?: string;
-  
-  // Campos de enriquecimento
-  full_name?: string | null;
-  headline?: string | null;
-  about?: string | null;
-  location?: string | null;
-  education?: string | null;
-  connections?: string | null;
-  avatar_url?: string | null;
-  seniority?: string | null;
-  department?: string | null;
-  twitter_url?: string | null;
-  company_size?: string | null;
-  company_industry?: string | null;
-  company_location?: string | null;
+}
+
+// Activity types
+export interface Activity {
+  id: string;
+  lead_id: string;
+  user_id: string;
+  type: 'call' | 'email' | 'meeting' | 'task' | 'note' | 'whatsapp';
+  title: string;
+  description: string | null;
+  due_date: string | null;
+  completed: boolean;
+  completed_at: string | null;
+  duration: number | null;
+  outcome: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 // Fetch all leads for a user

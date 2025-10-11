@@ -10,6 +10,7 @@ import {
   HelpCircle,
   Coins,
   Plus,
+  Briefcase,
 } from "lucide-react";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
@@ -43,7 +44,8 @@ import { getAccountStatus } from "@/lib/devAccount";
 
 const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Leads", url: "/dashboard", icon: Users },
+  { title: "Negócios", url: "/deals", icon: Briefcase },
+  { title: "Leads (Pessoas)", url: "/leads", icon: Users },
   { title: "Atividades", url: "/activities", icon: FileText },
   { title: "Relatórios", url: "/reports", icon: BarChart3 },
   { title: "Configurações", url: "/settings", icon: Settings },

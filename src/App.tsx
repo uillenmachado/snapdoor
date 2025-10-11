@@ -10,6 +10,8 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Pricing from "./pages/Pricing";
 import Dashboard from "./pages/Dashboard";
+import Deals from "./pages/Deals";
+import DealDetail from "./pages/DealDetail";
 import Activities from "./pages/Activities";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
@@ -52,6 +54,22 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/deals"
+            element={
+              <ProtectedRoute>
+                <Deals />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/deals/:id"
+            element={
+              <ProtectedRoute>
+                <DealDetail />
               </ProtectedRoute>
             }
           />

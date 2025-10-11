@@ -49,82 +49,120 @@ export type Database = {
             foreignKeyName: "activities_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
+        ]
+      }
+      companies: {
+        Row: {
+          created_at: string
+          id: string
+          industry: string | null
+          logo_url: string | null
+          name: string
+          size: string | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          industry?: string | null
+          logo_url?: string | null
+          name: string
+          size?: string | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          industry?: string | null
+          logo_url?: string | null
+          name?: string
+          size?: string | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "companies_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
         ]
       }
       credit_packages: {
         Row: {
-          credits: number
+          active: boolean
           created_at: string
-          discount_percentage: number | null
+          credits: number
+          discount_percentage: number
           id: string
-          is_active: boolean | null
           name: string
-          price_brl: number
+          price_in_cents: number
           updated_at: string
         }
         Insert: {
-          credits: number
+          active?: boolean
           created_at?: string
-          discount_percentage?: number | null
+          credits: number
+          discount_percentage?: number
           id?: string
-          is_active?: boolean | null
           name: string
-          price_brl: number
+          price_in_cents: number
           updated_at?: string
         }
         Update: {
-          credits?: number
+          active?: boolean
           created_at?: string
-          discount_percentage?: number | null
+          credits?: number
+          discount_percentage?: number
           id?: string
-          is_active?: boolean | null
           name?: string
-          price_brl?: number
+          price_in_cents?: number
           updated_at?: string
         }
         Relationships: []
       }
       credit_purchases: {
         Row: {
-          amount_paid_brl: number
-          completed_at: string | null
+          amount_in_cents: number
           created_at: string
-          credits_purchased: number
+          credits: number
           id: string
-          package_id: string | null
-          payment_method: string | null
-          payment_status: string | null
-          stripe_payment_id: string | null
-          stripe_session_id: string | null
+          package_id: string
+          payment_method: string
+          status: string
+          updated_at: string
           user_id: string
         }
         Insert: {
-          amount_paid_brl: number
-          completed_at?: string | null
+          amount_in_cents: number
           created_at?: string
-          credits_purchased: number
+          credits: number
           id?: string
-          package_id?: string | null
-          payment_method?: string | null
-          payment_status?: string | null
-          stripe_payment_id?: string | null
-          stripe_session_id?: string | null
+          package_id: string
+          payment_method: string
+          status: string
+          updated_at?: string
           user_id: string
         }
         Update: {
-          amount_paid_brl?: number
-          completed_at?: string | null
+          amount_in_cents?: number
           created_at?: string
-          credits_purchased?: number
+          credits?: number
           id?: string
-          package_id?: string | null
-          payment_method?: string | null
-          payment_status?: string | null
-          stripe_payment_id?: string | null
-          stripe_session_id?: string | null
+          package_id?: string
+          payment_method?: string
+          status?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -139,49 +177,34 @@ export type Database = {
             foreignKeyName: "credit_purchases_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       credit_usage_history: {
         Row: {
-          created_at: string
+          action_type: string
           credits_used: number
-          domain: string | null
-          email: string | null
-          error_message: string | null
+          created_at: string
           id: string
-          operation_type: string
-          query_params: Json | null
-          result_summary: Json | null
-          success: boolean | null
+          metadata: Json | null
           user_id: string
         }
         Insert: {
-          created_at?: string
+          action_type: string
           credits_used: number
-          domain?: string | null
-          email?: string | null
-          error_message?: string | null
+          created_at?: string
           id?: string
-          operation_type: string
-          query_params?: Json | null
-          result_summary?: Json | null
-          success?: boolean | null
+          metadata?: Json | null
           user_id: string
         }
         Update: {
-          created_at?: string
+          action_type?: string
           credits_used?: number
-          domain?: string | null
-          email?: string | null
-          error_message?: string | null
+          created_at?: string
           id?: string
-          operation_type?: string
-          query_params?: Json | null
-          result_summary?: Json | null
-          success?: boolean | null
+          metadata?: Json | null
           user_id?: string
         }
         Relationships: [
@@ -189,109 +212,234 @@ export type Database = {
             foreignKeyName: "credit_usage_history_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
-      leads: {
+      deal_participants: {
         Row: {
-          activities_count: number
-          company: string
           created_at: string
-          custom_fields: Json
-          email: string
-          first_name: string
+          deal_id: string
           id: string
-          is_archived: boolean
-          job_title: string
-          last_contact_date: string
-          last_name: string
-          next_follow_up: string | null
-          notes_count: number
-          phone: string
-          pipeline_id: string
-          priority: string
-          revenue: number
-          source: string
-          stage_id: string
-          tags: string[]
-          temperature: string
+          is_primary: boolean
+          lead_id: string
+          role: string
           updated_at: string
           user_id: string
         }
         Insert: {
-          activities_count?: number
-          company?: string
           created_at?: string
-          custom_fields?: Json
-          email: string
-          first_name: string
+          deal_id: string
           id?: string
-          is_archived?: boolean
-          job_title?: string
-          last_contact_date?: string
-          last_name: string
-          next_follow_up?: string | null
-          notes_count?: number
-          phone?: string
-          pipeline_id: string
-          priority?: string
-          revenue?: number
-          source?: string
-          stage_id: string
-          tags?: string[]
-          temperature?: string
+          is_primary?: boolean
+          lead_id: string
+          role?: string
           updated_at?: string
           user_id: string
         }
         Update: {
-          activities_count?: number
-          company?: string
           created_at?: string
-          custom_fields?: Json
-          email?: string
-          first_name?: string
+          deal_id?: string
           id?: string
-          is_archived?: boolean
-          job_title?: string
-          last_contact_date?: string
-          last_name?: string
-          next_follow_up?: string | null
-          notes_count?: number
-          phone?: string
-          pipeline_id?: string
-          priority?: string
-          revenue?: number
-          source?: string
-          stage_id?: string
-          tags?: string[]
-          temperature?: string
+          is_primary?: boolean
+          lead_id?: string
+          role?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "leads_pipeline_id_fkey"
+            foreignKeyName: "deal_participants_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "deals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deal_participants_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deal_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      deals: {
+        Row: {
+          closed_date: string | null
+          company_id: string | null
+          company_name: string | null
+          created_at: string
+          currency: string
+          custom_fields: Json | null
+          description: string | null
+          expected_close_date: string | null
+          id: string
+          lost_reason: string | null
+          owner_id: string | null
+          pipeline_id: string
+          position: number
+          probability: number
+          source: string | null
+          stage_id: string
+          status: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          closed_date?: string | null
+          company_id?: string | null
+          company_name?: string | null
+          created_at?: string
+          currency?: string
+          custom_fields?: Json | null
+          description?: string | null
+          expected_close_date?: string | null
+          id?: string
+          lost_reason?: string | null
+          owner_id?: string | null
+          pipeline_id: string
+          position?: number
+          probability?: number
+          source?: string | null
+          stage_id: string
+          status?: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+          value?: number
+        }
+        Update: {
+          closed_date?: string | null
+          company_id?: string | null
+          company_name?: string | null
+          created_at?: string
+          currency?: string
+          custom_fields?: Json | null
+          description?: string | null
+          expected_close_date?: string | null
+          id?: string
+          lost_reason?: string | null
+          owner_id?: string | null
+          pipeline_id?: string
+          position?: number
+          probability?: number
+          source?: string | null
+          stage_id?: string
+          status?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deals_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deals_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deals_pipeline_id_fkey"
             columns: ["pipeline_id"]
             isOneToOne: false
             referencedRelation: "pipelines"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "leads_stage_id_fkey"
+            foreignKeyName: "deals_stage_id_fkey"
             columns: ["stage_id"]
             isOneToOne: false
             referencedRelation: "stages"
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "deals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      leads: {
+        Row: {
+          company: string | null
+          created_at: string
+          email: string
+          enrichment_data: Json | null
+          id: string
+          last_interaction: string | null
+          name: string
+          phone: string | null
+          position: string | null
+          source: string | null
+          status: string
+          tags: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          email: string
+          enrichment_data?: Json | null
+          id?: string
+          last_interaction?: string | null
+          name: string
+          phone?: string | null
+          position?: string | null
+          source?: string | null
+          status?: string
+          tags?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          email?: string
+          enrichment_data?: Json | null
+          id?: string
+          last_interaction?: string | null
+          name?: string
+          phone?: string | null
+          position?: string | null
+          source?: string | null
+          status?: string
+          tags?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
             foreignKeyName: "leads_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       notes: {
@@ -300,6 +448,7 @@ export type Database = {
           created_at: string
           id: string
           lead_id: string
+          updated_at: string
           user_id: string
         }
         Insert: {
@@ -307,6 +456,7 @@ export type Database = {
           created_at?: string
           id?: string
           lead_id: string
+          updated_at?: string
           user_id: string
         }
         Update: {
@@ -314,6 +464,7 @@ export type Database = {
           created_at?: string
           id?: string
           lead_id?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -328,16 +479,15 @@ export type Database = {
             foreignKeyName: "notes_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       pipelines: {
         Row: {
           created_at: string
           id: string
-          is_default: boolean
           name: string
           updated_at: string
           user_id: string
@@ -345,7 +495,6 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          is_default?: boolean
           name: string
           updated_at?: string
           user_id: string
@@ -353,7 +502,6 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          is_default?: boolean
           name?: string
           updated_at?: string
           user_id?: string
@@ -363,70 +511,86 @@ export type Database = {
             foreignKeyName: "pipelines_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       profiles: {
         Row: {
-          avatar_url: string
+          avatar_url: string | null
+          company_name: string | null
+          company_size: string | null
           created_at: string
-          full_name: string
+          full_name: string | null
+          goals: string[] | null
           id: string
+          industry: string | null
+          job_role: string | null
+          onboarding_completed: boolean
+          onboarding_completed_at: string | null
+          plan: string
           updated_at: string
         }
         Insert: {
-          avatar_url?: string
+          avatar_url?: string | null
+          company_name?: string | null
+          company_size?: string | null
           created_at?: string
-          full_name?: string
+          full_name?: string | null
+          goals?: string[] | null
           id: string
+          industry?: string | null
+          job_role?: string | null
+          onboarding_completed?: boolean
+          onboarding_completed_at?: string | null
+          plan?: string
           updated_at?: string
         }
         Update: {
-          avatar_url?: string
+          avatar_url?: string | null
+          company_name?: string | null
+          company_size?: string | null
           created_at?: string
-          full_name?: string
+          full_name?: string | null
+          goals?: string[] | null
           id?: string
+          industry?: string | null
+          job_role?: string | null
+          onboarding_completed?: boolean
+          onboarding_completed_at?: string | null
+          plan?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "profiles_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       stages: {
         Row: {
-          color: string
           created_at: string
           id: string
           name: string
-          order_index: number
+          order: number
           pipeline_id: string
           updated_at: string
+          user_id: string
         }
         Insert: {
-          color?: string
           created_at?: string
           id?: string
           name: string
-          order_index: number
+          order: number
           pipeline_id: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          color?: string
           created_at?: string
           id?: string
           name?: string
-          order_index?: number
+          order?: number
           pipeline_id?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -436,6 +600,13 @@ export type Database = {
             referencedRelation: "pipelines"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "stages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
         ]
       }
       user_credits: {
@@ -443,8 +614,8 @@ export type Database = {
           created_at: string
           credits: number
           id: string
-          total_purchased: number | null
-          total_used: number | null
+          total_purchased: number
+          total_used: number
           updated_at: string
           user_id: string
         }
@@ -452,8 +623,8 @@ export type Database = {
           created_at?: string
           credits?: number
           id?: string
-          total_purchased?: number | null
-          total_used?: number | null
+          total_purchased?: number
+          total_used?: number
           updated_at?: string
           user_id: string
         }
@@ -461,8 +632,8 @@ export type Database = {
           created_at?: string
           credits?: number
           id?: string
-          total_purchased?: number | null
-          total_used?: number | null
+          total_purchased?: number
+          total_used?: number
           updated_at?: string
           user_id?: string
         }
@@ -471,9 +642,9 @@ export type Database = {
             foreignKeyName: "user_credits_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
-            referencedRelation: "users"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
     }
@@ -481,26 +652,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      add_credits: {
-        Args: {
-          p_user_id: string
-          p_credits: number
-          p_purchase_id?: string
-        }
-        Returns: boolean
-      }
-      debit_credits: {
-        Args: {
-          p_user_id: string
-          p_credits: number
-          p_operation_type: string
-          p_domain?: string
-          p_email?: string
-          p_query_params?: Json
-          p_result_summary?: Json
-        }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
@@ -591,4 +743,19 @@ export type Enums<
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
     ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof PublicSchema["CompositeTypes"]
+    | { schema: keyof Database },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
+    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never

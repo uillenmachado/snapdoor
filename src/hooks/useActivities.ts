@@ -7,10 +7,16 @@ export interface Activity {
   id: string;
   lead_id: string;
   user_id: string;
-  type: "message" | "email" | "call" | "meeting" | "comment";
-  description: string;
-  completed: boolean | null;
+  type: "call" | "email" | "meeting" | "task" | "note" | "whatsapp" | "message" | "comment";
+  title: string;
+  description: string | null;
+  due_date: string | null;
+  completed: boolean;
+  completed_at: string | null;
+  duration: number | null; // em minutos
+  outcome: string | null; // resultado da atividade
   created_at: string;
+  updated_at: string;
 }
 
 // Fetch activities for a lead
@@ -144,6 +150,66 @@ export const useDeleteActivity = () => {
     },
     onError: (error: Error) => {
       toast.error(`Erro ao excluir atividade: ${error.message}`);
+    },
+  });
+};
+
+// Count pending activities by lead
+export const usePendingActivitiesCount = (leadId: string | undefined) => {
+  return useQuery({
+    queryKey: ["activities", "count", leadId],
+    queryFn: async () => {
+      if (!leadId) throw new Error("Lead ID required");
+
+      const { count, error } = await supabase
+        .from("activities")
+        .select("*", { count: "exact", head: true })
+        .eq("lead_id", leadId)
+        .eq("completed", false);
+
+      if (error) throw error;
+      return count || 0;
+    },
+    enabled: !!leadId,
+  });
+};
+
+// Complete activity
+export const useCompleteActivity = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      leadId,
+      outcome,
+    }: {
+      id: string;
+      leadId: string;
+      outcome?: string;
+    }) => {
+      const { data, error} = await supabase
+        .from("activities")
+        .update({
+          completed: true,
+          completed_at: new Date().toISOString(),
+          outcome: outcome || null,
+        })
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { ...data, leadId };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["activities", data.leadId] });
+      queryClient.invalidateQueries({ queryKey: ["activities", "user"] });
+      queryClient.invalidateQueries({ queryKey: ["activities", "count", data.leadId] });
+      toast.success("Atividade concluída! ✓");
+    },
+    onError: (error: Error) => {
+      toast.error(`Erro ao concluir atividade: ${error.message}`);
     },
   });
 };

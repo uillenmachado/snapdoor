@@ -2,18 +2,14 @@ import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { DealKanbanBoard } from "@/components/DealKanbanBoard";
-import { LeadDetails } from "@/components/LeadDetails";
-import { AddLeadDialog } from "@/components/AddLeadDialog";
-import { SnapDoorAIDialog } from "@/components/SnapDoorAIDialog";
-import { GlobalSearch } from "@/components/GlobalSearch";
+import { DealCard } from "@/components/DealCard";
 import { DashboardMetrics } from "@/components/DashboardMetrics";
 import { UsageLimits } from "@/components/UsageLimits";
 import { NotificationBell } from "@/components/NotificationBell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Search, Filter, Plus, Loader2, Brain, Zap } from "lucide-react";
+import { Search, Filter, Plus, Loader2, TrendingUp, DollarSign } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -22,17 +18,26 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { usePipeline, useStages, useCreateStage, useUpdateStage, useDeleteStage } from "@/hooks/usePipelines";
-import { useDeals, Deal } from "@/hooks/useDeals";
+import { 
+  useDeals, 
+  useCreateDeal, 
+  useUpdateDeal, 
+  useDeleteDeal,
+  useMarkDealAsWon,
+  useMarkDealAsLost,
+  Deal 
+} from "@/hooks/useDeals";
 import { useSubscription } from "@/hooks/useSubscription";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   
-  // Fetch pipeline and stages
+  // Fetch pipeline, stages and DEALS (not leads!)
   const { data: pipeline, isLoading: pipelineLoading } = usePipeline(user?.id);
   const { data: stages, isLoading: stagesLoading } = useStages(pipeline?.id);
   const { data: deals, isLoading: dealsLoading } = useDeals(user?.id);
@@ -43,9 +48,9 @@ const Dashboard = () => {
   const updateStageMutation = useUpdateStage();
   const deleteStageMutation = useDeleteStage();
   
-  const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
-  const [isDealDetailsOpen, setIsDealDetailsOpen] = useState(false);
-  const [isAddDealOpen, setIsAddDealOpen] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [isLeadDetailsOpen, setIsLeadDetailsOpen] = useState(false);
+  const [isAddLeadOpen, setIsAddLeadOpen] = useState(false);
   const [isSnapDoorAIOpen, setIsSnapDoorAIOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [editingStageId, setEditingStageId] = useState<string | null>(null);
@@ -59,12 +64,12 @@ const Dashboard = () => {
   }, [user, authLoading, navigate]);
 
   useEffect(() => {
-    const handleOpenAddDeal = () => {
-      setIsAddDealOpen(true);
+    const handleOpenAddLead = () => {
+      setIsAddLeadOpen(true);
     };
 
-    window.addEventListener("openAddDeal", handleOpenAddDeal);
-    return () => window.removeEventListener("openAddDeal", handleOpenAddDeal);
+    window.addEventListener("openAddLead", handleOpenAddLead);
+    return () => window.removeEventListener("openAddLead", handleOpenAddLead);
   }, []);
 
   // Keyboard shortcut for SnapDoor AI (Ctrl+K)
@@ -80,38 +85,38 @@ const Dashboard = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Group deals by stage
-  const stagesWithDeals = useMemo(() => {
-    if (!stages || !deals) return [];
+  // Group leads by stage
+  const stagesWithLeads = useMemo(() => {
+    if (!stages || !leads) return [];
     
     return stages.map((stage) => ({
       ...stage,
-      deals: deals.filter((deal) => deal.stage_id === stage.id),
+      leads: leads.filter((lead) => lead.stage_id === stage.id),
     }));
-  }, [stages, deals]);
+  }, [stages, leads]);
 
   // Filter stages based on search
   const filteredStages = useMemo(() => {
-    if (!searchQuery) return stagesWithDeals;
+    if (!searchQuery) return stagesWithLeads;
     
-    return stagesWithDeals.map((stage) => ({
+    return stagesWithLeads.map((stage) => ({
       ...stage,
-      deals: stage.deals.filter(
-        (deal) =>
-          deal.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (deal.company_name && deal.company_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-          (deal.description && deal.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      leads: stage.leads.filter(
+        (lead) =>
+          lead.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          lead.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (lead.company && lead.company.toLowerCase().includes(searchQuery.toLowerCase()))
       ),
     }));
-  }, [stagesWithDeals, searchQuery]);
+  }, [stagesWithLeads, searchQuery]);
 
-  const handleDealClick = (deal: Deal) => {
-    setSelectedDeal(deal);
-    setIsDealDetailsOpen(true);
+  const handleLeadClick = (lead: Lead) => {
+    setSelectedLead(lead);
+    setIsLeadDetailsOpen(true);
   };
 
   const handleEditStage = (stageId: string) => {
-    const stage = stagesWithDeals.find((s) => s.id === stageId);
+    const stage = stages?.find((s) => s.id === stageId);
     if (stage) {
       setEditingStageId(stageId);
       setNewStageName(stage.name);
@@ -136,9 +141,9 @@ const Dashboard = () => {
   };
 
   const handleDeleteStage = async (stageId: string) => {
-    const stage = stagesWithDeals.find((s) => s.id === stageId);
-    if (stage && stage.deals.length > 0) {
-      toast.error("Não é possível excluir uma etapa com negócios");
+    const stage = stagesWithLeads.find((s) => s.id === stageId);
+    if (stage && stage.leads.length > 0) {
+      toast.error("Não é possível excluir uma etapa com leads");
       return;
     }
 
@@ -164,7 +169,7 @@ const Dashboard = () => {
   };
 
   // Loading state
-  if (authLoading || pipelineLoading || stagesLoading || dealsLoading) {
+  if (authLoading || pipelineLoading || stagesLoading || leadsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -198,18 +203,17 @@ const Dashboard = () => {
                 </div>
                 <UsageLimits 
                   subscription={subscription} 
-                  leadsCount={deals?.length || 0}
+                  leadsCount={leads?.length || 0}
                   pipelinesCount={1}
                 />
               </div>
               
               <div className="flex items-center gap-2">
                 <NotificationBell />
-                {/* TODO: Create GlobalDealSearch component */}
-                {/* <GlobalSearch 
-                  leads={deals || [] as any} 
-                  onSelectLead={handleDealClick}
-                /> */}
+                <GlobalSearch 
+                  leads={leads || []} 
+                  onSelectLead={handleLeadClick}
+                />
                 <Button variant="outline" size="icon">
                   <Filter className="h-4 w-4" />
                 </Button>
@@ -230,9 +234,9 @@ const Dashboard = () => {
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-                <Button onClick={() => setIsAddDealOpen(true)}>
+                <Button onClick={() => setIsAddLeadOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Adicionar Negócio
+                  Adicionar Lead
                 </Button>
               </div>
             </div>
@@ -241,12 +245,12 @@ const Dashboard = () => {
           {/* Main Content */}
           <main className="flex-1 overflow-auto p-6">
             {/* Dashboard Metrics */}
-            <DashboardMetrics leads={deals || [] as any} stages={(stages || []) as any} />
+            <DashboardMetrics leads={leads || []} stages={(stages || []) as any} />
             
             {/* Kanban Board */}
-            <DealKanbanBoard
+            <KanbanBoard
               stages={filteredStages as any}
-              onDealClick={handleDealClick}
+              onLeadClick={handleLeadClick}
               onEditStage={handleEditStage}
               onDeleteStage={handleDeleteStage}
               onAddStage={handleAddStage}
@@ -254,49 +258,21 @@ const Dashboard = () => {
           </main>
         </div>
 
-        {/* Deal Details - TODO: Create DealDetails component */}
-        {selectedDeal && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-            <div className="bg-white rounded-lg p-6 max-w-2xl w-full m-4">
-              <h2 className="text-2xl font-bold mb-4">{selectedDeal.title}</h2>
-              <p>Valor: R$ {selectedDeal.value.toLocaleString('pt-BR')}</p>
-              <p>Probabilidade: {selectedDeal.probability}%</p>
-              <p>Status: {selectedDeal.status}</p>
-              <button 
-                onClick={() => setIsDealDetailsOpen(false)}
-                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Fechar
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Legacy Lead Details - mantido para compatibilidade */}
-        {/* <LeadDetails
+        {/* Lead Details */}
+        <LeadDetails
           lead={selectedLead}
           isOpen={isLeadDetailsOpen}
           onClose={() => setIsLeadDetailsOpen(false)}
           userId={user?.id}
         />
 
-        {/* Add Deal Dialog - TODO: Create AddDealDialog component */}
-        {isAddDealOpen && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full m-4">
-              <h2 className="text-2xl font-bold mb-4">Adicionar Negócio</h2>
-              <p className="text-muted-foreground mb-4">
-                Funcionalidade em desenvolvimento. Use a página Negócios para criar novos deals.
-              </p>
-              <button 
-                onClick={() => setIsAddDealOpen(false)}
-                className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Fechar
-              </button>
-            </div>
-          </div>
-        )}
+        {/* Add Lead Dialog */}
+        <AddLeadDialog
+          isOpen={isAddLeadOpen}
+          onClose={() => setIsAddLeadOpen(false)}
+          stages={stages as any}
+          userId={user?.id}
+        />
 
         {/* Edit Stage Dialog */}
         <Dialog open={!!editingStageId} onOpenChange={() => setEditingStageId(null)}>

@@ -6,6 +6,12 @@ export interface Profile {
   id: string;
   full_name: string | null;
   avatar_url: string | null;
+  job_role: string | null;
+  company_size: string | null;
+  industry: string | null;
+  goals: string[] | null;
+  onboarding_completed: boolean | null;
+  onboarding_completed_at: string | null;
   created_at: string;
   updated_at: string;
 }
