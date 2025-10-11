@@ -44,8 +44,9 @@ serve(async (req) => {
 
     console.log('🔍 Extraindo dados do LinkedIn:', linkedinUrl);
 
-    // Faz requisição ao LinkedIn como se fosse um navegador
-    const response = await fetch(linkedinUrl, {
+    // Tenta requisição direta primeiro
+    let html: string | null = null;
+    let response = await fetch(linkedinUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -56,14 +57,43 @@ serve(async (req) => {
       },
     });
 
-    if (!response.ok) {
+    console.log('📡 Status da resposta LinkedIn (tentativa direta):', response.status);
+
+    if (response.ok) {
+      html = await response.text();
+    } else {
+      // FALLBACK: Tenta via proxy público (allorigins.win)
+      console.log('🔄 Tentando via proxy público...');
+      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(linkedinUrl)}`;
+      
+      response = await fetch(proxyUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        },
+      });
+
+      if (response.ok) {
+        html = await response.text();
+        console.log('✅ Proxy funcionou!');
+      } else {
+        console.error('❌ LinkedIn bloqueou ambas tentativas');
+        return new Response(
+          JSON.stringify({ 
+            error: 'Perfil não acessível', 
+            success: false,
+            details: `LinkedIn bloqueou acesso (status ${response.status})` 
+          }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    if (!html) {
       return new Response(
-        JSON.stringify({ error: 'Perfil não acessível', success: false }),
+        JSON.stringify({ error: 'Não foi possível obter conteúdo do perfil', success: false }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-
-    const html = await response.text();
     
     // Parsing do HTML
     const doc = new DOMParser().parseFromString(html, 'text/html');
