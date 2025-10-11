@@ -46,7 +46,10 @@ export class LinkedInScraperService {
       console.log('📡 [LinkedIn Scraper] Chamando Edge Function...');
       
       const { data, error } = await supabase.functions.invoke('linkedin-scraper', {
-        body: { linkedinUrl: profileUrl }
+        body: { linkedinUrl: profileUrl },
+        headers: {
+          'Content-Type': 'application/json',
+        }
       });
       
       if (error) {
