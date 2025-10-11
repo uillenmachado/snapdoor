@@ -65,11 +65,15 @@ export function useEnrichLead() {
       const result = await leadEnrichmentService.enrichLead(leadId, leadData, options);
 
       if (!result.success) {
-        // Mensagem mais amigável - enriquecimento parcial é válido
-        console.warn('⚠️ Enriquecimento parcial:', result);
-        // Não lança erro se algum dado foi enriquecido
-        if (result.creditsUsed === 0) {
-          throw new Error('Não há dados novos para enriquecer este lead');
+        console.warn('⚠️ Enriquecimento não obteve dados:', result);
+        
+        // Mensagens específicas por tipo de falha
+        if (result.source === 'no_new_data') {
+          throw new Error('Este lead já possui todos os dados disponíveis ou não há informações novas na base de dados');
+        } else if (result.source === 'insufficient_data') {
+          throw new Error('Dados insuficientes. Adicione nome completo + empresa ou email para enriquecer');
+        } else {
+          throw new Error('Não foi possível obter novos dados para este lead');
         }
       }
 

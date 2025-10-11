@@ -154,7 +154,9 @@ class LeadEnrichmentService {
             console.log(`🌐 FALLBACK: Extraindo dados públicos do LinkedIn: ${currentData.linkedin_url}`);
             const linkedInData = await linkedInScraperService.extractProfileData(currentData.linkedin_url);
             
-            if (linkedInData) {
+            // IMPORTANTE: Só usa dados do LinkedIn se tiver informações reais
+            // O fallback retorna dados genéricos que não devem ser salvos
+            if (linkedInData && linkedInData.firstName && linkedInData.lastName) {
               // Preenche com dados extraídos do perfil público (ORGANIZADO)
               enrichedData.first_name = linkedInData.firstName || enrichedData.first_name;
               enrichedData.last_name = linkedInData.lastName || enrichedData.last_name;
@@ -288,6 +290,21 @@ class LeadEnrichmentService {
         };
       }
 
+      // Verifica se realmente conseguiu enriquecer algo
+      const hasNewData = Object.keys(enrichedData).length > 0 && 
+                         Object.values(enrichedData).some(value => value !== null && value !== undefined && value !== '');
+      
+      if (!hasNewData) {
+        console.warn('⚠️ Nenhum dado novo foi obtido para enriquecimento');
+        return {
+          success: false,
+          creditsUsed: 0,
+          enrichedData: {},
+          source: 'no_new_data',
+          confidence: 0,
+        };
+      }
+
       // Atualiza o lead no banco de dados
       const { error: updateError } = await supabase
         .from('leads')
@@ -303,6 +320,7 @@ class LeadEnrichmentService {
       }
 
       console.log(`✅ Lead enriquecido com sucesso! ${totalCredits} créditos usados`);
+      console.log(`📊 Campos atualizados:`, Object.keys(enrichedData));
       console.log('Fontes usadas:', sources.join(', '));
 
       return {
