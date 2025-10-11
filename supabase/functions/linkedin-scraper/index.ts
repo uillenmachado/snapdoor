@@ -37,8 +37,8 @@ serve(async (req) => {
     
     if (!linkedinUrl) {
       return new Response(
-        JSON.stringify({ error: 'LinkedIn URL é obrigatória' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'LinkedIn URL é obrigatória', success: false }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -58,8 +58,8 @@ serve(async (req) => {
 
     if (!response.ok) {
       return new Response(
-        JSON.stringify({ error: 'Perfil não acessível' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Perfil não acessível', success: false }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -94,8 +94,8 @@ serve(async (req) => {
     
     if (!finalTitle) {
       return new Response(
-        JSON.stringify({ error: 'Não foi possível extrair dados do perfil' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Não foi possível extrair dados do perfil', success: false }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -229,7 +229,7 @@ serve(async (req) => {
         success: false 
       }),
       { 
-        status: 500, 
+        status: 200, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
     );

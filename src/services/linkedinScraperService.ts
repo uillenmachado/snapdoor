@@ -57,7 +57,13 @@ export class LinkedInScraperService {
         return null;
       }
       
-      if (!data?.success || !data?.data) {
+      // Edge Function sempre retorna 200, mas com success: false em caso de erro
+      if (!data?.success) {
+        console.warn('⚠️ [LinkedIn Scraper] Perfil não acessível:', data?.error || 'Erro desconhecido');
+        return null;
+      }
+      
+      if (!data?.data) {
         console.warn('⚠️ [LinkedIn Scraper] Edge Function não retornou dados');
         return null;
       }
