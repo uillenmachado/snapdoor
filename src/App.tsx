@@ -23,6 +23,7 @@ import Profile from "./pages/Profile";
 import Companies from "./pages/Companies";
 import CompanyDetail from "./pages/CompanyDetail";
 import Meetings from "./pages/Meetings";
+import Automations from "./pages/Automations";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -164,6 +165,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <LeadProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/automations"
+            element={
+              <ProtectedRoute>
+                <Automations />
               </ProtectedRoute>
             }
           />
