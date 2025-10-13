@@ -56,10 +56,13 @@ export interface TaskFilters {
   search?: string;
   status?: TaskStatus;
   priority?: TaskPriority;
+  user_id?: string;         // Filtrar por usuário
   lead_id?: string;
   company_id?: string;
   deal_id?: string;
   assigned_to?: string;
+  due_date_from?: string;   // Data de início do intervalo
+  due_date_to?: string;     // Data de fim do intervalo
   overdue?: boolean;        // Apenas vencidas
   due_today?: boolean;      // Vencendo hoje
   due_this_week?: boolean;  // Vencendo esta semana
