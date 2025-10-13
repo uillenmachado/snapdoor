@@ -148,3 +148,75 @@ export const useDeleteActivity = () => {
   });
 };
 
+// ============================================
+// NOVOS HOOKS PARA FASE 5 - Timeline Avançada
+// ============================================
+
+import type {
+  Activity as ActivityExtended,
+  ActivityFilters,
+  ActivityType,
+} from "@/types/activity";
+import {
+  fetchActivitiesWithRelations,
+  fetchActivityStats,
+  logActivity as logActivityService,
+} from "@/services/activityService";
+
+/**
+ * Hook para buscar atividades com filtros e paginação (versão avançada)
+ */
+export const useActivitiesAdvanced = (
+  filters: ActivityFilters = {},
+  page: number = 1,
+  pageSize: number = 20
+) => {
+  return useQuery({
+    queryKey: ["activities", "advanced", filters, page, pageSize],
+    queryFn: () => fetchActivitiesWithRelations(filters, page, pageSize),
+    staleTime: 1000 * 60, // 1 minuto
+  });
+};
+
+/**
+ * Hook para estatísticas de atividades
+ */
+export const useActivityStats = (userId: string | undefined) => {
+  return useQuery({
+    queryKey: ["activities", "stats", userId],
+    queryFn: () => {
+      if (!userId) throw new Error("User ID required");
+      return fetchActivityStats(userId);
+    },
+    enabled: !!userId,
+    staleTime: 1000 * 60 * 5, // 5 minutos
+  });
+};
+
+/**
+ * Hook para criar log automático de atividade
+ */
+export const useLogActivity = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      type,
+      title,
+      description,
+      metadata,
+    }: {
+      userId: string;
+      type: ActivityType;
+      title: string;
+      description?: string;
+      metadata?: Record<string, any>;
+    }) => {
+      return logActivityService(userId, type, title, description, metadata);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["activities"] });
+    },
+  });
+};
