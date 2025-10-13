@@ -1,23 +1,8 @@
 // @ts-nocheck - Tipos do Supabase precisam ser regenerados após migration de companies
 import { supabase } from "@/integrations/supabase/client";
+import { Company } from "@/types/company";
 
-export interface Company {
-  id: string;
-  name: string;
-  domain?: string | null;
-  industry?: string | null;
-  size?: string | null;
-  location?: string | null;
-  logo_url?: string | null;
-  description?: string | null;
-  website?: string | null;
-  linkedin_url?: string | null;
-  twitter_url?: string | null;
-  phone?: string | null;
-  created_at: string;
-  updated_at: string;
-  user_id: string;
-}
+export type { Company };
 
 /**
  * Extrai o domínio de um email

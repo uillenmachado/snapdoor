@@ -19,6 +19,7 @@ import LeadProfile from "./pages/LeadProfile";
 import Leads from "./pages/Leads";
 import Profile from "./pages/Profile";
 import Companies from "./pages/Companies";
+import CompanyDetail from "./pages/CompanyDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -96,6 +97,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Companies />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/companies/:id"
+            element={
+              <ProtectedRoute>
+                <CompanyDetail />
               </ProtectedRoute>
             }
           />
