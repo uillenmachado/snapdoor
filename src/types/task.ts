@@ -30,12 +30,29 @@ export interface Task {
   deal_id?: string;
   assigned_to?: string;  // user_id de quem está atribuído
   
-  // Dados populados (joins)
+  // Dados populados (joins) - strings simples
   lead_name?: string;
   company_name?: string;
   deal_title?: string;
   assigned_user_name?: string;
   assigned_user_avatar?: string;
+  
+  // Objetos populados completos (para queries com relations)
+  lead?: {
+    id: string;
+    name: string;
+    email?: string;
+  };
+  company?: {
+    id: string;
+    name: string;
+    website?: string;
+  };
+  deal?: {
+    id: string;
+    title: string;
+    value?: number;
+  };
 }
 
 // Dados para criar/editar tarefa

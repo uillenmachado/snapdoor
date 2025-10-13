@@ -8,33 +8,54 @@ import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { useAuth } from "@/hooks/useAuth";
-import { useActivitiesAdvanced, useActivityStats } from "@/hooks/useActivities";
+import { useUserActivities } from "@/hooks/useActivities";
 import { ActivityFilters, ActivityType, ACTIVITY_CONFIG } from "@/types/activity";
 import { Search, Plus, TrendingUp, Clock, Activity as ActivityIcon } from "lucide-react";
 
 export default function Activities() {
   const { user } = useAuth();
-  const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState<ActivityFilters>({
-    sortBy: "created_at",
-    sortOrder: "desc",
-  });
+  const [search, setSearch] = useState("");
 
-  const { data, isLoading } = useActivitiesAdvanced(filters, page, 20);
-  const { data: stats } = useActivityStats(user?.id);
-
-  const activities = data?.data || [];
-  const totalCount = data?.count || 0;
-  const totalPages = Math.ceil(totalCount / 20);
+  const { data, isLoading } = useUserActivities(user?.id);
+  
+  // Processar dados temporariamente até implementar hooks avançados
+  const allActivities = data || [];
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
+  
+  const stats = {
+    totalActivities: allActivities.length,
+    thisWeek: allActivities.filter((a: any) => 
+      new Date(a.created_at) > weekAgo
+    ).length,
+    byType: allActivities.reduce((acc: Record<string, number>, a: any) => {
+      acc[a.type] = (acc[a.type] || 0) + 1;
+      return acc;
+    }, {}),
+    recentCount: allActivities.filter((a: any) => {
+      const dayAgo = new Date();
+      dayAgo.setDate(dayAgo.getDate() - 1);
+      return new Date(a.created_at) > dayAgo;
+    }).length
+  };
+  
+  // Filtrar atividades por busca
+  const filteredActivities = search
+    ? allActivities.filter((a: any) =>
+        a.description?.toLowerCase().includes(search.toLowerCase()) ||
+        a.type?.toLowerCase().includes(search.toLowerCase())
+      )
+    : allActivities;
+  
+  // Converter para formato Activity (com title)
+  const activities = filteredActivities.map((a: any) => ({
+    ...a,
+    title: a.description || a.type,
+    updated_at: a.created_at
+  }));
 
   const handleSearch = (value: string) => {
-    setFilters({ ...filters, search: value });
-    setPage(1);
-  };
-
-  const handleTypeFilter = (value: string) => {
-    setFilters({ ...filters, type: value === "all" ? undefined : value as ActivityType });
-    setPage(1);
+    setSearch(value);
   };
 
   return (
@@ -95,27 +116,10 @@ export default function Activities() {
                   type="search"
                   placeholder="Buscar atividades..."
                   className="pl-8"
-                  value={filters.search || ""}
+                  value={search}
                   onChange={(e) => handleSearch(e.target.value)}
                 />
               </div>
-
-              <Select
-                value={filters.type || "all"}
-                onValueChange={handleTypeFilter}
-              >
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="Todos os tipos" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos os tipos</SelectItem>
-                  {Object.entries(ACTIVITY_CONFIG).map(([key, config]) => (
-                    <SelectItem key={key} value={key}>
-                      {config.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
 
             <Button>
@@ -127,31 +131,7 @@ export default function Activities() {
           {isLoading ? (
             <div className="text-center py-8">Carregando...</div>
           ) : (
-            <>
-              <ActivityFeed activities={activities} showRelated={true} />
-
-              {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                  >
-                    Anterior
-                  </Button>
-                  <span className="text-sm text-muted-foreground">
-                    Página {page} de {totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page === totalPages}
-                  >
-                    Próxima
-                  </Button>
-                </div>
-              )}
-            </>
+            <ActivityFeed activities={activities} showRelated={true} />
           )}
         </div>
       </SidebarInset>
