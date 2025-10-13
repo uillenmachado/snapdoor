@@ -10,6 +10,7 @@ import { GlobalSearch } from "@/components/GlobalSearch";
 import { DashboardMetrics } from "@/components/DashboardMetrics";
 import { UsageLimits } from "@/components/UsageLimits";
 import { NotificationBell } from "@/components/NotificationBell";
+import { TasksWidget } from "@/components/TasksWidget";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -243,14 +244,21 @@ const Dashboard = () => {
             {/* Dashboard Metrics */}
             <DashboardMetrics leads={deals || [] as any} stages={(stages || []) as any} />
             
+            {/* Tasks Widget */}
+            <div className="mt-6">
+              <TasksWidget />
+            </div>
+            
             {/* Kanban Board */}
-            <DealKanbanBoard
-              stages={filteredStages as any}
-              onDealClick={handleDealClick}
-              onEditStage={handleEditStage}
-              onDeleteStage={handleDeleteStage}
-              onAddStage={handleAddStage}
-            />
+            <div className="mt-6">
+              <DealKanbanBoard
+                stages={filteredStages as any}
+                onDealClick={handleDealClick}
+                onEditStage={handleEditStage}
+                onDeleteStage={handleDeleteStage}
+                onAddStage={handleAddStage}
+              />
+            </div>
           </main>
         </div>
 

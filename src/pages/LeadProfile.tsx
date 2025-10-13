@@ -35,6 +35,7 @@ import { useState } from 'react';
 import { AddLeadDialog } from '@/components/AddLeadDialog';
 import { EditableField } from '@/components/EditableField';
 import { MultipleContacts } from '@/components/MultipleContacts';
+import { RelatedTasksSection } from '@/components/RelatedTasksSection';
 
 // Tipo do database
 type DatabaseLead = {
@@ -476,6 +477,9 @@ export default function LeadProfile() {
               </CardContent>
             </Card>
           )}
+
+          {/* Seção de Tarefas */}
+          <RelatedTasksSection leadId={lead.id} title="Tarefas do Lead" />
         </div>
       </div>
 
