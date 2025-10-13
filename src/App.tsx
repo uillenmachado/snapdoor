@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ThemeProvider } from "@/components/theme-provider";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -16,6 +17,7 @@ import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import LeadProfile from "./pages/LeadProfile";
 import Leads from "./pages/Leads";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -30,15 +32,16 @@ const queryClient = new QueryClient({
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter
-          future={{
-            v7_startTransition: true,
-            v7_relativeSplatPath: true,
-          }}
-        >
+      <ThemeProvider defaultTheme="system" storageKey="snapdoor-theme">
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true,
+            }}
+          >
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Index />} />
@@ -80,6 +83,14 @@ const App = () => (
             }
           />
           <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/help"
             element={
               <ProtectedRoute>
@@ -109,6 +120,7 @@ const App = () => (
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
+      </ThemeProvider>
   </QueryClientProvider>
   </ErrorBoundary>
 );
