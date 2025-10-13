@@ -22,7 +22,7 @@ import Leads from "./pages/Leads";
 import Profile from "./pages/Profile";
 import Companies from "./pages/Companies";
 import CompanyDetail from "./pages/CompanyDetail";
-import Deals from "./pages/Deals";
+import Meetings from "./pages/Meetings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -84,6 +84,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Activities />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/meetings"
+            element={
+              <ProtectedRoute>
+                <Meetings />
               </ProtectedRoute>
             }
           />
