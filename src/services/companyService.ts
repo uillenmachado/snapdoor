@@ -236,3 +236,192 @@ export async function updateCompanyFromEnrichment(companyId: string, enrichmentD
   console.log("✅ Empresa atualizada com dados de enriquecimento");
   return data;
 }
+
+/**
+ * Buscar empresas com filtros e paginação
+ */
+export async function fetchCompanies(
+  filters?: {
+    search?: string;
+    industry?: string;
+    size?: string;
+    sortBy?: 'name' | 'created_at' | 'updated_at';
+    sortOrder?: 'asc' | 'desc';
+  },
+  page = 1,
+  pageSize = 20
+): Promise<{ data: Company[]; count: number }> {
+  let query = supabase
+    .from('companies')
+    .select('*', { count: 'exact' });
+
+  // Aplicar busca
+  if (filters?.search) {
+    query = query.or(
+      `name.ilike.%${filters.search}%,domain.ilike.%${filters.search}%,description.ilike.%${filters.search}%`
+    );
+  }
+
+  // Aplicar filtros
+  if (filters?.industry) {
+    query = query.eq('industry', filters.industry);
+  }
+
+  if (filters?.size) {
+    query = query.eq('size', filters.size);
+  }
+
+  // Aplicar ordenação
+  const sortBy = filters?.sortBy || 'created_at';
+  const sortOrder = filters?.sortOrder || 'desc';
+  query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+
+  // Aplicar paginação
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+  query = query.range(from, to);
+
+  const { data, error, count } = await query;
+
+  if (error) {
+    console.error('Erro ao buscar empresas:', error);
+    throw new Error(`Erro ao buscar empresas: ${error.message}`);
+  }
+
+  return { data: (data || []) as Company[], count: count || 0 };
+}
+
+/**
+ * Buscar empresa por ID
+ */
+export async function fetchCompanyById(id: string): Promise<Company> {
+  const { data, error } = await supabase
+    .from('companies')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    console.error('Erro ao buscar empresa:', error);
+    throw new Error(`Erro ao buscar empresa: ${error.message}`);
+  }
+
+  if (!data) {
+    throw new Error('Empresa não encontrada');
+  }
+
+  return data as Company;
+}
+
+/**
+ * Criar nova empresa
+ */
+export async function createCompany(companyData: Partial<Company>): Promise<Company> {
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error('Usuário não autenticado');
+  }
+
+  const { data, error } = await supabase
+    .from('companies')
+    .insert([{
+      ...companyData,
+      user_id: user.id,
+    }])
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Erro ao criar empresa:', error);
+    throw new Error(`Erro ao criar empresa: ${error.message}`);
+  }
+
+  return data as Company;
+}
+
+/**
+ * Atualizar empresa existente
+ */
+export async function updateCompany(
+  id: string,
+  updates: Partial<Company>
+): Promise<Company> {
+  const { data, error } = await supabase
+    .from('companies')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Erro ao atualizar empresa:', error);
+    throw new Error(`Erro ao atualizar empresa: ${error.message}`);
+  }
+
+  return data as Company;
+}
+
+/**
+ * Deletar empresa
+ */
+export async function deleteCompany(id: string): Promise<void> {
+  const { error } = await supabase
+    .from('companies')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Erro ao deletar empresa:', error);
+    throw new Error(`Erro ao deletar empresa: ${error.message}`);
+  }
+}
+
+/**
+ * Contar leads por empresa
+ */
+export async function countLeadsByCompany(companyId: string): Promise<number> {
+  const { count, error } = await supabase
+    .from('leads')
+    .select('*', { count: 'exact', head: true })
+    .eq('company_id', companyId);
+
+  if (error) {
+    console.error('Erro ao contar leads:', error);
+    return 0;
+  }
+
+  return count || 0;
+}
+
+/**
+ * Contar deals por empresa
+ */
+export async function countDealsByCompany(companyId: string): Promise<number> {
+  const { count, error } = await supabase
+    .from('deals')
+    .select('*', { count: 'exact', head: true })
+    .eq('company_id', companyId);
+
+  if (error) {
+    console.error('Erro ao contar deals:', error);
+    return 0;
+  }
+
+  return count || 0;
+}
+
+/**
+ * Buscar estatísticas da empresa
+ */
+export async function fetchCompanyStats(companyId: string) {
+  const [leadsCount, dealsCount] = await Promise.all([
+    countLeadsByCompany(companyId),
+    countDealsByCompany(companyId),
+  ]);
+
+  return {
+    leadsCount,
+    dealsCount,
+  };
+}
