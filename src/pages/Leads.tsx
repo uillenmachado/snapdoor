@@ -22,10 +22,13 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ImportWizard } from "@/components/ImportWizard";
+import { ExportDialog } from "@/components/ExportDialog";
 import { 
   Search, 
   Filter, 
   Download, 
+  Upload,
   Eye, 
   Building2, 
   Mail, 
@@ -52,6 +55,8 @@ export default function Leads() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [companyFilter, setCompanyFilter] = useState<string>("all");
+  const [showImportWizard, setShowImportWizard] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
 
   // Buscar todos os leads do usuário
   const { data: leads = [], isLoading } = useQuery({
@@ -276,9 +281,14 @@ export default function Leads() {
                 </SelectContent>
               </Select>
 
-              <Button variant="outline" onClick={handleExportCSV}>
+              <Button variant="outline" onClick={() => setShowImportWizard(true)}>
+                <Upload className="h-4 w-4 mr-2" />
+                Importar
+              </Button>
+
+              <Button variant="outline" onClick={() => setShowExportDialog(true)}>
                 <Download className="h-4 w-4 mr-2" />
-                Exportar CSV
+                Exportar
               </Button>
             </div>
           </div>
@@ -385,6 +395,27 @@ export default function Leads() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Import/Export Dialogs */}
+      <ImportWizard
+        open={showImportWizard}
+        onOpenChange={setShowImportWizard}
+        entityType="leads"
+        onComplete={() => {
+          // Recarregar dados após importação
+          window.location.reload();
+        }}
+      />
+
+      <ExportDialog
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
+        entityType="leads"
+        filters={{
+          status: statusFilter !== "all" ? statusFilter : undefined,
+          company: companyFilter !== "all" ? companyFilter : undefined,
+        }}
+      />
     </div>
   );
 }

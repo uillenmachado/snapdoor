@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { useCompanies, useDeleteCompany } from '@/hooks/useCompanies';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ImportWizard } from '@/components/ImportWizard';
+import { ExportDialog } from '@/components/ExportDialog';
 import {
   Select,
   SelectContent,
@@ -51,7 +53,9 @@ import {
   Edit,
   Trash2,
   ExternalLink,
-  Loader2
+  Loader2,
+  Upload,
+  Download
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -74,6 +78,8 @@ export default function Companies() {
   });
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [showImportWizard, setShowImportWizard] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
 
   const { data, isLoading } = useCompanies(filters, page, 20);
   const deleteMutation = useDeleteCompany();
@@ -125,10 +131,20 @@ export default function Companies() {
             Gerencie as empresas do seu pipeline
           </p>
         </div>
-        <Button onClick={() => setShowCreateDialog(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Nova Empresa
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setShowImportWizard(true)}>
+            <Upload className="w-4 h-4 mr-2" />
+            Importar
+          </Button>
+          <Button variant="outline" onClick={() => setShowExportDialog(true)}>
+            <Download className="w-4 h-4 mr-2" />
+            Exportar
+          </Button>
+          <Button onClick={() => setShowCreateDialog(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Nova Empresa
+          </Button>
+        </div>
       </div>
 
       {/* Filtros e Busca */}
@@ -363,6 +379,24 @@ export default function Companies() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Import/Export Dialogs */}
+      <ImportWizard
+        open={showImportWizard}
+        onOpenChange={setShowImportWizard}
+        entityType="companies"
+        onComplete={() => {
+          // Recarregar dados após importação
+          window.location.reload();
+        }}
+      />
+
+      <ExportDialog
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
+        entityType="companies"
+        filters={filters}
+      />
     </div>
   );
 }
