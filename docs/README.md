@@ -1,92 +1,157 @@
 # 📚 Documentação SnapDoor CRM
 
-Bem-vindo à documentação completa do SnapDoor CRM. Esta pasta contém toda a documentação técnica, guias de uso e arquitetura do sistema.
+Bem-vindo à documentação oficial do **SnapDoor CRM** - Um sistema completo de gestão de leads com enriquecimento via LinkedIn e Hunter.io.
 
-## 📁 Estrutura da Documentação
+## 📖 Índice
 
-### 🚀 Setup e Configuração (`/setup`)
-Guias para configurar e iniciar o projeto:
-- **SUPABASE_SETUP_GUIDE.md** - Configuração completa do Supabase
-- **DEV_ACCOUNT_SETUP.md** - Configuração da conta de desenvolvedor
-- **SETUP_SUMMARY.md** - Resumo das configurações do projeto
-- **CLEAR_CACHE_INSTRUCTIONS.md** - Como limpar cache e resolver problemas
+- [Sistema de Créditos](./CREDIT_SYSTEM_GUIDE.md)
+- [Enriquecimento de Leads](./LEAD_ENRICHMENT_GUIDE.md)
+- [Guia do Usuário - Enriquecimento](./USER_ENRICHMENT_GUIDE.md)
+- [Configuração do Supabase](./SUPABASE_SETUP_GUIDE.md)
+- [Melhorias Implementadas](./MELHORIAS_IMPLEMENTADAS.md)
 
-### 📖 Guias de Uso (`/guides`)
-Documentação para usuários e desenvolvedores:
-- **LEAD_ENRICHMENT_GUIDE.md** - Como enriquecer leads com dados externos
-- **USER_ENRICHMENT_GUIDE.md** - Guia de enriquecimento para usuários
-- **CREDIT_SYSTEM_GUIDE.md** - Sistema de créditos e cobrança
-- **GUIA_DE_TESTE.md** - Guia para testar funcionalidades
+## 🚀 Início Rápido
 
-### 🏗️ Arquitetura (`/architecture`)
-Documentação técnica da arquitetura do sistema:
-- **ENRICHMENT_REQUIREMENTS.md** - Requisitos do sistema de enriquecimento
-- **SUPABASE_DOCS_INDEX.md** - Índice da documentação do Supabase
-- **MELHORIAS_IMPLEMENTADAS.md** - Histórico de melhorias implementadas
+### Pré-requisitos
 
-### 🔄 Migrações (`/migrations`)
-Documentação sobre migrações de banco de dados:
-- **MIGRATION_WALKTHROUGH.md** - Passo a passo das migrações
-- **EXECUTE_MIGRATION_NOW.md** - Instruções para executar migrações
-- **APPLY_MIGRATION_NOW.md** - Como aplicar novas migrações
-- **QUICK_START_MIGRATION.md** - Início rápido com migrações
+- Node.js 18+
+- Conta no Supabase
+- Chaves de API: Hunter.io, Stripe (opcional)
 
-### 🧪 Testes e Validação (`/testing`)
-Documentação de testes e validações:
-- **VALIDATION_CHECKLIST.md** - Checklist de validação do sistema
-- **FIX_LOG.md** - Log de correções aplicadas
+### Instalação
 
-### 📊 Auditorias (`/audits`)
-Relatórios de auditorias do sistema:
-- **AUDITORIA_COMPLETA_PROJETO.md** - Auditoria completa do projeto
-- **AUDITORIA_RESUMO.md** - Resumo das auditorias
-- **AUDITORIA_SUPABASE_COMPLETA.md** - Auditoria completa do Supabase
+```bash
+# 1. Clone o repositório
+git clone https://github.com/uillenmachado/snapdoor.git
+cd snapdoor
 
-### 📈 Status e Relatórios (raiz `/docs`)
-Documentos executivos e de acompanhamento:
-- **EXECUTIVE_SUMMARY.md** - Resumo executivo do projeto
-- **FINAL_CELEBRATION.md** - Marcos e celebrações
-- **MONETIZATION_READY.md** - Status de monetização
-- **VISUAL_STATUS_BOARD.md** - Quadro visual de status
-- **AUDITORIA_FINAL.md** - Auditoria final do sistema
-- **SISTEMA_COMPLETO_CELEBRACAO.md** - Celebração do sistema completo
-- **STATUS_FINAL_10_10.md** - Status final de 10/10/2025
-- **STATUS_VISUAL.md** - Status visual do projeto
-- **ROADMAP_TO_10.md** - Roadmap para versão 10
+# 2. Instale as dependências
+npm install
 
-## 🔍 Como Navegar
+# 3. Configure as variáveis de ambiente
+cp .env.example .env
+# Edite o arquivo .env com suas chaves
 
-1. **Novo no projeto?** 
-   - 📂 Veja a [estrutura completa](./PROJECT_STRUCTURE.md)
-   - 🚀 Comece pelo `/setup` e leia o **SUPABASE_SETUP_GUIDE.md**
-2. **Desenvolvendo features?** 
-   - 📖 Consulte `/guides` para uso de funcionalidades
-   - 🏗️ Veja `/architecture` para decisões técnicas
-3. **Aplicando mudanças no banco?** 
-   - 🔄 Veja `/migrations` para guias de migração
-4. **Testando o sistema?** 
-   - 🧪 Consulte `/testing` para validação e QA
-5. **Revisando o projeto?** 
-   - 📊 Veja `/audits` para análises completas
-   - 📈 Consulte os relatórios na raiz para status executivo
-6. **Busca rápida?** 
-   - 🔍 Use o [índice rápido](./INDEX.md) com busca por tópico
+# 4. Execute as migrações do Supabase
+npx supabase db push
 
-## 📝 Convenções
+# 5. Inicie o servidor de desenvolvimento
+npm run dev
+```
 
-- **MAIÚSCULAS.md** - Documentos importantes ou guias principais
-- **CamelCase.md** - Documentação técnica específica
-- **lowercase.md** - Documentação auxiliar ou temporária
+## 🏗️ Arquitetura
+
+### Tecnologias Principais
+
+- **Frontend**: React 18 + TypeScript + Vite
+- **Backend**: Supabase (PostgreSQL + Auth + Storage)
+- **Edge Functions**: Deno (LinkedIn Scraper)
+- **Integrações**: Hunter.io, Stripe
+- **Estilização**: TailwindCSS + shadcn/ui
+
+### Estrutura do Projeto
+
+```
+snapdoor/
+├── src/
+│   ├── components/      # Componentes React reutilizáveis
+│   ├── pages/           # Páginas da aplicação
+│   ├── hooks/           # Custom hooks
+│   ├── services/        # Serviços de integração
+│   ├── lib/             # Utilitários e helpers
+│   └── integrations/    # Configuração Supabase
+├── supabase/
+│   ├── migrations/      # Migrações SQL
+│   └── functions/       # Edge Functions (LinkedIn Scraper)
+├── docs/                # Documentação do projeto
+└── public/              # Arquivos estáticos
+```
+
+## 📊 Funcionalidades Principais
+
+### 1. Gestão de Leads
+- ✅ Kanban Board com drag-and-drop
+- ✅ Múltiplos pipelines personalizáveis
+- ✅ Campos customizados e tags
+- ✅ Histórico de atividades
+
+### 2. Enriquecimento de Dados
+- ✅ Enriquecimento via Email (Hunter.io)
+- ✅ Enriquecimento via LinkedIn Handle (Hunter.io)
+- ✅ Scraping de perfis públicos do LinkedIn (Fallback)
+- ✅ Extração automática de: cargo, empresa, localização, educação, conexões
+
+### 3. Sistema de Contatos
+- ✅ Múltiplos emails por lead
+- ✅ Múltiplos telefones por lead
+- ✅ Marcação de contato preferencial
+- ✅ Verificação de emails (Hunter.io)
+
+### 4. Informações Comerciais
+- ✅ Valor do negócio (revenue)
+- ✅ Dashboard com métricas reais
+- ✅ Relatórios precisos
+- ✅ Taxa de conversão
+
+### 5. Sistema de Créditos
+- ✅ Controle de uso de API
+- ✅ Planos: Essential, Advanced, Professional
+- ✅ Integração com Stripe
+- ✅ Monitoramento de consumo
+
+## 🔐 Segurança
+
+- ✅ Row Level Security (RLS) em todas as tabelas
+- ✅ Autenticação via Supabase Auth
+- ✅ Chaves de API criptografadas
+- ✅ HTTPS obrigatório
+
+## 🧪 Testes
+
+```bash
+# Executar testes
+npm test
+
+# Cobertura
+npm run test:coverage
+```
+
+## 📦 Build para Produção
+
+```bash
+# Build otimizado
+npm run build
+
+# Preview local
+npm run preview
+```
 
 ## 🤝 Contribuindo
 
-Ao adicionar nova documentação:
-1. Coloque na pasta apropriada
-2. Use nomes descritivos em inglês ou português consistente
-3. Mantenha este README atualizado
-4. Adicione links cruzados quando relevante
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m '✨ Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📝 Licença
+
+Este projeto está sob a licença MIT.
+
+## 🆘 Suporte
+
+- **Issues**: [GitHub Issues](https://github.com/uillenmachado/snapdoor/issues)
+- **Documentação**: [docs/](./docs/)
+- **Email**: suporte@snapdoor.com
+
+## 🗺️ Roadmap
+
+- [ ] Integração com WhatsApp Business
+- [ ] Automações avançadas
+- [ ] Relatórios exportáveis (PDF, Excel)
+- [ ] Integração com Google Calendar
+- [ ] App Mobile (React Native)
 
 ---
 
-**Última atualização:** 11 de outubro de 2025
-**Versão:** 1.0.0
+**SnapDoor CRM** - Transformando leads em clientes com inteligência artificial.

@@ -318,16 +318,21 @@ class LeadEnrichmentService {
       }
 
       // Atualiza o lead no banco de dados
+      const updateData = {
+        ...enrichedData,
+        updated_at: new Date().toISOString(),
+      };
+      
+      console.log('📝 Dados que serão atualizados:', updateData);
+      
       const { error: updateError } = await supabase
         .from('leads')
-        .update({
-          ...enrichedData,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq('id', leadId);
 
       if (updateError) {
         console.error('Erro ao atualizar lead:', updateError);
+        console.error('Dados enviados:', JSON.stringify(updateData, null, 2));
         throw updateError;
       }
 

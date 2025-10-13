@@ -148,6 +148,12 @@ export function KanbanBoard({
         {optimisticStages.map((stage, index) => {
           const colorScheme = stageColors[index % stageColors.length];
           
+          // Calculate total value for this stage
+          const stageValue = stage.leads.reduce((sum, lead) => sum + (lead.deal_value || 0), 0);
+          const formattedValue = stageValue >= 1000 
+            ? `R$ ${(stageValue / 1000).toFixed(0)}k`
+            : `R$ ${stageValue.toFixed(0)}`;
+          
           return (
             <div
               key={stage.id}
@@ -160,11 +166,18 @@ export function KanbanBoard({
             >
               <div className={`rounded-t-lg p-4 ${colorScheme.header}`}>
                 <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <h2 className={`font-semibold ${colorScheme.accent}`}>{stage.name}</h2>
-                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${colorScheme.counter}`}>
-                      {stage.leads.length}
-                    </span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <h2 className={`font-semibold ${colorScheme.accent}`}>{stage.name}</h2>
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${colorScheme.counter}`}>
+                        {stage.leads.length}
+                      </span>
+                    </div>
+                    {stageValue > 0 && (
+                      <div className={`text-xs font-semibold ${colorScheme.accent} opacity-80`}>
+                        💰 {formattedValue}
+                      </div>
+                    )}
                   </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

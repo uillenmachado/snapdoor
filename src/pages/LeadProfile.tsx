@@ -27,6 +27,8 @@ import {
   MessageSquare,
   ExternalLink,
   Loader2,
+  DollarSign,
+  CheckCircle2,
 } from 'lucide-react';
 import { useEnrichLead } from '@/hooks/useEnrichLead';
 import { useState } from 'react';
@@ -329,6 +331,36 @@ export default function LeadProfile() {
                 icon={<MapPin className="w-4 h-4 text-muted-foreground" />}
                 onUpdate={() => refetch()}
               />
+            </CardContent>
+          </Card>
+
+          {/* Card de Informações Comerciais */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Informações Comerciais</CardTitle>
+              <CardDescription>Valor do negócio e informações de vendas</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <EditableField
+                leadId={lead.id}
+                fieldName="revenue"
+                value={lead.revenue?.toString()}
+                label="Valor do Negócio (R$)"
+                icon={<DollarSign className="w-4 h-4 text-muted-foreground" />}
+                type="text"
+                onUpdate={() => refetch()}
+              />
+              
+              {lead.revenue && lead.revenue > 0 && (
+                <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
+                    <CheckCircle2 className="w-5 h-5" />
+                    <span className="font-semibold">
+                      Negócio fechado: R$ {lead.revenue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 

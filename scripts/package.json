@@ -1,5 +1,0 @@
-{
-  "scripts": {
-    "apply-migration": "ts-node scripts/apply-migration-http.ts"
-  }
-}

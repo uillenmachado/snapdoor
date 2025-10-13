@@ -16,45 +16,64 @@ interface DashboardMetricsProps {
 
 export const DashboardMetrics = ({ leads, stages }: DashboardMetricsProps) => {
   const metrics = useMemo(() => {
-    const totalLeads = leads.length;
-    const activeLeads = leads.length; // All leads are considered active
+    const totalDeals = leads.length;
+    const activeDeals = leads.filter(lead => lead.status !== 'won' && lead.status !== 'lost').length;
     
-    // Calculate conversion rate (leads that moved to later stages)
-    const sortedStages = [...stages].sort((a, b) => a.position - b.position);
-    const firstStageId = sortedStages[0]?.id;
-    const lastStageId = sortedStages[sortedStages.length - 1]?.id;
-    const leadsInFirstStage = leads.filter(lead => lead.stage_id === firstStageId).length;
-    const leadsInLastStage = leads.filter(lead => lead.stage_id === lastStageId).length;
-    const conversionRate = totalLeads > 0 ? ((leadsInLastStage / totalLeads) * 100).toFixed(1) : 0;
+    // Calculate VALOR TOTAL DO PIPELINE (soma dos deal_value)
+    const pipelineValue = leads
+      .filter(lead => lead.status !== 'won' && lead.status !== 'lost')
+      .reduce((sum, lead) => sum + (lead.deal_value || 0), 0);
     
-    // Calculate estimated revenue (R$500 per lead in final stages)
-    const estimatedRevenue = leadsInLastStage * 500;
+    // Calculate VALOR PONDERADO (weighted value = valor × probabilidade)
+    const weightedValue = leads
+      .filter(lead => lead.status !== 'won' && lead.status !== 'lost')
+      .reduce((sum, lead) => sum + ((lead.deal_value || 0) * (lead.probability || 50) / 100), 0);
     
-    // Calculate activity rate (leads with recent activity)
-    const recentLeads = leads.filter(lead => {
+    // Calculate TICKET MÉDIO (valor médio dos negócios)
+    const avgDealValue = activeDeals > 0 ? pipelineValue / activeDeals : 0;
+    
+    // Calculate TAXA DE CONVERSÃO (won / total)
+    const wonDeals = leads.filter(lead => lead.status === 'won').length;
+    const lostDeals = leads.filter(lead => lead.status === 'lost').length;
+    const closedDeals = wonDeals + lostDeals;
+    const conversionRate = closedDeals > 0 ? ((wonDeals / closedDeals) * 100).toFixed(1) : 0;
+    
+    // Calculate RECEITA FECHADA (soma dos valores ganhos)
+    const wonRevenue = leads
+      .filter(lead => lead.status === 'won')
+      .reduce((sum, lead) => sum + (lead.deal_value || 0), 0);
+    
+    // Calculate activity rate (deals with recent activity)
+    const recentDeals = leads.filter(lead => {
       const updatedAt = new Date(lead.updated_at);
       const now = new Date();
       const daysDiff = Math.floor((now.getTime() - updatedAt.getTime()) / (1000 * 60 * 60 * 24));
       return daysDiff <= 7;
     }).length;
-    const activityRate = totalLeads > 0 ? ((recentLeads / totalLeads) * 100).toFixed(1) : 0;
+    const activityRate = totalDeals > 0 ? ((recentDeals / totalDeals) * 100).toFixed(1) : 0;
     
     return {
-      totalLeads,
-      activeLeads,
+      totalDeals,
+      activeDeals,
+      pipelineValue,
+      weightedValue,
+      avgDealValue,
       conversionRate,
-      estimatedRevenue,
+      wonDeals,
+      wonRevenue,
       activityRate,
-      recentLeads
+      recentDeals
     };
   }, [leads, stages]);
 
   const metricsData = [
     {
-      title: "Total de Leads",
-      value: metrics.totalLeads,
-      subtitle: `${metrics.activeLeads} ativos`,
-      icon: Users,
+      title: "Valor do Pipeline",
+      value: metrics.pipelineValue >= 1000 
+        ? `R$ ${(metrics.pipelineValue / 1000).toFixed(0)}k`
+        : `R$ ${metrics.pipelineValue.toFixed(0)}`,
+      subtitle: `${metrics.activeDeals} negócios ativos`,
+      icon: DollarSign,
       color: "text-blue-600",
       bgColor: "bg-blue-50 dark:bg-blue-950/20",
       trend: "+12%",
@@ -63,7 +82,7 @@ export const DashboardMetrics = ({ leads, stages }: DashboardMetricsProps) => {
     {
       title: "Taxa de Conversão",
       value: `${metrics.conversionRate}%`,
-      subtitle: "Pipeline completo",
+      subtitle: `${metrics.wonDeals} fechados`,
       icon: TrendingUp,
       color: "text-green-600",
       bgColor: "bg-green-50 dark:bg-green-950/20",
@@ -71,24 +90,28 @@ export const DashboardMetrics = ({ leads, stages }: DashboardMetricsProps) => {
       trendUp: true
     },
     {
-      title: "Receita Estimada",
-      value: `R$ ${(metrics.estimatedRevenue / 1000).toFixed(1)}k`,
-      subtitle: "Este mês",
-      icon: DollarSign,
+      title: "Receita Fechada",
+      value: metrics.wonRevenue >= 1000 
+        ? `R$ ${(metrics.wonRevenue / 1000).toFixed(0)}k`
+        : `R$ ${metrics.wonRevenue.toFixed(0)}`,
+      subtitle: `${metrics.wonDeals} negócios ganhos`,
+      icon: Target,
       color: "text-purple-600",
       bgColor: "bg-purple-50 dark:bg-purple-950/20",
       trend: "+8.1%",
       trendUp: true
     },
     {
-      title: "Taxa de Atividade",
-      value: `${metrics.activityRate}%`,
-      subtitle: `${metrics.recentLeads} nos últimos 7 dias`,
+      title: "Ticket Médio",
+      value: metrics.avgDealValue >= 1000 
+        ? `R$ ${(metrics.avgDealValue / 1000).toFixed(1)}k`
+        : `R$ ${metrics.avgDealValue.toFixed(0)}`,
+      subtitle: `${metrics.recentDeals} atualizados em 7d`,
       icon: Activity,
       color: "text-orange-600",
       bgColor: "bg-orange-50 dark:bg-orange-950/20",
-      trend: "-2.3%",
-      trendUp: false
+      trend: `${metrics.activityRate}%`,
+      trendUp: parseFloat(metrics.activityRate as string) > 50
     }
   ];
 

@@ -7,10 +7,16 @@ export interface Activity {
   id: string;
   lead_id: string;
   user_id: string;
-  type: "message" | "email" | "call" | "meeting" | "comment";
-  description: string;
-  completed: boolean | null;
+  type: "call" | "email" | "meeting" | "task" | "note" | "whatsapp" | "message" | "comment";
+  title: string;
+  description: string | null;
+  due_date: string | null;
+  completed: boolean;
+  completed_at: string | null;
+  duration: number | null; // em minutos
+  outcome: string | null; // resultado da atividade
   created_at: string;
+  updated_at: string;
 }
 
 // Fetch activities for a lead
@@ -148,75 +154,63 @@ export const useDeleteActivity = () => {
   });
 };
 
-// ============================================
-// NOVOS HOOKS PARA FASE 5 - Timeline Avançada
-// ============================================
-
-import type {
-  Activity as ActivityExtended,
-  ActivityFilters,
-  ActivityType,
-} from "@/types/activity";
-import {
-  fetchActivitiesWithRelations,
-  fetchActivityStats,
-  logActivity as logActivityService,
-} from "@/services/activityService";
-
-/**
- * Hook para buscar atividades com filtros e paginação (versão avançada)
- */
-export const useActivitiesAdvanced = (
-  filters: ActivityFilters = {},
-  page: number = 1,
-  pageSize: number = 20
-) => {
+// Count pending activities by lead
+export const usePendingActivitiesCount = (leadId: string | undefined) => {
   return useQuery({
-    queryKey: ["activities", "advanced", filters, page, pageSize],
-    queryFn: () => fetchActivitiesWithRelations(filters, page, pageSize),
-    staleTime: 1000 * 60, // 1 minuto
-  });
-};
+    queryKey: ["activities", "count", leadId],
+    queryFn: async () => {
+      if (!leadId) throw new Error("Lead ID required");
 
-/**
- * Hook para estatísticas de atividades
- */
-export const useActivityStats = (userId: string | undefined) => {
-  return useQuery({
-    queryKey: ["activities", "stats", userId],
-    queryFn: () => {
-      if (!userId) throw new Error("User ID required");
-      return fetchActivityStats(userId);
+      const { count, error } = await supabase
+        .from("activities")
+        .select("*", { count: "exact", head: true })
+        .eq("lead_id", leadId)
+        .eq("completed", false);
+
+      if (error) throw error;
+      return count || 0;
     },
-    enabled: !!userId,
-    staleTime: 1000 * 60 * 5, // 5 minutos
+    enabled: !!leadId,
   });
 };
 
-/**
- * Hook para criar log automático de atividade
- */
-export const useLogActivity = () => {
+// Complete activity
+export const useCompleteActivity = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({
-      userId,
-      type,
-      title,
-      description,
-      metadata,
+      id,
+      leadId,
+      outcome,
     }: {
-      userId: string;
-      type: ActivityType;
-      title: string;
-      description?: string;
-      metadata?: Record<string, any>;
+      id: string;
+      leadId: string;
+      outcome?: string;
     }) => {
-      return logActivityService(userId, type, title, description, metadata);
+      const { data, error} = await supabase
+        .from("activities")
+        .update({
+          completed: true,
+          completed_at: new Date().toISOString(),
+          outcome: outcome || null,
+        })
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { ...data, leadId };
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["activities"] });
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["activities", data.leadId] });
+      queryClient.invalidateQueries({ queryKey: ["activities", "user"] });
+      queryClient.invalidateQueries({ queryKey: ["activities", "count", data.leadId] });
+      toast.success("Atividade concluída! ✓");
+    },
+    onError: (error: Error) => {
+      toast.error(`Erro ao concluir atividade: ${error.message}`);
     },
   });
 };
+
