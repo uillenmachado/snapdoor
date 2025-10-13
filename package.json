@@ -9,8 +9,12 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "test:watch": "vitest --watch",
     "db:migrate": "ts-node scripts/apply-migration-http.ts",
-    "db:types": "npx supabase gen types typescript --project-id cfydbvrzjtbcrbzimfjm > src/integrations/supabase/types.ts"
+    "db:types": "npx supabase gen types typescript --project-id cfydbvrzjtbcrbzimfjm > src/integrations/supabase/types.ts",
+    "bootstrap:admin": "tsx scripts/bootstrap-admin.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
