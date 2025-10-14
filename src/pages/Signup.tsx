@@ -27,7 +27,7 @@ const Signup = () => {
           data: {
             full_name: fullName,
           },
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/confirm-email`,
         },
       });
 
@@ -37,10 +37,24 @@ const Signup = () => {
       }
 
       if (data.user) {
-        toast.success("Conta criada com sucesso! Redirecionando...");
-        navigate("/dashboard");
+        // Se email confirmation está habilitada, usuário precisa confirmar
+        if (data.user.identities && data.user.identities.length === 0) {
+          toast.info("Email já cadastrado. Verifique sua caixa de entrada.");
+          return;
+        }
+
+        // Verificar se precisa confirmar email
+        if (!data.user.email_confirmed_at) {
+          toast.success("Conta criada! Verifique seu email para confirmar.");
+          navigate("/confirm-email");
+        } else {
+          // Email já confirmado (auto-confirm habilitado)
+          toast.success("Conta criada com sucesso! Redirecionando...");
+          navigate("/dashboard");
+        }
       }
     } catch (error) {
+      console.error("Signup error:", error);
       toast.error("Erro ao criar conta");
     } finally {
       setLoading(false);

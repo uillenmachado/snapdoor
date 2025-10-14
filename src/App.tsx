@@ -13,6 +13,7 @@ import { Loader2 } from "lucide-react";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ConfirmEmail from "./pages/ConfirmEmail";
 import Pricing from "./pages/Pricing";
 import NotFound from "./pages/NotFound";
 
@@ -76,8 +77,8 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
+                <Route path="/confirm-email" element={<ConfirmEmail />} />
                 <Route path="/pricing" element={<Pricing />} />
-            <Route path="/pricing" element={<Pricing />} />
           
           {/* Protected routes */}
           <Route
