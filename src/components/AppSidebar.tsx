@@ -12,6 +12,7 @@ import {
   Plus,
   Briefcase,
   Zap,
+  UsersRound,
 } from "lucide-react";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
@@ -49,6 +50,7 @@ const menuItems = [
   { title: "Leads (Pessoas)", url: "/leads", icon: Users },
   { title: "Atividades", url: "/activities", icon: FileText },
   { title: "Automações", url: "/automations", icon: Zap },
+  { title: "Equipe", url: "/team", icon: UsersRound },
   { title: "Relatórios", url: "/reports", icon: BarChart3 },
   { title: "Configurações", url: "/settings", icon: Settings },
   { title: "Ajuda", url: "/help", icon: HelpCircle },

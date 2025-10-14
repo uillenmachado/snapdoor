@@ -16,6 +16,7 @@ import DealDetail from "./pages/DealDetail";
 import Activities from "./pages/Activities";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import TeamSettings from "./pages/TeamSettings";
 import Help from "./pages/Help";
 import LeadProfile from "./pages/LeadProfile";
 import Leads from "./pages/Leads";
@@ -173,6 +174,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Automations />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/team"
+            element={
+              <ProtectedRoute>
+                <TeamSettings />
               </ProtectedRoute>
             }
           />
