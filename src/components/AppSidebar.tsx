@@ -13,6 +13,7 @@ import {
   Briefcase,
   Zap,
   UsersRound,
+  Activity,
 } from "lucide-react";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
@@ -51,6 +52,7 @@ const menuItems = [
   { title: "Atividades", url: "/activities", icon: FileText },
   { title: "Automações", url: "/automations", icon: Zap },
   { title: "Equipe", url: "/team", icon: UsersRound },
+  { title: "Scraper Logs", url: "/scraper-logs", icon: Activity },
   { title: "Relatórios", url: "/reports", icon: BarChart3 },
   { title: "Configurações", url: "/settings", icon: Settings },
   { title: "Ajuda", url: "/help", icon: HelpCircle },

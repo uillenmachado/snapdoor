@@ -17,6 +17,7 @@ import Activities from "./pages/Activities";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import TeamSettings from "./pages/TeamSettings";
+import ScraperLogs from "./pages/ScraperLogs";
 import Help from "./pages/Help";
 import LeadProfile from "./pages/LeadProfile";
 import Leads from "./pages/Leads";
@@ -174,6 +175,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Automations />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/scraper-logs"
+            element={
+              <ProtectedRoute>
+                <ScraperLogs />
               </ProtectedRoute>
             }
           />
