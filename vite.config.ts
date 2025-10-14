@@ -37,41 +37,15 @@ export default defineConfig(({ mode }) => ({
     
     rollupOptions: {
       output: {
-        // Manual chunks para otimizar bundle splitting
+        // Manual chunks simplificado - evita quebrar React em múltiplos chunks
         manualChunks: (id) => {
-          // Vendor chunks - bibliotecas grandes separadas
           if (id.includes('node_modules')) {
-            // React core
-            if (id.includes('react') || id.includes('react-dom')) {
-              return 'vendor-react';
-            }
-            
-            // React Query
-            if (id.includes('@tanstack/react-query')) {
-              return 'vendor-query';
-            }
-            
-            // Recharts (library pesada)
+            // Recharts (biblioteca pesada - separar)
             if (id.includes('recharts')) {
               return 'vendor-charts';
             }
             
-            // Date utilities
-            if (id.includes('date-fns')) {
-              return 'vendor-date';
-            }
-            
-            // UI components (shadcn/ui é grande)
-            if (id.includes('@radix-ui')) {
-              return 'vendor-ui';
-            }
-            
-            // Supabase
-            if (id.includes('@supabase')) {
-              return 'vendor-supabase';
-            }
-            
-            // Outras libs pequenas juntas
+            // Todas as outras libs juntas (evita problemas de createContext)
             return 'vendor';
           }
         },

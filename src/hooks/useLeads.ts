@@ -33,9 +33,15 @@ export interface Lead {
   created_at: string;
   updated_at: string;
   
-  // Campos legacy (mantidos para retrocompatibilidade)
+  // Campos legacy e enriquecimento (mantidos para retrocompatibilidade)
   first_name?: string;
   last_name?: string;
+  full_name?: string;
+  avatar_url?: string;
+  headline?: string;
+  location?: string;
+  about?: string;
+  connections?: string;
   stage_id?: string;
   pipeline_id?: string;
   job_title?: string | null;
