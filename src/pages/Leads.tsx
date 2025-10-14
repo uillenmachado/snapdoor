@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { useDebounce } from "@/hooks/useDebounce";
 import {
   Table,
   TableBody,
@@ -53,6 +54,7 @@ export default function Leads() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [companyFilter, setCompanyFilter] = useState<string>("all");
   const [showImportWizard, setShowImportWizard] = useState(false);
@@ -60,7 +62,7 @@ export default function Leads() {
 
   // Buscar todos os leads do usuário
   const { data: leads = [], isLoading } = useQuery({
-    queryKey: ["all-leads", user?.id, searchQuery, statusFilter, companyFilter],
+    queryKey: ["all-leads", user?.id, debouncedSearchQuery, statusFilter, companyFilter],
     queryFn: async () => {
       if (!user?.id) return [];
 
@@ -86,10 +88,10 @@ export default function Leads() {
         query = query.eq("company", companyFilter);
       }
 
-      // Busca por texto
-      if (searchQuery.trim()) {
+      // Busca por texto (usando valor debounced)
+      if (debouncedSearchQuery.trim()) {
         query = query.or(
-          `first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%,company.ilike.%${searchQuery}%`
+          `first_name.ilike.%${debouncedSearchQuery}%,last_name.ilike.%${debouncedSearchQuery}%,email.ilike.%${debouncedSearchQuery}%,company.ilike.%${debouncedSearchQuery}%`
         );
       }
 

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -22,7 +23,7 @@ interface DealCardProps {
   onClick?: (deal: Deal) => void;
 }
 
-export function DealCard({
+export const DealCard = memo(function DealCard({
   deal,
   onEdit,
   onDelete,
@@ -201,4 +202,4 @@ export function DealCard({
       </CardContent>
     </Card>
   );
-}
+});

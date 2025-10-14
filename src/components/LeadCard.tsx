@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Lead } from "@/hooks/useLeads";
 import { useMarkLeadAsWon, useMarkLeadAsLost } from "@/hooks/useLeadHistory";
 import { useEnrichLead } from "@/hooks/useEnrichLead";
@@ -53,7 +54,7 @@ interface LeadCardProps {
   onClick: (lead: Lead) => void;
 }
 
-export function LeadCard({ lead, onClick }: LeadCardProps) {
+export const LeadCard = memo(function LeadCard({ lead, onClick }: LeadCardProps) {
   const navigate = useNavigate();
   const [showWonDialog, setShowWonDialog] = useState(false);
   const [showLostDialog, setShowLostDialog] = useState(false);
@@ -633,4 +634,4 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
       </Dialog>
     </>
   );
-}
+});

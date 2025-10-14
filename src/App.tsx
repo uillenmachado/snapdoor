@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,33 +7,52 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Loader2 } from "lucide-react";
+
+// Eager load: Critical pages (landing, auth)
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Pricing from "./pages/Pricing";
-import Dashboard from "./pages/Dashboard";
-import Deals from "./pages/Deals";
-import DealDetail from "./pages/DealDetail";
-import Activities from "./pages/Activities";
-import Reports from "./pages/Reports";
-import Settings from "./pages/Settings";
-import TeamSettings from "./pages/TeamSettings";
-import ScraperLogs from "./pages/ScraperLogs";
-import Help from "./pages/Help";
-import LeadProfile from "./pages/LeadProfile";
-import Leads from "./pages/Leads";
-import Profile from "./pages/Profile";
-import Companies from "./pages/Companies";
-import CompanyDetail from "./pages/CompanyDetail";
-import Meetings from "./pages/Meetings";
-import Automations from "./pages/Automations";
 import NotFound from "./pages/NotFound";
+
+// Lazy load: App pages (code splitting)
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Deals = lazy(() => import("./pages/Deals"));
+const DealDetail = lazy(() => import("./pages/DealDetail"));
+const Activities = lazy(() => import("./pages/Activities"));
+const Reports = lazy(() => import("./pages/Reports"));
+const Settings = lazy(() => import("./pages/Settings"));
+const TeamSettings = lazy(() => import("./pages/TeamSettings"));
+const ScraperLogs = lazy(() => import("./pages/ScraperLogs"));
+const Help = lazy(() => import("./pages/Help"));
+const LeadProfile = lazy(() => import("./pages/LeadProfile"));
+const Leads = lazy(() => import("./pages/Leads"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Companies = lazy(() => import("./pages/Companies"));
+const CompanyDetail = lazy(() => import("./pages/CompanyDetail"));
+const Meetings = lazy(() => import("./pages/Meetings"));
+const Automations = lazy(() => import("./pages/Automations"));
+
+// Loading fallback component
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+  </div>
+);
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5, // 5 minutes - dados ficam fresh por 5min
+      gcTime: 1000 * 60 * 10, // 10 minutes - garbage collection após 10min
+      refetchOnWindowFocus: false, // Não refetch ao voltar à janela
+      refetchOnReconnect: true, // Refetch ao reconectar
+      retry: 1, // Apenas 1 retry em caso de erro
+    },
+    mutations: {
+      // Mutations não fazem retry por padrão
+      retry: false,
     },
   },
 });
@@ -50,11 +70,13 @@ const App = () => (
               v7_relativeSplatPath: true,
             }}
           >
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                {/* Public routes */}
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/pricing" element={<Pricing />} />
             <Route path="/pricing" element={<Pricing />} />
           
           {/* Protected routes */}
@@ -198,6 +220,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+            </Suspense>
       </BrowserRouter>
     </TooltipProvider>
       </ThemeProvider>
