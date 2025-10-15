@@ -343,15 +343,15 @@ export default function Leads() {
                 {leads.length} {leads.length === 1 ? 'lead encontrado' : 'leads encontrados'}.
               </caption>
               <TableHeader>
-                <TableRow className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-border hover:bg-neutral-50 dark:hover:bg-neutral-900/50">
-                  <TableHead className="w-12 font-semibold text-neutral-700 dark:text-neutral-300"></TableHead>
-                  <TableHead className="font-semibold text-neutral-700 dark:text-neutral-300">Nome</TableHead>
-                  <TableHead className="font-semibold text-neutral-700 dark:text-neutral-300">Empresa</TableHead>
-                  <TableHead className="font-semibold text-neutral-700 dark:text-neutral-300">Cargo</TableHead>
-                  <TableHead className="font-semibold text-neutral-700 dark:text-neutral-300">Contato</TableHead>
-                  <TableHead className="font-semibold text-neutral-700 dark:text-neutral-300">Status</TableHead>
-                  <TableHead className="font-semibold text-neutral-700 dark:text-neutral-300">Atualizado</TableHead>
-                  <TableHead className="w-24 font-semibold text-neutral-700 dark:text-neutral-300">Ações</TableHead>
+                <TableRow className="bg-neutral-100 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-900">
+                  <TableHead className="w-12 font-semibold text-neutral-900 dark:text-neutral-100"></TableHead>
+                  <TableHead className="font-semibold text-neutral-900 dark:text-neutral-100">Nome</TableHead>
+                  <TableHead className="font-semibold text-neutral-900 dark:text-neutral-100">Empresa</TableHead>
+                  <TableHead className="font-semibold text-neutral-900 dark:text-neutral-100">Cargo</TableHead>
+                  <TableHead className="font-semibold text-neutral-900 dark:text-neutral-100">Contato</TableHead>
+                  <TableHead className="font-semibold text-neutral-900 dark:text-neutral-100">Status</TableHead>
+                  <TableHead className="font-semibold text-neutral-900 dark:text-neutral-100">Atualizado</TableHead>
+                  <TableHead className="w-24 font-semibold text-neutral-900 dark:text-neutral-100">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -369,7 +369,7 @@ export default function Leads() {
                   leads.map((lead) => (
                     <TableRow
                       key={lead.id}
-                      className="cursor-pointer border-b border-neutral-100 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900/50 transition-colors"
+                      className="cursor-pointer border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
                       onClick={() => navigate(`/leads/${lead.id}`)}
                     >
                       <TableCell className="py-4">
