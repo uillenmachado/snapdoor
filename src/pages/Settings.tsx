@@ -106,6 +106,7 @@ const Settings = () => {
                 <TabsTrigger value="profile">Perfil</TabsTrigger>
                 <TabsTrigger value="notifications">Notificações</TabsTrigger>
                 <TabsTrigger value="integration">Integração</TabsTrigger>
+                <TabsTrigger value="scraper">Scraper Logs</TabsTrigger>
                 <TabsTrigger value="account">Conta</TabsTrigger>
               </TabsList>
 
@@ -261,8 +262,6 @@ const Settings = () => {
                       </div>
                       <Switch defaultChecked />
                     </div>
-
-                    <Button onClick={handleSave}>Salvar Preferências</Button>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -326,6 +325,33 @@ const Settings = () => {
                     </div>
 
                     <Button variant="outline">Configurar Extensão</Button>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="scraper" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Scraper Logs</CardTitle>
+                    <CardDescription>
+                      Acompanhe os logs e estatísticas do scraper de dados
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="p-6 rounded-lg bg-muted text-center">
+                      <p className="text-sm text-muted-foreground">
+                        Os logs do scraper são exibidos aqui para monitoramento de jobs, status e estatísticas.
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Acesse a página dedicada para visualização completa:
+                      </p>
+                      <Button 
+                        className="mt-4" 
+                        onClick={() => window.location.href = '/scraper-logs'}
+                      >
+                        Ver Scraper Logs Completo
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>
