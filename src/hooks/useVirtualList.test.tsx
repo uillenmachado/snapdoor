@@ -4,8 +4,16 @@ import { useVirtualList, useVirtualTable } from './useVirtualList';
 
 describe('useVirtualList', () => {
   beforeEach(() => {
-    // Mock DOM methods
-    HTMLElement.prototype.scrollTop = 0;
+    // Mock scrollTop as a configurable property
+    Object.defineProperty(HTMLElement.prototype, 'scrollTop', {
+      configurable: true,
+      get() {
+        return this._scrollTop || 0;
+      },
+      set(value) {
+        this._scrollTop = value;
+      },
+    });
   });
 
   it('should return correct initial values', () => {

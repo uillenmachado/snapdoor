@@ -92,6 +92,7 @@ describe('useDebounce', () => {
 
 describe('useDebouncedCallback', () => {
   it('should debounce callback execution', async () => {
+    vi.useFakeTimers();
     const callback = vi.fn();
     const { result } = renderHook(() => useDebouncedCallback(callback, 200));
 
@@ -103,47 +104,53 @@ describe('useDebouncedCallback', () => {
     // Callback should not be called yet
     expect(callback).not.toHaveBeenCalled();
 
-    // Wait for debounce
-    await waitFor(() => expect(callback).toHaveBeenCalledTimes(1), {
-      timeout: 300,
-    });
+    // Fast-forward time by 200ms
+    vi.advanceTimersByTime(200);
 
-    // Should only call with last argument
+    // Should only call once with last argument
+    expect(callback).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledWith('test3');
+    
+    vi.useRealTimers();
   });
 
   it('should cancel previous timeout on new call', async () => {
+    vi.useFakeTimers();
     const callback = vi.fn();
     const { result } = renderHook(() => useDebouncedCallback(callback, 150));
 
     result.current('first');
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    vi.advanceTimersByTime(50);
     result.current('second');
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    vi.advanceTimersByTime(50);
     result.current('third');
 
     // Wait for final debounce
-    await waitFor(() => expect(callback).toHaveBeenCalledTimes(1), {
-      timeout: 250,
-    });
+    vi.advanceTimersByTime(150);
 
+    expect(callback).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledWith('third');
+    
+    vi.useRealTimers();
   });
 
   it('should handle multiple arguments', async () => {
+    vi.useFakeTimers();
     const callback = vi.fn();
     const { result } = renderHook(() => useDebouncedCallback(callback, 100));
 
     result.current('arg1', 'arg2', 'arg3');
 
-    await waitFor(() => expect(callback).toHaveBeenCalledTimes(1), {
-      timeout: 200,
-    });
+    vi.advanceTimersByTime(100);
 
+    expect(callback).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledWith('arg1', 'arg2', 'arg3');
+    
+    vi.useRealTimers();
   });
 
   it('should work with different delay values', async () => {
+    vi.useFakeTimers();
     const callback = vi.fn();
     const { result, rerender } = renderHook(
       ({ delay }) => useDebouncedCallback(callback, delay),
@@ -152,12 +159,15 @@ describe('useDebouncedCallback', () => {
 
     result.current('test');
 
-    await waitFor(() => expect(callback).toHaveBeenCalledTimes(1), {
-      timeout: 150,
-    });
+    vi.advanceTimersByTime(50);
+
+    expect(callback).toHaveBeenCalledTimes(1);
+    
+    vi.useRealTimers();
   });
 
   it('should preserve callback arguments types', async () => {
+    vi.useFakeTimers();
     const callback = vi.fn((num: number, str: string, bool: boolean) => {
       return { num, str, bool };
     });
@@ -166,10 +176,11 @@ describe('useDebouncedCallback', () => {
 
     result.current(42, 'test', true);
 
-    await waitFor(() => expect(callback).toHaveBeenCalledTimes(1), {
-      timeout: 200,
-    });
+    vi.advanceTimersByTime(100);
 
+    expect(callback).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledWith(42, 'test', true);
+    
+    vi.useRealTimers();
   });
 });
