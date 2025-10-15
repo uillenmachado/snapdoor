@@ -150,16 +150,16 @@ export default function Leads() {
     });
   };
 
-  // Função para obter badge de status
+  // Função para obter badge de status - Pipedrive Style
   const getStatusBadge = (lead: Lead) => {
     if (lead.temperature === "hot") {
-      return <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Quente</Badge>;
+      return <Badge className="bg-success-100 dark:bg-success-900/30 text-success-700 dark:text-success-400 hover:bg-success-100 dark:hover:bg-success-900/30 border-0 font-medium">Quente</Badge>;
     } else if (lead.temperature === "cold") {
-      return <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Frio</Badge>;
+      return <Badge className="bg-danger-100 dark:bg-danger-900/30 text-danger-700 dark:text-danger-400 hover:bg-danger-100 dark:hover:bg-danger-900/30 border-0 font-medium">Frio</Badge>;
     } else if (lead.temperature === "warm") {
-      return <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100">Morno</Badge>;
+      return <Badge className="bg-warning-100 dark:bg-warning-900/30 text-warning-700 dark:text-warning-400 hover:bg-warning-100 dark:hover:bg-warning-900/30 border-0 font-medium">Morno</Badge>;
     }
-    return <Badge className="bg-gray-100 text-gray-700 hover:bg-gray-100">Neutro</Badge>;
+    return <Badge className="bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 border-0 font-medium">Neutro</Badge>;
   };
 
   if (isLoading) {
@@ -190,88 +190,88 @@ export default function Leads() {
               </div>
             </div>
 
-      {/* Cards de Estatísticas */}
+      {/* Cards de Estatísticas - Pipedrive Style */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card>
+        <Card className="border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider flex items-center gap-2">
               <Users className="h-4 w-4" />
               Total de Leads
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
+            <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{stats.total}</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <Target className="h-4 w-4" />
+            <CardTitle className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider flex items-center gap-2">
+              <Target className="h-4 w-4 text-info-600 dark:text-info-500" />
               Ativos
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.active}</div>
+            <div className="text-2xl font-bold text-info-600 dark:text-info-500">{stats.active}</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border border-success-200 dark:border-success-800 bg-white dark:bg-neutral-900 hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-green-600" />
+            <CardTitle className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-success-600 dark:text-success-500" />
               Ganhos
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.won}</div>
+            <div className="text-2xl font-bold text-success-600 dark:text-success-500">{stats.won}</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border border-danger-200 dark:border-danger-800 bg-white dark:bg-neutral-900 hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-red-600" />
+            <CardTitle className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider flex items-center gap-2">
+              <DollarSign className="h-4 w-4 text-danger-600 dark:text-danger-500" />
               Perdidos
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{stats.lost}</div>
+            <div className="text-2xl font-bold text-danger-600 dark:text-danger-500">{stats.lost}</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border border-brand-purple-200 dark:border-brand-purple-800 bg-white dark:bg-neutral-900 hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
               Taxa de Conversão
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.conversionRate}%</div>
+            <div className="text-2xl font-bold text-brand-purple-600 dark:text-brand-purple-500">{stats.conversionRate}%</div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filtros e Busca */}
-      <Card>
-        <CardHeader>
+      {/* Filtros e Busca - Pipedrive Style */}
+      <Card className="border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
+        <CardHeader className="border-b border-neutral-200 dark:border-neutral-800">
           <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
             <div className="flex-1 w-full md:w-auto">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400 dark:text-neutral-500" />
                 <Input
                   placeholder="Buscar por nome, email ou empresa..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 border-neutral-300 dark:border-neutral-700 focus:border-brand-green-500 dark:focus:border-brand-green-500"
                 />
               </div>
             </div>
 
-            <div className="flex gap-2 w-full md:w-auto">
+            <div className="flex gap-2 w-full md:w-auto flex-wrap">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full md:w-[180px]">
-                  <Filter className="h-4 w-4 mr-2" />
+                <SelectTrigger className="w-full md:w-[180px] border-neutral-300 dark:border-neutral-700">
+                  <Filter className="h-4 w-4 mr-2 text-neutral-500" />
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -283,8 +283,8 @@ export default function Leads() {
               </Select>
 
               <Select value={companyFilter} onValueChange={setCompanyFilter}>
-                <SelectTrigger className="w-full md:w-[180px]">
-                  <Building2 className="h-4 w-4 mr-2" />
+                <SelectTrigger className="w-full md:w-[180px] border-neutral-300 dark:border-neutral-700">
+                  <Building2 className="h-4 w-4 mr-2 text-neutral-500" />
                   <SelectValue placeholder="Empresa" />
                 </SelectTrigger>
                 <SelectContent>
@@ -297,12 +297,20 @@ export default function Leads() {
                 </SelectContent>
               </Select>
 
-              <Button variant="outline" onClick={() => setShowImportWizard(true)}>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowImportWizard(true)}
+                className="border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              >
                 <Upload className="h-4 w-4 mr-2" />
                 Importar
               </Button>
 
-              <Button variant="outline" onClick={() => setShowExportDialog(true)}>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowExportDialog(true)}
+                className="border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              >
                 <Download className="h-4 w-4 mr-2" />
                 Exportar
               </Button>
@@ -310,91 +318,96 @@ export default function Leads() {
           </div>
         </CardHeader>
 
-        <CardContent>
-          {/* Tabela de Leads */}
-          <div className="border rounded-lg overflow-hidden">
+        <CardContent className="p-0">
+          {/* Tabela de Leads - Professional Style */}
+          <div className="overflow-hidden">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/50">
-                  <TableHead className="w-12"></TableHead>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Empresa</TableHead>
-                  <TableHead>Cargo</TableHead>
-                  <TableHead>Contato</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Atualizado</TableHead>
-                  <TableHead className="w-24">Ações</TableHead>
+                <TableRow className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900/50">
+                  <TableHead className="w-12 font-semibold text-neutral-700 dark:text-neutral-300"></TableHead>
+                  <TableHead className="font-semibold text-neutral-700 dark:text-neutral-300">Nome</TableHead>
+                  <TableHead className="font-semibold text-neutral-700 dark:text-neutral-300">Empresa</TableHead>
+                  <TableHead className="font-semibold text-neutral-700 dark:text-neutral-300">Cargo</TableHead>
+                  <TableHead className="font-semibold text-neutral-700 dark:text-neutral-300">Contato</TableHead>
+                  <TableHead className="font-semibold text-neutral-700 dark:text-neutral-300">Status</TableHead>
+                  <TableHead className="font-semibold text-neutral-700 dark:text-neutral-300">Atualizado</TableHead>
+                  <TableHead className="w-24 font-semibold text-neutral-700 dark:text-neutral-300">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {leads.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                      Nenhum lead encontrado
+                    <TableCell colSpan={8} className="text-center py-12 text-neutral-400 dark:text-neutral-600">
+                      <div className="flex flex-col items-center gap-2">
+                        <Users className="h-12 w-12 opacity-40" />
+                        <p className="font-medium">Nenhum lead encontrado</p>
+                        <p className="text-sm">Tente ajustar os filtros de busca</p>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ) : (
                   leads.map((lead) => (
                     <TableRow
                       key={lead.id}
-                      className="cursor-pointer hover:bg-muted/50"
+                      className="cursor-pointer border-b border-neutral-100 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900/50 transition-colors"
                       onClick={() => navigate(`/leads/${lead.id}`)}
                     >
-                      <TableCell>
+                      <TableCell className="py-4">
                         {lead.avatar_url ? (
                           <img
                             src={lead.avatar_url}
                             alt={`${lead.first_name} ${lead.last_name}`}
-                            className="h-8 w-8 rounded-full object-cover"
+                            className="h-9 w-9 rounded-full object-cover ring-2 ring-neutral-200 dark:ring-neutral-800"
                           />
                         ) : (
-                          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-xs font-semibold text-primary">
+                          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-brand-green-100 to-brand-green-200 dark:from-brand-green-900/30 dark:to-brand-green-800/30 flex items-center justify-center text-xs font-semibold text-brand-green-700 dark:text-brand-green-400 ring-2 ring-brand-green-200 dark:ring-brand-green-800/50">
                             {lead.first_name.charAt(0)}
                             {lead.last_name.charAt(0)}
                           </div>
                         )}
                       </TableCell>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium text-neutral-900 dark:text-neutral-100 py-4">
                         <div className="flex flex-col">
-                          <span>{lead.full_name || `${lead.first_name} ${lead.last_name}`}</span>
+                          <span className="font-semibold">{lead.full_name || `${lead.first_name} ${lead.last_name}`}</span>
                           {lead.location && (
-                            <span className="text-xs text-muted-foreground">{lead.location}</span>
+                            <span className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">{lead.location}</span>
                           )}
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Building2 className="h-4 w-4 text-muted-foreground" />
-                          {lead.company || "-"}
+                      <TableCell className="py-4">
+                        <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
+                          <Building2 className="h-4 w-4 text-neutral-400 dark:text-neutral-500" />
+                          <span className="font-medium">{lead.company || "-"}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-sm">
+                      <TableCell className="text-sm text-neutral-600 dark:text-neutral-400 py-4">
                         {lead.headline || lead.job_title || "-"}
                       </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col gap-1 text-xs">
+                      <TableCell className="py-4">
+                        <div className="flex flex-col gap-1.5 text-xs">
                           {lead.email && (
-                            <div className="flex items-center gap-1 text-muted-foreground">
-                              <Mail className="h-3 w-3" />
-                              <span className="truncate max-w-[150px]">{lead.email}</span>
+                            <div className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-400">
+                              <Mail className="h-3.5 w-3.5 text-neutral-400 dark:text-neutral-500" />
+                              <span className="truncate max-w-[150px] font-medium">{lead.email}</span>
                             </div>
                           )}
                           {lead.phone && (
-                            <div className="flex items-center gap-1 text-muted-foreground">
-                              <Phone className="h-3 w-3" />
-                              <span>{lead.phone}</span>
+                            <div className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-400">
+                              <Phone className="h-3.5 w-3.5 text-neutral-400 dark:text-neutral-500" />
+                              <span className="font-medium">{lead.phone}</span>
                             </div>
                           )}
                         </div>
                       </TableCell>
-                      <TableCell>{getStatusBadge(lead)}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
+                      <TableCell className="py-4">{getStatusBadge(lead)}</TableCell>
+                      <TableCell className="text-sm text-neutral-600 dark:text-neutral-400 py-4 font-medium">
                         {formatDate(lead.updated_at)}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="py-4">
                         <Button
                           size="sm"
                           variant="ghost"
+                          className="hover:bg-brand-green-50 dark:hover:bg-brand-green-900/20 hover:text-brand-green-600 dark:hover:text-brand-green-400 transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/leads/${lead.id}`);
