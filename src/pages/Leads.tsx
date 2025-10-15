@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useDebounce } from "@/hooks/useDebounce";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
 import {
   Table,
   TableBody,
@@ -162,19 +164,31 @@ export default function Leads() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
+      <SidebarProvider>
+        <div className="flex h-screen w-full">
+          <AppSidebar />
+          <main className="flex-1 flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </main>
+        </div>
+      </SidebarProvider>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-6">
-      {/* Header com Estatísticas */}
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Todos os Leads</h1>
-        <p className="text-muted-foreground">Visão completa do seu banco de dados de leads</p>
-      </div>
+    <SidebarProvider>
+      <div className="flex h-screen w-full overflow-hidden">
+        <AppSidebar />
+        <main className="flex-1 overflow-y-auto">
+          <div className="container mx-auto px-4 py-8 space-y-6">
+            {/* Header com Trigger e Título */}
+            <div className="flex items-center gap-4">
+              <SidebarTrigger />
+              <div className="flex-1">
+                <h1 className="text-3xl font-bold mb-2">Todos os Leads</h1>
+                <p className="text-muted-foreground">Visão completa do seu banco de dados de leads</p>
+              </div>
+            </div>
 
       {/* Cards de Estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -418,6 +432,9 @@ export default function Leads() {
           company: companyFilter !== "all" ? companyFilter : undefined,
         }}
       />
-    </div>
+          </div>
+        </main>
+      </div>
+    </SidebarProvider>
   );
 }
