@@ -322,6 +322,10 @@ export default function Leads() {
           {/* Tabela de Leads - Professional Style */}
           <div className="overflow-hidden">
             <Table>
+              <caption className="sr-only">
+                Lista de leads com informações de contato, empresa e status. 
+                {leads.length} {leads.length === 1 ? 'lead encontrado' : 'leads encontrados'}.
+              </caption>
               <TableHeader>
                 <TableRow className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900/50">
                   <TableHead className="w-12 font-semibold text-neutral-700 dark:text-neutral-300"></TableHead>
@@ -412,8 +416,9 @@ export default function Leads() {
                             e.stopPropagation();
                             navigate(`/leads/${lead.id}`);
                           }}
+                          aria-label={`Ver detalhes de ${lead.full_name || `${lead.first_name} ${lead.last_name}`}`}
                         >
-                          <Eye className="h-4 w-4" />
+                          <Eye className="h-4 w-4" aria-hidden="true" />
                         </Button>
                       </TableCell>
                     </TableRow>
