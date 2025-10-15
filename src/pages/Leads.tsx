@@ -379,32 +379,32 @@ export default function Leads() {
                         </div>
                       </TableCell>
                       <TableCell className="py-4">
-                        <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
-                          <Building2 className="h-4 w-4 text-neutral-400 dark:text-neutral-500" />
+                        <div className="flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
+                          <Building2 className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
                           <span className="font-medium">{lead.company || "-"}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-sm text-neutral-600 dark:text-neutral-400 py-4">
+                      <TableCell className="text-sm text-neutral-900 dark:text-neutral-100 py-4 font-medium">
                         {lead.headline || lead.job_title || "-"}
                       </TableCell>
                       <TableCell className="py-4">
                         <div className="flex flex-col gap-1.5 text-xs">
                           {lead.email && (
-                            <div className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-400">
-                              <Mail className="h-3.5 w-3.5 text-neutral-400 dark:text-neutral-500" />
+                            <div className="flex items-center gap-1.5 text-neutral-700 dark:text-neutral-300">
+                              <Mail className="h-3.5 w-3.5 text-neutral-500 dark:text-neutral-400" />
                               <span className="truncate max-w-[150px] font-medium">{lead.email}</span>
                             </div>
                           )}
                           {lead.phone && (
-                            <div className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-400">
-                              <Phone className="h-3.5 w-3.5 text-neutral-400 dark:text-neutral-500" />
+                            <div className="flex items-center gap-1.5 text-neutral-700 dark:text-neutral-300">
+                              <Phone className="h-3.5 w-3.5 text-neutral-500 dark:text-neutral-400" />
                               <span className="font-medium">{lead.phone}</span>
                             </div>
                           )}
                         </div>
                       </TableCell>
                       <TableCell className="py-4">{getStatusBadge(lead)}</TableCell>
-                      <TableCell className="text-sm text-neutral-600 dark:text-neutral-400 py-4 font-medium">
+                      <TableCell className="text-sm text-neutral-700 dark:text-neutral-300 py-4 font-medium">
                         {formatDate(lead.updated_at)}
                       </TableCell>
                       <TableCell className="py-4">

@@ -225,8 +225,8 @@ export function DealKanbanBoard({
               )}
             </div>
 
-            {/* Stage Content - Improved Spacing */}
-            <div className="p-3 space-y-2.5 overflow-y-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
+            {/* Stage Content - Improved Spacing with background */}
+            <div className="p-3 space-y-2.5 overflow-y-auto bg-card/50" style={{ maxHeight: "calc(100vh - 280px)" }}>
               {stage.deals.map((deal) => (
                 <div
                   key={deal.id}
