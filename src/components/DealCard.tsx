@@ -61,30 +61,36 @@ export const DealCard = memo(function DealCard({
 
   return (
     <Card
-      className="hover:shadow-md transition-shadow cursor-pointer group"
+      className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:shadow-md hover:border-neutral-300 dark:hover:border-neutral-700 transition-all duration-200 cursor-pointer group"
       onClick={() => onClick?.(deal)}
     >
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">
+      <CardHeader className="pb-3 pt-3.5 px-4">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-sm text-neutral-900 dark:text-neutral-100 line-clamp-2 group-hover:text-brand-green-600 dark:group-hover:text-brand-green-400 transition-colors">
               {deal.title}
             </h3>
             {deal.company_name && (
-              <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-                <Building2 className="h-3 w-3" />
-                <span className="truncate">{deal.company_name}</span>
+              <div className="flex items-center gap-1.5 mt-1.5">
+                <Building2 className="h-3.5 w-3.5 text-neutral-400 dark:text-neutral-500 flex-shrink-0" />
+                <span className="text-xs text-neutral-600 dark:text-neutral-400 truncate font-medium">
+                  {deal.company_name}
+                </span>
               </div>
             )}
           </div>
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100">
-                <MoreVertical className="h-4 w-4" />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              >
+                <MoreVertical className="h-3.5 w-3.5 text-neutral-500" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-48">
               {onEdit && (
                 <DropdownMenuItem onClick={(e) => {
                   e.stopPropagation();
@@ -99,7 +105,7 @@ export const DealCard = memo(function DealCard({
                     e.stopPropagation();
                     onMarkAsWon(deal.id);
                   }}
-                  className="text-green-600"
+                  className="text-success-600 focus:text-success-700"
                 >
                   Marcar como Ganho
                 </DropdownMenuItem>
@@ -110,7 +116,7 @@ export const DealCard = memo(function DealCard({
                     e.stopPropagation();
                     onMarkAsLost(deal.id);
                   }}
-                  className="text-red-600"
+                  className="text-danger-600 focus:text-danger-700"
                 >
                   Marcar como Perdido
                 </DropdownMenuItem>
@@ -121,7 +127,7 @@ export const DealCard = memo(function DealCard({
                     e.stopPropagation();
                     onDelete(deal.id);
                   }}
-                  className="text-destructive"
+                  className="text-danger-600 focus:text-danger-700"
                 >
                   Excluir
                 </DropdownMenuItem>
@@ -131,11 +137,11 @@ export const DealCard = memo(function DealCard({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 px-4 pb-4">
         {/* Valor e Status */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1">
-            <span className="text-lg font-bold text-primary">
+          <div className="flex items-center gap-1.5">
+            <span className="text-lg font-bold text-brand-green-600 dark:text-brand-green-500">
               {formatCurrency(deal.value)}
             </span>
           </div>
@@ -144,20 +150,27 @@ export const DealCard = memo(function DealCard({
 
         {/* Probabilidade */}
         {deal.status === 'open' && (
-          <div className="flex items-center gap-2">
-            <TrendingUp className="h-3.5 w-3.5 text-muted-foreground" />
-            <div className="flex-1">
-              <div className="flex items-center justify-between text-xs mb-1">
-                <span className="text-muted-foreground">Probabilidade</span>
-                <span className={`font-medium ${getProbabilityColor(deal.probability)}`}>
-                  {deal.probability}%
-                </span>
-              </div>
-              <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
-                <div
-                  className={`h-full ${getProbabilityColor(deal.probability)} transition-all`}
-                  style={{ width: `${deal.probability}%` }}
-                />
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-3.5 w-3.5 text-neutral-400 dark:text-neutral-500" />
+              <div className="flex-1">
+                <div className="flex items-center justify-between text-xs mb-1.5">
+                  <span className="text-neutral-500 dark:text-neutral-400 font-medium">Probabilidade</span>
+                  <span className={`font-semibold px-2 py-0.5 rounded ${getProbabilityColor(deal.probability)}`}>
+                    {deal.probability}%
+                  </span>
+                </div>
+                <div className="h-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-300 ${
+                      deal.probability >= 75 ? 'bg-success-500' :
+                      deal.probability >= 50 ? 'bg-warning-500' :
+                      deal.probability >= 25 ? 'bg-warning-600' :
+                      'bg-danger-500'
+                    }`}
+                    style={{ width: `${deal.probability}%` }}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -165,9 +178,9 @@ export const DealCard = memo(function DealCard({
 
         {/* Data prevista de fechamento */}
         {deal.expected_close_date && deal.status === 'open' && (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Calendar className="h-3.5 w-3.5" />
-            <span>
+          <div className="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400">
+            <Calendar className="h-3.5 w-3.5 text-neutral-400 dark:text-neutral-500" />
+            <span className="font-medium">
               Previsão: {format(new Date(deal.expected_close_date), "dd MMM yyyy", { locale: ptBR })}
             </span>
           </div>
@@ -175,25 +188,27 @@ export const DealCard = memo(function DealCard({
 
         {/* Participantes (placeholder - será implementado quando integrarmos) */}
         <div className="flex items-center gap-2">
-          <Users className="h-3.5 w-3.5 text-muted-foreground" />
+          <Users className="h-3.5 w-3.5 text-neutral-400 dark:text-neutral-500" />
           <div className="flex -space-x-2">
             {/* Aqui vamos renderizar os avatares dos participantes */}
-            <Avatar className="h-6 w-6 border-2 border-background">
-              <AvatarFallback className="text-xs">+</AvatarFallback>
+            <Avatar className="h-6 w-6 border-2 border-white dark:border-neutral-900">
+              <AvatarFallback className="text-xs bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
+                +
+              </AvatarFallback>
             </Avatar>
           </div>
         </div>
 
         {/* Tags */}
         {deal.tags && deal.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1.5">
             {deal.tags.slice(0, 3).map((tag, index) => (
-              <Badge key={index} variant="secondary" className="text-xs">
+              <Badge key={index} variant="secondary" className="text-xs bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-0">
                 {tag}
               </Badge>
             ))}
             {deal.tags.length > 3 && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-xs bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-0">
                 +{deal.tags.length - 3}
               </Badge>
             )}

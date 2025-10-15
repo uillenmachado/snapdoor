@@ -11,49 +11,55 @@ import {
 import { useMoveDeal, Deal } from "@/hooks/useDeals";
 import { Stage } from "@/hooks/usePipelines";
 
-// Paleta de cores suaves para as colunas do pipeline
+// Paleta de cores profissionais Pipedrive-style para as colunas do pipeline
 const stageColors = [
   {
-    bg: "bg-blue-50/60",
-    border: "border-blue-200/40",
-    header: "bg-blue-100/50",
-    accent: "text-blue-700",
-    counter: "bg-blue-200/70 text-blue-800"
+    bg: "bg-gradient-to-b from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-900/50",
+    border: "border-pipeline-1/30 dark:border-pipeline-1/20",
+    header: "bg-pipeline-1/5 dark:bg-pipeline-1/10",
+    accent: "text-pipeline-1 dark:text-pipeline-1",
+    counter: "bg-pipeline-1/15 text-pipeline-1 dark:bg-pipeline-1/20 font-semibold",
+    shadow: "shadow-sm hover:shadow-md"
   },
   {
-    bg: "bg-amber-50/60", 
-    border: "border-amber-200/40",
-    header: "bg-amber-100/50",
-    accent: "text-amber-700",
-    counter: "bg-amber-200/70 text-amber-800"
+    bg: "bg-gradient-to-b from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-900/50", 
+    border: "border-pipeline-2/30 dark:border-pipeline-2/20",
+    header: "bg-pipeline-2/5 dark:bg-pipeline-2/10",
+    accent: "text-pipeline-2 dark:text-pipeline-2",
+    counter: "bg-pipeline-2/15 text-pipeline-2 dark:bg-pipeline-2/20 font-semibold",
+    shadow: "shadow-sm hover:shadow-md"
   },
   {
-    bg: "bg-violet-50/60",
-    border: "border-violet-200/40", 
-    header: "bg-violet-100/50",
-    accent: "text-violet-700",
-    counter: "bg-violet-200/70 text-violet-800"
+    bg: "bg-gradient-to-b from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-900/50",
+    border: "border-pipeline-3/30 dark:border-pipeline-3/20", 
+    header: "bg-pipeline-3/5 dark:bg-pipeline-3/10",
+    accent: "text-pipeline-3 dark:text-pipeline-3",
+    counter: "bg-pipeline-3/15 text-pipeline-3 dark:bg-pipeline-3/20 font-semibold",
+    shadow: "shadow-sm hover:shadow-md"
   },
   {
-    bg: "bg-emerald-50/60",
-    border: "border-emerald-200/40",
-    header: "bg-emerald-100/50", 
-    accent: "text-emerald-700",
-    counter: "bg-emerald-200/70 text-emerald-800"
+    bg: "bg-gradient-to-b from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-900/50",
+    border: "border-pipeline-4/30 dark:border-pipeline-4/20",
+    header: "bg-pipeline-4/5 dark:bg-pipeline-4/10", 
+    accent: "text-pipeline-4 dark:text-pipeline-4",
+    counter: "bg-pipeline-4/15 text-pipeline-4 dark:bg-pipeline-4/20 font-semibold",
+    shadow: "shadow-sm hover:shadow-md"
   },
   {
-    bg: "bg-rose-50/60",
-    border: "border-rose-200/40",
-    header: "bg-rose-100/50",
-    accent: "text-rose-700", 
-    counter: "bg-rose-200/70 text-rose-800"
+    bg: "bg-gradient-to-b from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-900/50",
+    border: "border-pipeline-5/30 dark:border-pipeline-5/20",
+    header: "bg-pipeline-5/5 dark:bg-pipeline-5/10",
+    accent: "text-pipeline-5 dark:text-pipeline-5", 
+    counter: "bg-pipeline-5/15 text-pipeline-5 dark:bg-pipeline-5/20 font-semibold",
+    shadow: "shadow-sm hover:shadow-md"
   },
   {
-    bg: "bg-slate-50/60",
-    border: "border-slate-200/40",
-    header: "bg-slate-100/50",
-    accent: "text-slate-700",
-    counter: "bg-slate-200/70 text-slate-800"
+    bg: "bg-gradient-to-b from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-900/50",
+    border: "border-pipeline-6/30 dark:border-pipeline-6/20",
+    header: "bg-pipeline-6/5 dark:bg-pipeline-6/10",
+    accent: "text-pipeline-6 dark:text-pipeline-6",
+    counter: "bg-pipeline-6/15 text-pipeline-6 dark:bg-pipeline-6/20 font-semibold",
+    shadow: "shadow-sm hover:shadow-md"
   }
 ];
 
@@ -155,7 +161,7 @@ export function DealKanbanBoard({
   };
 
   return (
-    <div className="flex gap-4 h-full overflow-x-auto pb-4">
+    <div className="flex gap-5 h-full overflow-x-auto pb-6 px-1">
       {optimisticStages.map((stage, index) => {
         const colorScheme = stageColors[index % stageColors.length];
         const stageValue = stage.deals.reduce((sum, deal) => sum + (deal.value || 0), 0);
@@ -163,38 +169,42 @@ export function DealKanbanBoard({
         return (
           <div
             key={stage.id}
-            className={`flex-shrink-0 w-80 rounded-lg border-2 ${colorScheme.border} ${colorScheme.bg} transition-all duration-200 ${
-              dragOverStage === stage.id ? "ring-2 ring-blue-400 shadow-lg" : ""
+            className={`flex-shrink-0 w-80 rounded-lg border ${colorScheme.border} ${colorScheme.bg} ${colorScheme.shadow} transition-all duration-300 ${
+              dragOverStage === stage.id ? "ring-2 ring-brand-green-500 shadow-lg scale-[1.02]" : ""
             }`}
             onDragOver={(e) => handleDragOver(e, stage.id)}
             onDragLeave={handleDragLeave}
             onDrop={() => handleDrop(stage.id)}
           >
-            {/* Stage Header */}
-            <div className={`p-4 ${colorScheme.header} rounded-t-lg border-b-2 ${colorScheme.border}`}>
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
+            {/* Stage Header - Pipedrive Style */}
+            <div className={`px-4 py-3 ${colorScheme.header} rounded-t-lg border-b border-neutral-200 dark:border-neutral-800`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
                   <h3 className={`font-semibold text-sm ${colorScheme.accent}`}>
                     {stage.name}
                   </h3>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${colorScheme.counter}`}>
+                  <span className={`text-xs px-2.5 py-1 rounded-full ${colorScheme.counter}`}>
                     {stage.deals.length}
                   </span>
                 </div>
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                      <MoreVertical className="h-4 w-4" />
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-7 w-7 p-0 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                    >
+                      <MoreVertical className="h-4 w-4 text-neutral-500" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  <DropdownMenuContent align="end" className="w-48">
                     <DropdownMenuItem onClick={() => onEditStage(stage.id)}>
                       Editar coluna
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => onDeleteStage(stage.id)}
-                      className="text-red-600"
+                      className="text-danger-500 focus:text-danger-600"
                     >
                       Excluir coluna
                     </DropdownMenuItem>
@@ -202,23 +212,29 @@ export function DealKanbanBoard({
                 </DropdownMenu>
               </div>
 
-              {/* Stage Value */}
+              {/* Stage Value - Professional Format */}
               {stageValue > 0 && (
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <span>💰</span>
-                  <span className="font-semibold">{formatCurrency(stageValue)}</span>
+                <div className="mt-2 flex items-baseline gap-1.5">
+                  <span className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+                    Valor total:
+                  </span>
+                  <span className="text-sm font-bold text-neutral-900 dark:text-neutral-100">
+                    {formatCurrency(stageValue)}
+                  </span>
                 </div>
               )}
             </div>
 
-            {/* Stage Content */}
-            <div className="p-3 space-y-3 overflow-y-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
+            {/* Stage Content - Improved Spacing */}
+            <div className="p-3 space-y-2.5 overflow-y-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
               {stage.deals.map((deal) => (
                 <div
                   key={deal.id}
                   draggable
                   onDragStart={() => handleDragStart(deal, stage.id)}
-                  className={`cursor-move ${draggedDeal?.id === deal.id ? 'opacity-50' : ''}`}
+                  className={`cursor-move transition-opacity duration-200 ${
+                    draggedDeal?.id === deal.id ? 'opacity-40' : 'opacity-100'
+                  }`}
                 >
                   <DealCard
                     deal={deal}
@@ -228,8 +244,10 @@ export function DealKanbanBoard({
               ))}
 
               {stage.deals.length === 0 && (
-                <div className="text-center text-muted-foreground text-sm py-8">
-                  Nenhum negócio nesta etapa
+                <div className="text-center text-neutral-400 dark:text-neutral-600 text-sm py-12 px-4">
+                  <div className="text-3xl mb-2 opacity-40">📭</div>
+                  <p className="font-medium">Nenhum negócio</p>
+                  <p className="text-xs mt-1">Arraste cards para cá</p>
                 </div>
               )}
             </div>
@@ -237,15 +255,15 @@ export function DealKanbanBoard({
         );
       })}
 
-      {/* Add Stage Button */}
+      {/* Add Stage Button - Professional Style */}
       <div className="flex-shrink-0 w-80">
         <Button
           variant="outline"
-          className="w-full h-32 border-2 border-dashed hover:border-primary hover:bg-primary/5"
+          className="w-full h-32 border-2 border-dashed border-neutral-300 dark:border-neutral-700 hover:border-brand-green-400 hover:bg-brand-green-50/50 dark:hover:bg-brand-green-900/10 transition-all duration-200 text-neutral-600 dark:text-neutral-400 hover:text-brand-green-600 dark:hover:text-brand-green-400"
           onClick={onAddStage}
         >
           <Plus className="h-5 w-5 mr-2" />
-          Adicionar Coluna
+          <span className="font-medium">Adicionar Coluna</span>
         </Button>
       </div>
     </div>
