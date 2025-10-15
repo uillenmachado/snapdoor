@@ -17,6 +17,10 @@
 *.env
 **/node_modules/**/.env
 
+# Server-side environment variables (Backend/Edge Functions)
+.env.server
+.env.backup
+
 # ========================================
 # Node.js Dependencies
 # ========================================

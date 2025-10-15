@@ -1,6 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { EnrichmentData } from "@/types/enrichment";
+
+// Company type for JOIN
+export interface Company {
+  id: string;
+  name: string;
+  domain: string | null;
+  logo_url: string | null;
+  industry: string | null;
+}
 
 // Types - Alinhado com schema do banco de dados
 export interface Lead {
@@ -12,7 +22,8 @@ export interface Lead {
   email: string;
   phone: string | null;
   position: string | null; // Cargo
-  company: string | null; // Empresa onde trabalha
+  company: string | null; // Empresa onde trabalha (nome string)
+  company_id?: string | null; // FK para companies table
   
   // Status e organização
   status: string; // active, inactive, new, won, lost
@@ -20,14 +31,14 @@ export interface Lead {
   tags: string[] | null;
   
   // Dados de enriquecimento (LinkedIn, Hunter.io)
-  enrichment_data: any;
+  enrichment_data: EnrichmentData | null;
   last_interaction: string | null;
   
   // Campos de NEGÓCIO (Deal)
-  deal_value: number; // Valor do negócio em reais
-  expected_close_date: string | null; // Data prevista de fechamento
-  probability: number; // Probabilidade de fechamento (0-100)
-  deal_stage: string; // Etapa do negócio
+  deal_value?: number; // Valor do negócio em reais
+  expected_close_date?: string | null; // Data prevista de fechamento
+  probability?: number; // Probabilidade de fechamento (0-100)
+  deal_stage?: string; // Etapa do negócio
   
   // Timestamps
   created_at: string;
@@ -48,6 +59,9 @@ export interface Lead {
   linkedin_url?: string | null;
   is_archived?: boolean;
   temperature?: string;
+  
+  // JOIN with companies table (optional - populated when using JOIN)
+  companies?: Company | null;
 }
 
 // Activity types
@@ -81,7 +95,7 @@ export const useLeads = (userId: string | undefined) => {
         .order("position", { ascending: true });
 
       if (error) throw error;
-      return data as Lead[];
+      return data as unknown as Lead[];
     },
     enabled: !!userId,
   });

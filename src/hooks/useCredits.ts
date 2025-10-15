@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CREDIT_COSTS } from "@/services/hunterClient";
+import { QueryParams, ResultSummary } from "@/types/enrichment";
 
 // Types
 export interface UserCredits {
@@ -21,8 +22,8 @@ export interface CreditUsageHistory {
   credits_used: number;
   domain: string | null;
   email: string | null;
-  query_params: any;
-  result_summary: any;
+  query_params: QueryParams | null;
+  result_summary: ResultSummary | null;
   success: boolean;
   error_message: string | null;
   created_at: string;
