@@ -114,7 +114,7 @@ const Dashboard = () => {
             <DashboardMetrics leads={deals || [] as any} stages={(stages || []) as any} />
             
             {/* Acesso Rápido ao Pipeline */}
-            <Card className="mt-6">
+            <Card className="mt-6 bg-card border-border">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
@@ -134,7 +134,7 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-3">
-                  <div className="flex flex-col p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+                  <div className="flex flex-col p-4 border border-border rounded-lg bg-card hover:bg-accent/50 transition-colors">
                     <div className="flex items-center gap-2 mb-2">
                       <TrendingUp className="h-4 w-4 text-blue-600" />
                       <span className="text-sm font-medium">Total de Negócios</span>
@@ -145,7 +145,7 @@ const Dashboard = () => {
                     </p>
                   </div>
 
-                  <div className="flex flex-col p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+                  <div className="flex flex-col p-4 border border-border rounded-lg bg-card hover:bg-accent/50 transition-colors">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-xl">💰</span>
                       <span className="text-sm font-medium">Valor Total</span>
@@ -164,7 +164,7 @@ const Dashboard = () => {
                     </p>
                   </div>
 
-                  <div className="flex flex-col p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+                  <div className="flex flex-col p-4 border border-border rounded-lg bg-card hover:bg-accent/50 transition-colors">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-xl">🎯</span>
                       <span className="text-sm font-medium">Taxa de Conversão</span>

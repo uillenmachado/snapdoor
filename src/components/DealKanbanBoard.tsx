@@ -14,7 +14,7 @@ import { Stage } from "@/hooks/usePipelines";
 // Paleta de cores profissionais Pipedrive-style para as colunas do pipeline
 const stageColors = [
   {
-    bg: "bg-gradient-to-b from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-900/50",
+    bg: "bg-gradient-to-b from-card to-card/80 dark:from-card dark:to-card/80",
     border: "border-pipeline-1/30 dark:border-pipeline-1/20",
     header: "bg-pipeline-1/5 dark:bg-pipeline-1/10",
     accent: "text-pipeline-1 dark:text-pipeline-1",
@@ -22,7 +22,7 @@ const stageColors = [
     shadow: "shadow-sm hover:shadow-md"
   },
   {
-    bg: "bg-gradient-to-b from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-900/50", 
+    bg: "bg-gradient-to-b from-card to-card/80 dark:from-card dark:to-card/80", 
     border: "border-pipeline-2/30 dark:border-pipeline-2/20",
     header: "bg-pipeline-2/5 dark:bg-pipeline-2/10",
     accent: "text-pipeline-2 dark:text-pipeline-2",
@@ -30,7 +30,7 @@ const stageColors = [
     shadow: "shadow-sm hover:shadow-md"
   },
   {
-    bg: "bg-gradient-to-b from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-900/50",
+    bg: "bg-gradient-to-b from-card to-card/80 dark:from-card dark:to-card/80",
     border: "border-pipeline-3/30 dark:border-pipeline-3/20", 
     header: "bg-pipeline-3/5 dark:bg-pipeline-3/10",
     accent: "text-pipeline-3 dark:text-pipeline-3",
@@ -38,7 +38,7 @@ const stageColors = [
     shadow: "shadow-sm hover:shadow-md"
   },
   {
-    bg: "bg-gradient-to-b from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-900/50",
+    bg: "bg-gradient-to-b from-card to-card/80 dark:from-card dark:to-card/80",
     border: "border-pipeline-4/30 dark:border-pipeline-4/20",
     header: "bg-pipeline-4/5 dark:bg-pipeline-4/10", 
     accent: "text-pipeline-4 dark:text-pipeline-4",
@@ -46,7 +46,7 @@ const stageColors = [
     shadow: "shadow-sm hover:shadow-md"
   },
   {
-    bg: "bg-gradient-to-b from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-900/50",
+    bg: "bg-gradient-to-b from-card to-card/80 dark:from-card dark:to-card/80",
     border: "border-pipeline-5/30 dark:border-pipeline-5/20",
     header: "bg-pipeline-5/5 dark:bg-pipeline-5/10",
     accent: "text-pipeline-5 dark:text-pipeline-5", 
@@ -54,7 +54,7 @@ const stageColors = [
     shadow: "shadow-sm hover:shadow-md"
   },
   {
-    bg: "bg-gradient-to-b from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-900/50",
+    bg: "bg-gradient-to-b from-card to-card/80 dark:from-card dark:to-card/80",
     border: "border-pipeline-6/30 dark:border-pipeline-6/20",
     header: "bg-pipeline-6/5 dark:bg-pipeline-6/10",
     accent: "text-pipeline-6 dark:text-pipeline-6",

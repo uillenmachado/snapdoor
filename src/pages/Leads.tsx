@@ -192,7 +192,7 @@ export default function Leads() {
 
       {/* Cards de Estatísticas - Pipedrive Style */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card className="border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:shadow-md transition-shadow">
+        <Card className="border border-border bg-card hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider flex items-center gap-2">
               <Users className="h-4 w-4" />
@@ -204,7 +204,7 @@ export default function Leads() {
           </CardContent>
         </Card>
 
-        <Card className="border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:shadow-md transition-shadow">
+        <Card className="border border-border bg-card hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider flex items-center gap-2">
               <Target className="h-4 w-4 text-info-600 dark:text-info-500" />
@@ -216,7 +216,7 @@ export default function Leads() {
           </CardContent>
         </Card>
 
-        <Card className="border border-success-200 dark:border-success-800 bg-white dark:bg-neutral-900 hover:shadow-md transition-shadow">
+        <Card className="border border-success-200 dark:border-success-800 bg-card hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-success-600 dark:text-success-500" />
@@ -228,7 +228,7 @@ export default function Leads() {
           </CardContent>
         </Card>
 
-        <Card className="border border-danger-200 dark:border-danger-800 bg-white dark:bg-neutral-900 hover:shadow-md transition-shadow">
+        <Card className="border border-danger-200 dark:border-danger-800 bg-card hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-danger-600 dark:text-danger-500" />
@@ -240,7 +240,7 @@ export default function Leads() {
           </CardContent>
         </Card>
 
-        <Card className="border border-brand-purple-200 dark:border-brand-purple-800 bg-white dark:bg-neutral-900 hover:shadow-md transition-shadow">
+        <Card className="border border-brand-purple-200 dark:border-brand-purple-800 bg-card hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
               Taxa de Conversão
@@ -253,8 +253,8 @@ export default function Leads() {
       </div>
 
       {/* Filtros e Busca - Pipedrive Style */}
-      <Card className="border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
-        <CardHeader className="border-b border-neutral-200 dark:border-neutral-800">
+      <Card className="border border-border bg-card">
+        <CardHeader className="border-b border-border">
           <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
             <div className="flex-1 w-full md:w-auto">
               <div className="relative">
@@ -327,7 +327,7 @@ export default function Leads() {
                 {leads.length} {leads.length === 1 ? 'lead encontrado' : 'leads encontrados'}.
               </caption>
               <TableHeader>
-                <TableRow className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900/50">
+                <TableRow className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-border hover:bg-neutral-50 dark:hover:bg-neutral-900/50">
                   <TableHead className="w-12 font-semibold text-neutral-700 dark:text-neutral-300"></TableHead>
                   <TableHead className="font-semibold text-neutral-700 dark:text-neutral-300">Nome</TableHead>
                   <TableHead className="font-semibold text-neutral-700 dark:text-neutral-300">Empresa</TableHead>

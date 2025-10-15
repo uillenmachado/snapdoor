@@ -75,7 +75,7 @@ const Reports = () => {
 
         <div className="flex-1 flex flex-col">
           {/* Header Profissional - Pipedrive Style */}
-          <header className="border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 sticky top-0 z-10 shadow-sm">
+          <header className="border-b border-border bg-card sticky top-0 z-10 shadow-sm">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between p-6 gap-4">
               <div className="flex items-center gap-4">
                 <SidebarTrigger />
@@ -87,7 +87,7 @@ const Reports = () => {
 
               <div className="flex items-center gap-3 flex-wrap">
                 <Select value={periodDays.toString()} onValueChange={(v) => setPeriodDays(parseInt(v))}>
-                  <SelectTrigger className="w-[160px] border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900">
+                  <SelectTrigger className="w-[160px] border-border bg-card">
                     <Calendar className="h-4 w-4 mr-2 text-neutral-500" />
                     <SelectValue />
                   </SelectTrigger>
@@ -102,7 +102,7 @@ const Reports = () => {
                   variant="outline" 
                   size="sm" 
                   onClick={handleRefresh}
-                  className="border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                  className="border-border hover:bg-neutral-100 dark:hover:bg-neutral-800"
                 >
                   <RefreshCcw className="h-4 w-4 mr-2" />
                   Atualizar
@@ -125,7 +125,7 @@ const Reports = () => {
           <main className="flex-1 p-6">
             <Tabs defaultValue="overview" className="w-full">
               {/* Tabs Navigation - Professional Style */}
-              <TabsList className="grid w-full grid-cols-4 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-1 rounded-lg h-auto">
+              <TabsList className="grid w-full grid-cols-4 bg-card border border-border p-1 rounded-lg h-auto">
                 <TabsTrigger 
                   value="overview"
                   className="data-[state=active]:bg-brand-green-50 dark:data-[state=active]:bg-brand-green-900/20 data-[state=active]:text-brand-green-700 dark:data-[state=active]:text-brand-green-400 data-[state=active]:font-semibold transition-all py-2.5"
@@ -157,50 +157,50 @@ const Reports = () => {
               {/* Content Area - Cards com espaçamento profissional */}
               <div id="reports-content" className="mt-6">
                 <TabsContent value="overview" className="space-y-6 mt-0">
-                  <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 p-6">
+                  <div className="bg-card rounded-lg border border-border p-6">
                     <MetricsWidget />
                   </div>
                   
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 p-6">
+                    <div className="bg-card rounded-lg border border-border p-6">
                       <ConversionFunnelChart />
                     </div>
-                    <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 p-6">
+                    <div className="bg-card rounded-lg border border-border p-6">
                       <ForecastWidget />
                     </div>
                   </div>
 
-                  <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 p-6">
+                  <div className="bg-card rounded-lg border border-border p-6">
                     <ActivityChart days={periodDays} />
                   </div>
                 </TabsContent>
                 
                 <TabsContent value="sales" className="space-y-6 mt-0">
-                  <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 p-6">
+                  <div className="bg-card rounded-lg border border-border p-6">
                     <RevenueChart periodType="day" limit={periodDays} chartType="area" />
                   </div>
-                  <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 p-6">
+                  <div className="bg-card rounded-lg border border-border p-6">
                     <SalesTrendChart days={periodDays} />
                   </div>
                 </TabsContent>
 
                 <TabsContent value="performance" className="space-y-6 mt-0">
-                  <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 p-6">
+                  <div className="bg-card rounded-lg border border-border p-6">
                     <TopPerformersChart limit={10} />
                   </div>
                   
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 p-6">
+                    <div className="bg-card rounded-lg border border-border p-6">
                       <ActivityChart days={periodDays} />
                     </div>
-                    <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 p-6">
+                    <div className="bg-card rounded-lg border border-border p-6">
                       <ForecastWidget />
                     </div>
                   </div>
                 </TabsContent>
                 
                 <TabsContent value="conversions" className="mt-0">
-                  <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 p-6">
+                  <div className="bg-card rounded-lg border border-border p-6">
                     <LeadHistorySection />
                   </div>
                 </TabsContent>
