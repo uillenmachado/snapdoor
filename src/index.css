@@ -8,91 +8,172 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 210 11% 15%;
+    /* ===== PALETA DE NEUTROS ===== */
+    --neutral-50: 220 15% 98%;
+    --neutral-100: 220 15% 95%;
+    --neutral-200: 220 15% 90%;
+    --neutral-300: 220 15% 80%;
+    --neutral-400: 220 15% 65%;
+    --neutral-500: 220 15% 50%;
+    --neutral-600: 220 15% 40%;
+    --neutral-700: 220 15% 30%;
+    --neutral-800: 220 15% 20%;
+    --neutral-900: 220 15% 12%;
+
+    /* ===== CORES DE MARCA SNAPDOOR ===== */
+    /* Verde SnapDoor - Primária */
+    --brand-green-50: 157 76% 95%;
+    --brand-green-100: 157 76% 91%;
+    --brand-green-200: 157 70% 80%;
+    --brand-green-300: 157 65% 65%;
+    --brand-green-400: 157 60% 50%;
+    --brand-green-500: 157 100% 33%;  /* PRIMARY */
+    --brand-green-600: 157 100% 28%;
+    --brand-green-700: 157 100% 23%;
+    --brand-green-800: 157 100% 18%;
+    --brand-green-900: 157 100% 13%;
+
+    /* Roxo SnapDoor - Secundária/CTA */
+    --brand-purple-50: 257 82% 95%;
+    --brand-purple-100: 257 82% 90%;
+    --brand-purple-200: 257 82% 80%;
+    --brand-purple-300: 257 82% 70%;
+    --brand-purple-400: 257 82% 65%;
+    --brand-purple-500: 257 82% 61%;  /* SECONDARY */
+    --brand-purple-600: 257 82% 55%;
+    --brand-purple-700: 257 82% 48%;
+    --brand-purple-800: 257 82% 40%;
+    --brand-purple-900: 257 82% 32%;
+
+    /* ===== CORES DE STATUS ===== */
+    /* Sucesso - Verde */
+    --status-success-50: 145 60% 95%;
+    --status-success-100: 145 60% 90%;
+    --status-success-500: 145 60% 45%;
+    --status-success-700: 145 60% 35%;
+
+    /* Info - Azul */
+    --status-info-50: 210 100% 95%;
+    --status-info-100: 210 100% 90%;
+    --status-info-500: 210 100% 55%;
+    --status-info-700: 210 100% 45%;
+
+    /* Atenção - Amarelo/Laranja */
+    --status-warning-50: 40 100% 95%;
+    --status-warning-100: 40 100% 90%;
+    --status-warning-500: 40 100% 55%;
+    --status-warning-700: 40 100% 45%;
+
+    /* Erro - Vermelho */
+    --status-danger-50: 0 70% 95%;
+    --status-danger-100: 0 70% 90%;
+    --status-danger-500: 0 70% 55%;
+    --status-danger-700: 0 70% 45%;
+
+    /* ===== CORES DE ETAPAS DO PIPELINE ===== */
+    --pipeline-stage-1: 210 85% 60%;   /* Azul - Primeiro contato */
+    --pipeline-stage-2: 270 70% 60%;   /* Roxo - Qualificação */
+    --pipeline-stage-3: 330 75% 60%;   /* Rosa - Proposta */
+    --pipeline-stage-4: 25 85% 55%;    /* Laranja - Negociação */
+    --pipeline-stage-5: 145 60% 50%;   /* Verde - Ganho */
+    --pipeline-stage-6: 0 70% 55%;     /* Vermelho - Perdido */
+
+    /* ===== MAPEAMENTO SHADCN (compatibilidade) ===== */
+    --background: 220 15% 98%;  /* neutral-50 */
+    --foreground: 220 15% 30%;  /* neutral-700 */
 
     --card: 0 0% 100%;
-    --card-foreground: 210 11% 15%;
+    --card-foreground: 220 15% 30%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 11% 15%;
+    --popover-foreground: 220 15% 30%;
 
-    /* Snapdoor Green */
-    --primary: 157 100% 33%;
+    --primary: 157 100% 33%;  /* brand-green-500 */
     --primary-foreground: 0 0% 100%;
     
-    /* Snapdoor Purple for CTAs */
-    --secondary: 257 82% 61%;
+    --secondary: 257 82% 61%;  /* brand-purple-500 */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 15% 95%;  /* neutral-100 */
+    --muted-foreground: 220 15% 50%;  /* neutral-500 */
 
-    --accent: 157 76% 91%;
-    --accent-foreground: 157 100% 33%;
+    --accent: 157 76% 91%;  /* brand-green-100 */
+    --accent-foreground: 157 100% 33%;  /* brand-green-500 */
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 70% 55%;  /* status-danger-500 */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 157 100% 33%;
+    --border: 220 15% 90%;  /* neutral-200 */
+    --input: 220 15% 90%;
+    --ring: 157 100% 33%;  /* brand-green-500 */
 
-    --radius: 0.5rem;
+    --radius: 0.375rem;  /* 6px - padrão md */
 
-    /* Snapdoor Sidebar Dark */
-    --sidebar-background: 210 11% 10%;
-    --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 157 100% 33%;
+    /* ===== SIDEBAR ===== */
+    --sidebar-background: 220 15% 12%;  /* neutral-900 */
+    --sidebar-foreground: 220 15% 95%;  /* neutral-100 */
+    --sidebar-primary: 157 100% 33%;  /* brand-green-500 */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 11% 15%;
-    --sidebar-accent-foreground: 0 0% 90%;
-    --sidebar-border: 210 11% 20%;
+    --sidebar-accent: 220 15% 20%;  /* neutral-800 */
+    --sidebar-accent-foreground: 220 15% 95%;
+    --sidebar-border: 220 15% 25%;
     --sidebar-ring: 157 100% 33%;
-
-    /* Custom Snapdoor Colors */
-    --snapdoor-green-light: 157 76% 91%;
-    --snapdoor-purple: 257 82% 61%;
-    --snapdoor-gray: 210 11% 96%;
-    --snapdoor-dark: 210 11% 10%;
   }
 
   .dark {
-    --background: 210 11% 10%;
-    --foreground: 0 0% 98%;
+    /* ===== PALETA DE NEUTROS (Dark Mode) ===== */
+    --neutral-50: 220 15% 12%;
+    --neutral-100: 220 15% 20%;
+    --neutral-200: 220 15% 25%;
+    --neutral-300: 220 15% 30%;
+    --neutral-400: 220 15% 50%;
+    --neutral-500: 220 15% 60%;
+    --neutral-600: 220 15% 75%;
+    --neutral-700: 220 15% 85%;
+    --neutral-800: 220 15% 92%;
+    --neutral-900: 220 15% 98%;
 
-    --card: 210 11% 15%;
-    --card-foreground: 0 0% 98%;
+    /* Cores de marca permanecem iguais */
+    /* Cores de status permanecem iguais */
+    /* Cores de etapas permanecem iguais */
 
-    --popover: 210 11% 15%;
-    --popover-foreground: 0 0% 98%;
+    /* ===== MAPEAMENTO SHADCN (Dark Mode) ===== */
+    --background: 220 15% 12%;  /* neutral-50 (invertido) */
+    --foreground: 220 15% 98%;  /* neutral-900 (invertido) */
 
-    --primary: 157 100% 33%;
+    --card: 220 15% 20%;  /* neutral-100 (invertido) */
+    --card-foreground: 220 15% 98%;
+
+    --popover: 220 15% 20%;
+    --popover-foreground: 220 15% 98%;
+
+    --primary: 157 100% 33%;  /* mesmo */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 257 82% 61%;
+    --secondary: 257 82% 61%;  /* mesmo */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 11% 20%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 220 15% 25%;  /* neutral-200 (invertido) */
+    --muted-foreground: 220 15% 60%;  /* neutral-500 (invertido) */
 
-    --accent: 210 11% 20%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 220 15% 25%;
+    --accent-foreground: 157 100% 33%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 210 11% 20%;
-    --input: 210 11% 20%;
+    --border: 220 15% 25%;  /* neutral-200 (invertido) */
+    --input: 220 15% 25%;
     --ring: 157 100% 33%;
     
-    --sidebar-background: 210 11% 10%;
-    --sidebar-foreground: 0 0% 90%;
+    /* Sidebar permanece dark */
+    --sidebar-background: 220 15% 12%;
+    --sidebar-foreground: 220 15% 95%;
     --sidebar-primary: 157 100% 33%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 11% 15%;
-    --sidebar-accent-foreground: 0 0% 90%;
-    --sidebar-border: 210 11% 20%;
+    --sidebar-accent: 220 15% 20%;
+    --sidebar-accent-foreground: 220 15% 95%;
+    --sidebar-border: 220 15% 25%;
     --sidebar-ring: 157 100% 33%;
   }
 }
@@ -106,3 +187,149 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* ===== CLASSES UTILITÁRIAS CUSTOMIZADAS ===== */
+@layer utilities {
+  /* Classes de cores neutras */
+  .bg-neutral-50 { background-color: hsl(var(--neutral-50)); }
+  .bg-neutral-100 { background-color: hsl(var(--neutral-100)); }
+  .bg-neutral-200 { background-color: hsl(var(--neutral-200)); }
+  .bg-neutral-300 { background-color: hsl(var(--neutral-300)); }
+  .bg-neutral-400 { background-color: hsl(var(--neutral-400)); }
+  .bg-neutral-500 { background-color: hsl(var(--neutral-500)); }
+  .bg-neutral-600 { background-color: hsl(var(--neutral-600)); }
+  .bg-neutral-700 { background-color: hsl(var(--neutral-700)); }
+  .bg-neutral-800 { background-color: hsl(var(--neutral-800)); }
+  .bg-neutral-900 { background-color: hsl(var(--neutral-900)); }
+
+  .text-neutral-50 { color: hsl(var(--neutral-50)); }
+  .text-neutral-100 { color: hsl(var(--neutral-100)); }
+  .text-neutral-200 { color: hsl(var(--neutral-200)); }
+  .text-neutral-300 { color: hsl(var(--neutral-300)); }
+  .text-neutral-400 { color: hsl(var(--neutral-400)); }
+  .text-neutral-500 { color: hsl(var(--neutral-500)); }
+  .text-neutral-600 { color: hsl(var(--neutral-600)); }
+  .text-neutral-700 { color: hsl(var(--neutral-700)); }
+  .text-neutral-800 { color: hsl(var(--neutral-800)); }
+  .text-neutral-900 { color: hsl(var(--neutral-900)); }
+
+  .border-neutral-200 { border-color: hsl(var(--neutral-200)); }
+  .border-neutral-300 { border-color: hsl(var(--neutral-300)); }
+
+  /* Classes de status */
+  .bg-success { background-color: hsl(var(--status-success-500)); }
+  .bg-success-50 { background-color: hsl(var(--status-success-50)); }
+  .text-success { color: hsl(var(--status-success-700)); }
+
+  .bg-info { background-color: hsl(var(--status-info-500)); }
+  .bg-info-50 { background-color: hsl(var(--status-info-50)); }
+  .text-info { color: hsl(var(--status-info-700)); }
+
+  .bg-warning { background-color: hsl(var(--status-warning-500)); }
+  .bg-warning-50 { background-color: hsl(var(--status-warning-50)); }
+  .text-warning { color: hsl(var(--status-warning-700)); }
+
+  .bg-danger { background-color: hsl(var(--status-danger-500)); }
+  .bg-danger-50 { background-color: hsl(var(--status-danger-50)); }
+  .text-danger { color: hsl(var(--status-danger-700)); }
+
+  /* Classes de marca */
+  .bg-brand-green { background-color: hsl(var(--brand-green-500)); }
+  .bg-brand-purple { background-color: hsl(var(--brand-purple-500)); }
+  .text-brand-green { color: hsl(var(--brand-green-500)); }
+  .text-brand-purple { color: hsl(var(--brand-purple-500)); }
+
+  /* Sombras customizadas */
+  .shadow-xs { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+  .shadow-sm { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); }
+  .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+  .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+  .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+  .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+  .shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06); }
+  
+  /* Focus ring para acessibilidade */
+  .focus-ring {
+    outline: 2px solid hsl(var(--brand-green-500));
+    outline-offset: 2px;
+  }
+
+  /* Transições suaves */
+  .transition-smooth {
+    transition: all 200ms ease-in-out;
+  }
+
+  .transition-fast {
+    transition: all 150ms ease-in-out;
+  }
+
+  .transition-slow {
+    transition: all 300ms ease-in-out;
+  }
+
+  /* Layout helpers */
+  .app-shell-grid {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 0;
+  }
+
+  .app-shell-grid.sidebar-collapsed {
+    grid-template-columns: 64px 1fr;
+  }
+
+  .detail-layout {
+    display: grid;
+    grid-template-columns: 7fr 3fr;
+    gap: 1.5rem;
+  }
+
+  .pipeline-columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 320px));
+    gap: 1rem;
+    padding: 1.5rem;
+    overflow-x: auto;
+  }
+
+  /* Scrollbar styling */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: hsl(var(--neutral-100));
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--neutral-300));
+    border-radius: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--neutral-400));
+  }
+
+  /* Text truncation */
+  .text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .text-truncate-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .text-truncate-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+}
+
