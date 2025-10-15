@@ -64,7 +64,7 @@ export const DashboardMetrics = ({ leads, stages }: DashboardMetricsProps) => {
       activityRate,
       recentDeals
     };
-  }, [leads, stages]);
+  }, [leads]); // stages não é usado no cálculo
 
   const metricsData = [
     {
