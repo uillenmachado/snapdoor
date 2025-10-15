@@ -21,8 +21,8 @@ export interface Lead {
   name: string; // Nome completo
   email: string;
   phone: string | null;
-  position: string | null; // Cargo
-  company: string | null; // Empresa onde trabalha (nome string)
+  mobile?: string | null;
+  title: string | null; // Cargo (coluna real no banco)
   company_id?: string | null; // FK para companies table
   
   // Status e organização
@@ -33,6 +33,7 @@ export interface Lead {
   // Dados de enriquecimento (LinkedIn, Hunter.io)
   enrichment_data: EnrichmentData | null;
   last_interaction: string | null;
+  last_contacted_at?: string | null;
   
   // Campos de NEGÓCIO (Deal)
   deal_value?: number; // Valor do negócio em reais
@@ -44,20 +45,51 @@ export interface Lead {
   created_at: string;
   updated_at: string;
   
-  // Campos legacy e enriquecimento (mantidos para retrocompatibilidade)
+  // Campos do schema real (conforme check-leads-schema.sql)
   first_name?: string;
   last_name?: string;
   full_name?: string;
   avatar_url?: string;
-  headline?: string;
+  headline?: string; // Descrição profissional completa (ex: "CEO at Google")
   location?: string;
   about?: string;
   connections?: string;
+  linkedin_url?: string | null;
+  twitter_url?: string | null;
+  facebook_url?: string | null;
+  
+  // Enriquecimento
+  education?: any;
+  experience?: any;
+  skills?: string[] | null;
+  seniority?: string | null;
+  department?: string | null;
+  company_size?: string | null;
+  company_industry?: string | null;
+  company_location?: string | null;
+  company_website?: string | null;
+  company_linkedin_url?: string | null;
+  linkedin_profile_data?: any;
+  enriched_at?: string | null;
+  enrichment_source?: string | null;
+  
+  // Metadados
+  lead_score?: number;
+  is_qualified?: boolean;
+  notes?: string | null;
+  notes_count?: number;
+  activities_count?: number;
+  next_follow_up_at?: string | null;
+  custom_fields?: any;
+  is_archived?: boolean;
+  archived_at?: string | null;
+  
+  // Campos legacy (mantidos para retrocompatibilidade - NÃO existem no banco real)
+  position?: string | null; // Use 'title' ao invés
+  company?: string | null; // Use 'company_id' + JOIN ao invés
+  job_title?: string | null; // Use 'title' ao invés
   stage_id?: string;
   pipeline_id?: string;
-  job_title?: string | null;
-  linkedin_url?: string | null;
-  is_archived?: boolean;
   temperature?: string;
   
   // JOIN with companies table (optional - populated when using JOIN)
@@ -90,9 +122,18 @@ export const useLeads = (userId: string | undefined) => {
 
       const { data, error } = await supabase
         .from("leads")
-        .select("*")
+        .select(`
+          *,
+          companies:company_id (
+            id,
+            name,
+            domain,
+            logo_url,
+            industry
+          )
+        `)
         .eq("user_id", userId)
-        .order("position", { ascending: true });
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       return data as unknown as Lead[];

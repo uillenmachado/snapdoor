@@ -70,7 +70,16 @@ export default function Leads() {
 
       let query = supabase
         .from("leads")
-        .select("*")
+        .select(`
+          *,
+          companies:company_id (
+            id,
+            name,
+            domain,
+            logo_url,
+            industry
+          )
+        `)
         .eq("user_id", user.id)
         .order("updated_at", { ascending: false });
 
@@ -79,21 +88,21 @@ export default function Leads() {
         if (statusFilter === "active") {
           query = query.eq("is_archived", false);
         } else if (statusFilter === "won") {
-          query = query.eq("temperature", "hot");
+          query = query.eq("status", "won");
         } else if (statusFilter === "lost") {
-          query = query.eq("temperature", "cold");
+          query = query.eq("status", "lost");
         }
       }
 
-      // Filtro de empresa
+      // Filtro de empresa (usando company_id)
       if (companyFilter !== "all") {
-        query = query.eq("company", companyFilter);
+        query = query.eq("company_id", companyFilter);
       }
 
       // Busca por texto (usando valor debounced)
       if (debouncedSearchQuery.trim()) {
         query = query.or(
-          `first_name.ilike.%${debouncedSearchQuery}%,last_name.ilike.%${debouncedSearchQuery}%,email.ilike.%${debouncedSearchQuery}%,company.ilike.%${debouncedSearchQuery}%`
+          `first_name.ilike.%${debouncedSearchQuery}%,last_name.ilike.%${debouncedSearchQuery}%,email.ilike.%${debouncedSearchQuery}%,full_name.ilike.%${debouncedSearchQuery}%`
         );
       }
 
@@ -108,26 +117,33 @@ export default function Leads() {
   // Calcular estatísticas
   const stats: LeadStats = {
     total: leads.length,
-    won: leads.filter(l => l.temperature === "hot").length,
-    lost: leads.filter(l => l.temperature === "cold").length,
+    won: leads.filter(l => l.status === "won").length,
+    lost: leads.filter(l => l.status === "lost").length,
     active: leads.filter(l => !l.is_archived).length,
     conversionRate: leads.length > 0 
-      ? Math.round((leads.filter(l => l.temperature === "hot").length / leads.length) * 100) 
+      ? Math.round((leads.filter(l => l.status === "won").length / leads.length) * 100) 
       : 0,
   };
 
-  // Obter lista única de empresas
-  const companies = Array.from(new Set(leads.map(l => l.company).filter(Boolean)));
+  // Obter lista única de empresas (do JOIN)
+  const companies = Array.from(
+    new Map(
+      leads
+        .filter(l => l.companies)
+        .map(l => [l.companies!.id, l.companies!])
+    ).values()
+  );
 
   // Função para exportar CSV
   const handleExportCSV = () => {
-    const headers = ["Nome", "Empresa", "Email", "Telefone", "Status", "Criado em"];
+    const headers = ["Nome", "Empresa", "Cargo", "Email", "Telefone", "Status", "Criado em"];
     const rows = leads.map(lead => [
-      `${lead.first_name} ${lead.last_name}`,
-      lead.company || "",
+      lead.full_name || `${lead.first_name} ${lead.last_name}`,
+      lead.companies?.name || "",
+      lead.title || lead.headline || "",
       lead.email || "",
       lead.phone || "",
-      lead.temperature || "",
+      lead.status || "",
       new Date(lead.created_at).toLocaleDateString("pt-BR"),
     ]);
 
@@ -290,8 +306,8 @@ export default function Leads() {
                 <SelectContent>
                   <SelectItem value="all">Todas as Empresas</SelectItem>
                   {companies.map((company) => (
-                    <SelectItem key={company} value={company!}>
-                      {company}
+                    <SelectItem key={company.id} value={company.id}>
+                      {company.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -381,11 +397,11 @@ export default function Leads() {
                       <TableCell className="py-4">
                         <div className="flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
                           <Building2 className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
-                          <span className="font-medium">{lead.company || "-"}</span>
+                          <span className="font-medium">{lead.companies?.name || "-"}</span>
                         </div>
                       </TableCell>
                       <TableCell className="text-sm text-neutral-900 dark:text-neutral-100 py-4 font-medium">
-                        {lead.headline || lead.job_title || "-"}
+                        {lead.title || lead.headline || "-"}
                       </TableCell>
                       <TableCell className="py-4">
                         <div className="flex flex-col gap-1.5 text-xs">
