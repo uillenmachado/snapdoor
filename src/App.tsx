@@ -20,7 +20,6 @@ import NotFound from "./pages/NotFound";
 // Lazy load: App pages (code splitting)
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Pipelines = lazy(() => import("./pages/Pipelines"));
-const Deals = lazy(() => import("./pages/Deals"));
 const DealDetail = lazy(() => import("./pages/DealDetail"));
 const Activities = lazy(() => import("./pages/Activities"));
 const Reports = lazy(() => import("./pages/Reports"));
@@ -99,14 +98,6 @@ const App = () => (
             }
           />
           <Route
-            path="/deals"
-            element={
-              <ProtectedRoute>
-                <Deals />
-              </ProtectedRoute>
-            }
-          />
-          <Route
             path="/deals/:id"
             element={
               <ProtectedRoute>
@@ -167,14 +158,6 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <CompanyDetail />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/deals"
-            element={
-              <ProtectedRoute>
-                <Deals />
               </ProtectedRoute>
             }
           />
