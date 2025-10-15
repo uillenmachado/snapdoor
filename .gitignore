@@ -20,6 +20,16 @@
 # Server-side environment variables (Backend/Edge Functions)
 .env.server
 .env.backup
+.env.old
+
+# ========================================
+# Documentation Temporary Files
+# ========================================
+docs/**/*.tmp
+docs/**/*.backup
+docs/**/*.draft
+docs/**/*.old
+*.md.backup
 
 # ========================================
 # Node.js Dependencies
