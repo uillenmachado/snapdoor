@@ -1,57 +1,33 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { DealKanbanBoard } from "@/components/DealKanbanBoard";
-import { LeadDetails } from "@/components/LeadDetails";
-import { AddLeadDialog } from "@/components/AddLeadDialog";
-import { SnapDoorAIDialog } from "@/components/SnapDoorAIDialog";
-import { GlobalSearch } from "@/components/GlobalSearch";
 import { DashboardMetrics } from "@/components/DashboardMetrics";
 import { UsageLimits } from "@/components/UsageLimits";
 import { NotificationBell } from "@/components/NotificationBell";
 import { TasksWidget } from "@/components/TasksWidget";
 import { MeetingsWidget } from "@/components/MeetingsWidget";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Search, Filter, Plus, Loader2, Brain, Zap } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
+import { Loader2, Brain, Zap, TrendingUp, ArrowRight, LayoutGrid } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { usePipeline, useStages, useCreateStage, useUpdateStage, useDeleteStage } from "@/hooks/usePipelines";
-import { useDeals, Deal } from "@/hooks/useDeals";
+import { usePipeline, useStages } from "@/hooks/usePipelines";
+import { useDeals } from "@/hooks/useDeals";
 import { useSubscription } from "@/hooks/useSubscription";
+import { SnapDoorAIDialog } from "@/components/SnapDoorAIDialog";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   
-  // Fetch pipeline and stages
-  const { data: pipeline, isLoading: pipelineLoading } = usePipeline(user?.id);
-  const { data: stages, isLoading: stagesLoading } = useStages(pipeline?.id);
+  // Fetch data
+  const { data: pipeline } = usePipeline(user?.id);
+  const { data: stages } = useStages(pipeline?.id);
   const { data: deals, isLoading: dealsLoading } = useDeals(user?.id);
   const { data: subscription } = useSubscription(user?.id);
   
-  // Mutations
-  const createStageMutation = useCreateStage();
-  const updateStageMutation = useUpdateStage();
-  const deleteStageMutation = useDeleteStage();
-  
-  const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
-  const [isDealDetailsOpen, setIsDealDetailsOpen] = useState(false);
-  const [isAddDealOpen, setIsAddDealOpen] = useState(false);
   const [isSnapDoorAIOpen, setIsSnapDoorAIOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [editingStageId, setEditingStageId] = useState<string | null>(null);
-  const [newStageName, setNewStageName] = useState("");
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -59,15 +35,6 @@ const Dashboard = () => {
       navigate("/login");
     }
   }, [user, authLoading, navigate]);
-
-  useEffect(() => {
-    const handleOpenAddDeal = () => {
-      setIsAddDealOpen(true);
-    };
-
-    window.addEventListener("openAddDeal", handleOpenAddDeal);
-    return () => window.removeEventListener("openAddDeal", handleOpenAddDeal);
-  }, []);
 
   // Keyboard shortcut for SnapDoor AI (Ctrl+K)
   useEffect(() => {
@@ -82,102 +49,11 @@ const Dashboard = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Group deals by stage
-  const stagesWithDeals = useMemo(() => {
-    if (!stages || !deals) return [];
-    
-    return stages.map((stage) => ({
-      ...stage,
-      deals: deals.filter((deal) => deal.stage_id === stage.id),
-    }));
-  }, [stages, deals]);
-
-  // Filter stages based on search
-  const filteredStages = useMemo(() => {
-    if (!searchQuery) return stagesWithDeals;
-    
-    return stagesWithDeals.map((stage) => ({
-      ...stage,
-      deals: stage.deals.filter(
-        (deal) =>
-          deal.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (deal.company_name && deal.company_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-          (deal.description && deal.description.toLowerCase().includes(searchQuery.toLowerCase()))
-      ),
-    }));
-  }, [stagesWithDeals, searchQuery]);
-
-  const handleDealClick = (deal: Deal) => {
-    setSelectedDeal(deal);
-    setIsDealDetailsOpen(true);
-  };
-
-  const handleEditStage = (stageId: string) => {
-    const stage = stagesWithDeals.find((s) => s.id === stageId);
-    if (stage) {
-      setEditingStageId(stageId);
-      setNewStageName(stage.name);
-    }
-  };
-
-  const handleSaveStage = async () => {
-    if (!newStageName.trim()) {
-      toast.error("Nome da etapa não pode estar vazio");
-      return;
-    }
-
-    if (!editingStageId) return;
-
-    await updateStageMutation.mutateAsync({
-      id: editingStageId,
-      updates: { name: newStageName },
-    });
-    
-    setEditingStageId(null);
-    setNewStageName("");
-  };
-
-  const handleDeleteStage = async (stageId: string) => {
-    const stage = stagesWithDeals.find((s) => s.id === stageId);
-    if (stage && stage.deals.length > 0) {
-      toast.error("Não é possível excluir uma etapa com negócios");
-      return;
-    }
-
-    if (!pipeline?.id) return;
-
-    await deleteStageMutation.mutateAsync({ 
-      id: stageId, 
-      pipelineId: pipeline.id 
-    });
-  };
-
-  const handleAddStage = async () => {
-    if (!pipeline?.id || !stages) return;
-
-    const maxPosition = Math.max(...stages.map((s: any) => s.position || s.order_index || 0), 0);
-    
-    await createStageMutation.mutateAsync({
-      pipeline_id: pipeline.id,
-      name: "Nova Etapa",
-      position: maxPosition + 1,
-      color: "#6B46F2",
-    });
-  };
-
   // Loading state
-  if (authLoading || pipelineLoading || stagesLoading || dealsLoading) {
+  if (authLoading || dealsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!pipeline || !stages) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Erro ao carregar pipeline</p>
       </div>
     );
   }
@@ -188,15 +64,18 @@ const Dashboard = () => {
         <AppSidebar />
         
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Header com UsageLimits */}
+          {/* Header Superior - Ações Rápidas */}
           <header className="border-b border-border bg-card sticky top-0 z-10">
             <div className="flex items-center justify-between p-4">
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-4">
                   <SidebarTrigger />
-                  <h1 className="text-2xl font-bold text-foreground">
-                    {pipeline?.name || "Pipeline Principal"}
-                  </h1>
+                  <div>
+                    <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+                    <p className="text-sm text-muted-foreground">
+                      Visão geral do seu negócio
+                    </p>
+                  </div>
                 </div>
                 <UsageLimits 
                   subscription={subscription} 
@@ -207,14 +86,7 @@ const Dashboard = () => {
               
               <div className="flex items-center gap-2">
                 <NotificationBell />
-                {/* TODO: Create GlobalDealSearch component */}
-                {/* <GlobalSearch 
-                  leads={deals || [] as any} 
-                  onSelectLead={handleDealClick}
-                /> */}
-                <Button variant="outline" size="icon">
-                  <Filter className="h-4 w-4" />
-                </Button>
+                
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -232,10 +104,6 @@ const Dashboard = () => {
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-                <Button onClick={() => setIsAddDealOpen(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Adicionar Negócio
-                </Button>
               </div>
             </div>
           </header>
@@ -245,102 +113,83 @@ const Dashboard = () => {
             {/* Dashboard Metrics */}
             <DashboardMetrics leads={deals || [] as any} stages={(stages || []) as any} />
             
-            {/* Widgets */}
+            {/* Acesso Rápido ao Pipeline */}
+            <Card className="mt-6">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <LayoutGrid className="h-5 w-5" />
+                      Pipeline de Vendas
+                    </CardTitle>
+                    <CardDescription>
+                      Gerencie seus negócios através do funil de vendas
+                    </CardDescription>
+                  </div>
+                  <Button onClick={() => navigate('/pipelines')}>
+                    Ver Pipeline Completo
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="flex flex-col p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+                    <div className="flex items-center gap-2 mb-2">
+                      <TrendingUp className="h-4 w-4 text-blue-600" />
+                      <span className="text-sm font-medium">Total de Negócios</span>
+                    </div>
+                    <div className="text-3xl font-bold">{deals?.length || 0}</div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {stages?.length || 0} etapas ativas
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xl">💰</span>
+                      <span className="text-sm font-medium">Valor Total</span>
+                    </div>
+                    <div className="text-3xl font-bold">
+                      {new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL',
+                        minimumFractionDigits: 0,
+                      }).format(
+                        deals?.reduce((sum, deal) => sum + (deal.value || 0), 0) || 0
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Em negociação
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xl">🎯</span>
+                      <span className="text-sm font-medium">Taxa de Conversão</span>
+                    </div>
+                    <div className="text-3xl font-bold">
+                      {deals && deals.length > 0
+                        ? ((deals.filter(d => d.status === 'won').length / deals.length) * 100).toFixed(1)
+                        : '0'
+                      }%
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {deals?.filter(d => d.status === 'won').length || 0} negócios ganhos
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Widgets de Tarefas e Reuniões */}
             <div className="mt-6 grid gap-6 md:grid-cols-2">
               <TasksWidget />
               <MeetingsWidget />
             </div>
-            
-            {/* Kanban Board */}
-            <div className="mt-6">
-              <DealKanbanBoard
-                stages={filteredStages as any}
-                onDealClick={handleDealClick}
-                onEditStage={handleEditStage}
-                onDeleteStage={handleDeleteStage}
-                onAddStage={handleAddStage}
-              />
-            </div>
           </main>
         </div>
-
-        {/* Deal Details - TODO: Create DealDetails component */}
-        {selectedDeal && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-            <div className="bg-white rounded-lg p-6 max-w-2xl w-full m-4">
-              <h2 className="text-2xl font-bold mb-4">{selectedDeal.title}</h2>
-              <p>Valor: R$ {selectedDeal.value.toLocaleString('pt-BR')}</p>
-              <p>Probabilidade: {selectedDeal.probability}%</p>
-              <p>Status: {selectedDeal.status}</p>
-              <button 
-                onClick={() => setIsDealDetailsOpen(false)}
-                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Fechar
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Legacy Lead Details - mantido para compatibilidade */}
-        {/* <LeadDetails
-          lead={selectedLead}
-          isOpen={isLeadDetailsOpen}
-          onClose={() => setIsLeadDetailsOpen(false)}
-          userId={user?.id}
-        />
-
-        {/* Add Deal Dialog - TODO: Create AddDealDialog component */}
-        {isAddDealOpen && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full m-4">
-              <h2 className="text-2xl font-bold mb-4">Adicionar Negócio</h2>
-              <p className="text-muted-foreground mb-4">
-                Funcionalidade em desenvolvimento. Use a página Negócios para criar novos deals.
-              </p>
-              <button 
-                onClick={() => setIsAddDealOpen(false)}
-                className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Fechar
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Edit Stage Dialog */}
-        <Dialog open={!!editingStageId} onOpenChange={() => setEditingStageId(null)}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Editar Etapa</DialogTitle>
-              <DialogDescription>
-                Altere o nome da etapa do pipeline
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="stageName">Nome da Etapa</Label>
-                <Input
-                  id="stageName"
-                  value={newStageName}
-                  onChange={(e) => setNewStageName(e.target.value)}
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setEditingStageId(null)}
-                  className="flex-1"
-                >
-                  Cancelar
-                </Button>
-                <Button onClick={handleSaveStage} className="flex-1">
-                  Salvar
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
 
         {/* SnapDoor AI Dialog */}
         <SnapDoorAIDialog 

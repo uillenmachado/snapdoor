@@ -14,6 +14,7 @@ import {
   Zap,
   UsersRound,
   Activity,
+  GitBranch,
 } from "lucide-react";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
@@ -47,6 +48,7 @@ import { getAccountStatus } from "@/lib/devAccount";
 
 const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Pipelines", url: "/pipelines", icon: GitBranch },
   { title: "Negócios", url: "/deals", icon: Briefcase },
   { title: "Leads (Pessoas)", url: "/leads", icon: Users },
   { title: "Atividades", url: "/activities", icon: FileText },
