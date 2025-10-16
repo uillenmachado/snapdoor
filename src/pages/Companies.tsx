@@ -6,8 +6,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCompanies, useDeleteCompany } from '@/hooks/useCompanies';
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { PageHeader } from "@/components/PageHeader";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ImportWizard } from '@/components/ImportWizard';
@@ -125,44 +126,37 @@ export default function Companies() {
       <div className="min-h-screen flex w-full bg-background">
         <AppSidebar />
         
-        <div className="flex-1 flex flex-col">
-          <header className="border-b border-border bg-card sticky top-0 z-10">
-            <div className="flex items-center justify-between p-4">
-              <div className="flex items-center gap-4">
-                <SidebarTrigger />
-                <div>
-                  <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-                    <Building2 className="w-6 h-6" />
-                    Empresas
-                  </h1>
-                </div>
-              </div>
-              <div className="flex gap-2">
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Header Padronizado */}
+          <PageHeader
+            title="Empresas"
+            description="Gerencie suas empresas e contatos"
+            actions={
+              <>
                 <Button variant="outline" onClick={() => setShowImportWizard(true)}>
-                  <Upload className="w-4 h-4 mr-2" />
+                  <Upload className="h-4 w-4 mr-2" />
                   Importar
                 </Button>
                 <Button variant="outline" onClick={() => setShowExportDialog(true)}>
-                  <Download className="w-4 h-4 mr-2" />
+                  <Download className="h-4 w-4 mr-2" />
                   Exportar
                 </Button>
                 <Button onClick={() => setShowCreateDialog(true)}>
-                  <Plus className="w-4 h-4 mr-2" />
+                  <Plus className="h-4 w-4 mr-2" />
                   Nova Empresa
                 </Button>
-              </div>
-            </div>
-          </header>
+              </>
+            }
+          />
 
-          <main className="flex-1 overflow-auto p-6 space-y-6">
+          <main className="flex-1 overflow-auto p-6">
             {/* Filtros e Busca */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Filter className="w-5 h-5" />
-                  Filtros
-                </CardTitle>
-                <CardDescription>Busque e filtre empresas</CardDescription>
+            <Card className="bg-card border-border">
+              <CardHeader className="border-b border-border">
+                <div className="flex items-center justify-between">
+                  <CardTitle>Filtros e Busca</CardTitle>
+                  <CardDescription>{totalCount} empresas encontradas</CardDescription>
+                </div>
               </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
