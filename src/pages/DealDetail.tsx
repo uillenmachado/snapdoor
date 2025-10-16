@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { NotificationBell } from "@/components/NotificationBell";
+import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -228,48 +228,51 @@ export default function DealDetail() {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
+      <div className="min-h-screen flex w-full bg-background">
         <AppSidebar />
-        <div className="flex-1 flex flex-col">
-          {/* Header */}
-          <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-6">
-            <SidebarTrigger />
-            <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar
-            </Button>
-            <div className="flex-1" />
-            <NotificationBell />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <MoreVertical className="h-4 w-4" />
+        
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <PageHeader
+            title={deal?.title || "Detalhes do Negócio"}
+            description={deal?.value ? `Valor: ${formatCurrency(deal.value)} • Probabilidade: ${deal.probability}%` : "Gerencie as informações do negócio"}
+            actions={
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => navigate("/deals")}>
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Voltar
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {deal.status === "open" && (
-                  <>
-                    <DropdownMenuItem onClick={handleMarkAsWon} className="text-green-600">
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Marcar como Ganho
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {deal.status === "open" && (
+                      <>
+                        <DropdownMenuItem onClick={handleMarkAsWon}>
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Marcar como Ganho
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleMarkAsLost}>
+                          <XCircle className="h-4 w-4 mr-2" />
+                          Marcar como Perdido
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    <DropdownMenuItem onClick={() => toast.info("Editar - em desenvolvimento")}>
+                      <Edit className="h-4 w-4 mr-2" />
+                      Editar Negócio
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleMarkAsLost} className="text-red-600">
-                      <XCircle className="h-4 w-4 mr-2" />
-                      Marcar como Perdido
+                    <DropdownMenuItem className="text-destructive">
+                      <Trash className="h-4 w-4 mr-2" />
+                      Excluir
                     </DropdownMenuItem>
-                  </>
-                )}
-                <DropdownMenuItem onClick={() => toast.info("Editar - em desenvolvimento")}>
-                  <Edit className="h-4 w-4 mr-2" />
-                  Editar Negócio
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-destructive">
-                  <Trash className="h-4 w-4 mr-2" />
-                  Excluir
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </header>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            }
+          />
 
           {/* Main Content */}
           <main className="flex-1 overflow-auto p-6 space-y-6">
