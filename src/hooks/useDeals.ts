@@ -35,6 +35,7 @@ export interface Deal {
   source: string | null;
   tags: string[] | null;
   custom_fields: any;
+  is_favorite: boolean | null;
   
   // Posição no pipeline
   position: number;
@@ -424,3 +425,81 @@ export const useRemoveDealParticipant = () => {
     },
   });
 };
+
+// ========================================
+// FAVORITAR / DUPLICAR
+// ========================================
+
+// Toggle favorite status
+export const useToggleFavoriteDeal = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ dealId, isFavorite }: { dealId: string; isFavorite: boolean }) => {
+      const { data, error } = await supabase
+        .from("deals")
+        .update({ is_favorite: !isFavorite })
+        .eq("id", dealId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as Deal;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["deals"] });
+      queryClient.invalidateQueries({ queryKey: ["deal", data.id] });
+      toast.success(data.is_favorite ? "⭐ Adicionado aos favoritos" : "Removido dos favoritos");
+    },
+    onError: (error: Error) => {
+      toast.error(`Erro: ${error.message}`);
+    },
+  });
+};
+
+// Duplicate deal
+export const useDuplicateDeal = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ dealId }: { dealId: string }) => {
+      // Fetch original deal
+      const { data: originalDeal, error: fetchError } = await supabase
+        .from("deals")
+        .select("*")
+        .eq("id", dealId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Create duplicate (remove id and timestamps, add " - Cópia" to title)
+      const { id, created_at, updated_at, closed_date, ...dealData } = originalDeal;
+      
+      const { data: newDeal, error: createError } = await supabase
+        .from("deals")
+        .insert({
+          ...dealData,
+          title: `${dealData.title} - Cópia`,
+          status: 'open', // Reset to open
+          probability: dealData.probability || 50,
+          closed_date: null,
+          lost_reason: null,
+          is_favorite: false, // Don't carry favorite status
+        })
+        .select()
+        .single();
+
+      if (createError) throw createError;
+      return newDeal as Deal;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["deals"] });
+      queryClient.invalidateQueries({ queryKey: ["deals", "stage", data.stage_id] });
+      toast.success(`📋 Oportunidade duplicada: "${data.title}"`);
+    },
+    onError: (error: Error) => {
+      toast.error(`Erro ao duplicar: ${error.message}`);
+    },
+  });
+};
+

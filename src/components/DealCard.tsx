@@ -7,9 +7,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Building2, Calendar, MoreVertical, TrendingUp, Users } from "lucide-react";
+import { Building2, Calendar, MoreVertical, TrendingUp, Users, Star, Copy, Edit, CheckCircle, XCircle, Trash2 } from "lucide-react";
 import { Deal } from "@/hooks/useDeals";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -20,6 +21,8 @@ interface DealCardProps {
   onDelete?: (dealId: string) => void;
   onMarkAsWon?: (dealId: string) => void;
   onMarkAsLost?: (dealId: string) => void;
+  onDuplicate?: (deal: Deal) => void;
+  onToggleFavorite?: (dealId: string) => void;
   onClick?: (deal: Deal) => void;
 }
 
@@ -29,6 +32,8 @@ export const DealCard = memo(function DealCard({
   onDelete,
   onMarkAsWon,
   onMarkAsLost,
+  onDuplicate,
+  onToggleFavorite,
   onClick,
 }: DealCardProps) {
   // Formatar valor em moeda brasileira
@@ -61,19 +66,24 @@ export const DealCard = memo(function DealCard({
 
   return (
     <Card
-      className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:shadow-md hover:border-neutral-300 dark:hover:border-neutral-700 transition-all duration-200 cursor-pointer group"
+      className="bg-card border-border hover:shadow-lg hover:border-accent transition-all duration-200 cursor-pointer group"
       onClick={() => onClick?.(deal)}
     >
       <CardHeader className="pb-3 pt-3.5 px-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-sm text-neutral-900 dark:text-neutral-100 line-clamp-2 group-hover:text-brand-green-600 dark:group-hover:text-brand-green-400 transition-colors">
-              {deal.title}
-            </h3>
+            <div className="flex items-center gap-2">
+              {deal.is_favorite && (
+                <Star className="h-3.5 w-3.5 fill-yellow-500 text-yellow-500 flex-shrink-0" />
+              )}
+              <h3 className="font-semibold text-sm text-foreground line-clamp-2 group-hover:text-primary transition-colors">
+                {deal.title}
+              </h3>
+            </div>
             {deal.company_name && (
               <div className="flex items-center gap-1.5 mt-1.5">
-                <Building2 className="h-3.5 w-3.5 text-neutral-400 dark:text-neutral-500 flex-shrink-0" />
-                <span className="text-xs text-neutral-600 dark:text-neutral-400 truncate font-medium">
+                <Building2 className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                <span className="text-xs text-muted-foreground truncate font-medium">
                   {deal.company_name}
                 </span>
               </div>
@@ -85,50 +95,105 @@ export const DealCard = memo(function DealCard({
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-accent"
               >
-                <MoreVertical className="h-3.5 w-3.5 text-neutral-500" />
+                <MoreVertical className="h-3.5 w-3.5 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="w-56">
+              {/* Favoritar */}
+              {onToggleFavorite && (
+                <>
+                  <DropdownMenuItem 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleFavorite(deal.id);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <Star className={`h-4 w-4 mr-2 ${deal.is_favorite ? 'fill-yellow-500 text-yellow-500' : ''}`} />
+                    {deal.is_favorite ? 'Remover dos favoritos' : 'Favoritar'}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
+
+              {/* Editar */}
               {onEdit && (
-                <DropdownMenuItem onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit(deal);
-                }}>
+                <DropdownMenuItem 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(deal);
+                  }}
+                  className="cursor-pointer"
+                >
+                  <Edit className="h-4 w-4 mr-2" />
                   Editar
                 </DropdownMenuItem>
               )}
+
+              {/* Duplicar */}
+              {onDuplicate && (
+                <DropdownMenuItem 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDuplicate(deal);
+                  }}
+                  className="cursor-pointer"
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  Duplicar oportunidade
+                </DropdownMenuItem>
+              )}
+
+              {deal.status === 'open' && (
+                <DropdownMenuSeparator />
+              )}
+
+              {/* Marcar como Ganho */}
               {onMarkAsWon && deal.status === 'open' && (
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation();
                     onMarkAsWon(deal.id);
                   }}
-                  className="text-success-600 focus:text-success-700"
+                  className="cursor-pointer text-green-600 dark:text-green-500 focus:text-green-700 dark:focus:text-green-400"
                 >
+                  <CheckCircle className="h-4 w-4 mr-2" />
                   Marcar como Ganho
                 </DropdownMenuItem>
               )}
+
+              {/* Marcar como Perdido */}
               {onMarkAsLost && deal.status === 'open' && (
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation();
                     onMarkAsLost(deal.id);
                   }}
-                  className="text-danger-600 focus:text-danger-700"
+                  className="cursor-pointer text-orange-600 dark:text-orange-500 focus:text-orange-700 dark:focus:text-orange-400"
                 >
+                  <XCircle className="h-4 w-4 mr-2" />
                   Marcar como Perdido
                 </DropdownMenuItem>
               )}
+
+              {(onEdit || onDuplicate || onMarkAsWon || onMarkAsLost) && onDelete && (
+                <DropdownMenuSeparator />
+              )}
+
+              {/* Excluir */}
               {onDelete && (
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation();
-                    onDelete(deal.id);
+                    if (confirm(`Tem certeza que deseja excluir "${deal.title}"?`)) {
+                      onDelete(deal.id);
+                    }
                   }}
-                  className="text-danger-600 focus:text-danger-700"
+                  className="cursor-pointer text-red-600 dark:text-red-500 focus:text-red-700 dark:focus:text-red-400"
                 >
+                  <Trash2 className="h-4 w-4 mr-2" />
                   Excluir
                 </DropdownMenuItem>
               )}
@@ -141,7 +206,7 @@ export const DealCard = memo(function DealCard({
         {/* Valor e Status */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
-            <span className="text-lg font-bold text-brand-green-600 dark:text-brand-green-500">
+            <span className="text-lg font-bold text-primary">
               {formatCurrency(deal.value)}
             </span>
           </div>
@@ -152,15 +217,15 @@ export const DealCard = memo(function DealCard({
         {deal.status === 'open' && (
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <TrendingUp className="h-3.5 w-3.5 text-neutral-400 dark:text-neutral-500" />
+              <TrendingUp className="h-3.5 w-3.5 text-muted-foreground" />
               <div className="flex-1">
                 <div className="flex items-center justify-between text-xs mb-1.5">
-                  <span className="text-neutral-500 dark:text-neutral-400 font-medium">Probabilidade</span>
+                  <span className="text-muted-foreground font-medium">Probabilidade</span>
                   <span className={`font-semibold px-2 py-0.5 rounded ${getProbabilityColor(deal.probability)}`}>
                     {deal.probability}%
                   </span>
                 </div>
-                <div className="h-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
+                <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                   <div
                     className={`h-full transition-all duration-300 ${
                       deal.probability >= 75 ? 'bg-success-500' :
@@ -178,8 +243,8 @@ export const DealCard = memo(function DealCard({
 
         {/* Data prevista de fechamento */}
         {deal.expected_close_date && deal.status === 'open' && (
-          <div className="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400">
-            <Calendar className="h-3.5 w-3.5 text-neutral-400 dark:text-neutral-500" />
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
             <span className="font-medium">
               Previsão: {format(new Date(deal.expected_close_date), "dd MMM yyyy", { locale: ptBR })}
             </span>
@@ -188,11 +253,11 @@ export const DealCard = memo(function DealCard({
 
         {/* Participantes (placeholder - será implementado quando integrarmos) */}
         <div className="flex items-center gap-2">
-          <Users className="h-3.5 w-3.5 text-neutral-400 dark:text-neutral-500" />
+          <Users className="h-3.5 w-3.5 text-muted-foreground" />
           <div className="flex -space-x-2">
             {/* Aqui vamos renderizar os avatares dos participantes */}
-            <Avatar className="h-6 w-6 border-2 border-white dark:border-neutral-900">
-              <AvatarFallback className="text-xs bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
+            <Avatar className="h-6 w-6 border-2 border-card">
+              <AvatarFallback className="text-xs bg-muted text-muted-foreground">
                 +
               </AvatarFallback>
             </Avatar>
@@ -203,12 +268,12 @@ export const DealCard = memo(function DealCard({
         {deal.tags && deal.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {deal.tags.slice(0, 3).map((tag, index) => (
-              <Badge key={index} variant="secondary" className="text-xs bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-0">
+              <Badge key={index} variant="secondary" className="text-xs bg-accent text-foreground border-0">
                 {tag}
               </Badge>
             ))}
             {deal.tags.length > 3 && (
-              <Badge variant="secondary" className="text-xs bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-0">
+              <Badge variant="secondary" className="text-xs bg-accent text-foreground border-0">
                 +{deal.tags.length - 3}
               </Badge>
             )}

@@ -18,7 +18,15 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { usePipeline, useStages, useCreateStage, useUpdateStage, useDeleteStage } from "@/hooks/usePipelines";
-import { useDeals, Deal } from "@/hooks/useDeals";
+import { 
+  useDeals, 
+  useMarkDealAsWon, 
+  useMarkDealAsLost,
+  useDuplicateDeal,
+  useToggleFavoriteDeal,
+  useDeleteDeal,
+  Deal 
+} from "@/hooks/useDeals";
 import { SnapDoorAIDialog } from "@/components/SnapDoorAIDialog";
 import { NotificationBell } from "@/components/NotificationBell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,6 +44,11 @@ const Pipelines = () => {
   const createStageMutation = useCreateStage();
   const updateStageMutation = useUpdateStage();
   const deleteStageMutation = useDeleteStage();
+  const markDealAsWonMutation = useMarkDealAsWon();
+  const markDealAsLostMutation = useMarkDealAsLost();
+  const duplicateDealMutation = useDuplicateDeal();
+  const toggleFavoriteMutation = useToggleFavoriteDeal();
+  const deleteDealMutation = useDeleteDeal();
   
   const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
   const [isDealDetailsOpen, setIsDealDetailsOpen] = useState(false);
@@ -69,49 +82,10 @@ const Pipelines = () => {
   const stagesWithDeals = useMemo(() => {
     if (!stages || !deals) return [];
     
-    const grouped = stages.map((stage) => ({
+    return stages.map((stage) => ({
       ...stage,
-      deals: deals.filter((deal) => deal.stage_id === stage.id),
+      deals: deals.filter((deal) => deal.stage_id === stage.id && deal.status === 'open'),
     }));
-
-    // 🔍 DEBUG: Ver distribuição de deals por stage
-    console.log('📊 DEBUG Pipeline DETALHADO:', {
-      totalStages: stages.length,
-      totalDeals: deals.length,
-      
-      // IDs DOS STAGES (primeiros 3)
-      stagesIds: stages.slice(0, 3).map(s => ({
-        name: s.name,
-        id: s.id,
-        tipo: typeof s.id
-      })),
-      
-      // IDS DOS DEALS (primeiros 3)
-      dealsStageIds: deals.slice(0, 3).map(d => ({
-        titulo: d.title,
-        stage_id: d.stage_id,
-        tipo: typeof d.stage_id,
-        status: d.status
-      })),
-      
-      // TESTE DE MATCH MANUAL
-      primeiroMatch: stages[0] && deals[0] ? {
-        stage_id_do_stage: stages[0].id,
-        stage_id_do_deal: deals[0].stage_id,
-        sao_iguais: deals[0].stage_id === stages[0].id,
-        comparacao_string: String(deals[0].stage_id) === String(stages[0].id)
-      } : null,
-      
-      // DISTRIBUIÇÃO FINAL
-      distribuicao: grouped.map(s => ({
-        stage: s.name,
-        stage_id: s.id,
-        quantidade: s.deals.length,
-        deals_titles: s.deals.map(d => d.title)
-      }))
-    });
-
-    return grouped;
   }, [stages, deals]);
 
   // Filter stages based on search
@@ -181,6 +155,27 @@ const Pipelines = () => {
       position: maxPosition + 1,
       color: "#6B46F2",
     });
+  };
+
+  // Deal actions handlers
+  const handleMarkAsWon = async (dealId: string) => {
+    await markDealAsWonMutation.mutateAsync({ dealId });
+  };
+
+  const handleMarkAsLost = async (dealId: string) => {
+    await markDealAsLostMutation.mutateAsync({ dealId });
+  };
+
+  const handleDuplicateDeal = async (deal: Deal) => {
+    await duplicateDealMutation.mutateAsync({ dealId: deal.id });
+  };
+
+  const handleToggleFavorite = async (dealId: string, isFavorite: boolean) => {
+    await toggleFavoriteMutation.mutateAsync({ dealId, isFavorite });
+  };
+
+  const handleDeleteDeal = async (dealId: string) => {
+    await deleteDealMutation.mutateAsync(dealId);
   };
 
   // Loading state
@@ -351,6 +346,11 @@ const Pipelines = () => {
               onEditStage={handleEditStage}
               onDeleteStage={handleDeleteStage}
               onAddStage={handleAddStage}
+              onMarkAsWon={handleMarkAsWon}
+              onMarkAsLost={handleMarkAsLost}
+              onDuplicateDeal={handleDuplicateDeal}
+              onToggleFavorite={handleToggleFavorite}
+              onDeleteDeal={handleDeleteDeal}
             />
           </main>
         </div>

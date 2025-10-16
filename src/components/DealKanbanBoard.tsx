@@ -69,6 +69,12 @@ interface DealKanbanBoardProps {
   onEditStage: (stageId: string) => void;
   onDeleteStage: (stageId: string) => void;
   onAddStage: () => void;
+  onEditDeal?: (deal: Deal) => void;
+  onDeleteDeal?: (dealId: string) => void;
+  onMarkAsWon?: (dealId: string) => void;
+  onMarkAsLost?: (dealId: string) => void;
+  onDuplicateDeal?: (deal: Deal) => void;
+  onToggleFavorite?: (dealId: string, isFavorite: boolean) => void;
 }
 
 export function DealKanbanBoard({
@@ -77,6 +83,12 @@ export function DealKanbanBoard({
   onEditStage,
   onDeleteStage,
   onAddStage,
+  onEditDeal,
+  onDeleteDeal,
+  onMarkAsWon,
+  onMarkAsLost,
+  onDuplicateDeal,
+  onToggleFavorite,
 }: DealKanbanBoardProps) {
   const [draggedDeal, setDraggedDeal] = useState<Deal | null>(null);
   const [draggedFromStage, setDraggedFromStage] = useState<string | null>(null);
@@ -239,12 +251,18 @@ export function DealKanbanBoard({
                   <DealCard
                     deal={deal}
                     onClick={() => onDealClick(deal)}
+                    onEdit={onEditDeal}
+                    onDelete={onDeleteDeal}
+                    onMarkAsWon={onMarkAsWon}
+                    onMarkAsLost={onMarkAsLost}
+                    onDuplicate={onDuplicateDeal}
+                    onToggleFavorite={onToggleFavorite ? () => onToggleFavorite(deal.id, deal.is_favorite || false) : undefined}
                   />
                 </div>
               ))}
 
               {stage.deals.length === 0 && (
-                <div className="text-center text-neutral-400 dark:text-neutral-600 text-sm py-12 px-4">
+                <div className="text-center text-muted-foreground text-sm py-12 px-4">
                   <div className="text-3xl mb-2 opacity-40">📭</div>
                   <p className="font-medium">Nenhum negócio</p>
                   <p className="text-xs mt-1">Arraste cards para cá</p>
