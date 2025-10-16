@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { PageHeader } from "@/components/PageHeader";
 import { LeadHistorySection } from "@/components/LeadHistorySection";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -70,25 +71,18 @@ const Reports = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-neutral-50 dark:bg-neutral-950">
+      <div className="min-h-screen flex w-full bg-background">
         <AppSidebar />
 
-        <div className="flex-1 flex flex-col">
-          {/* Header Profissional - Pipedrive Style */}
-          <header className="border-b border-border bg-card sticky top-0 z-10 shadow-sm">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between p-6 gap-4">
-              <div className="flex items-center gap-4">
-                <SidebarTrigger />
-                <div>
-                  <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-1">Relatórios & Analytics</h1>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400 font-medium">Análise detalhada de performance e métricas</p>
-                </div>
-              </div>
-
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <PageHeader
+            title="Relatórios & Analytics"
+            description="Análise detalhada de performance e métricas"
+            actions={
               <div className="flex items-center gap-3 flex-wrap">
                 <Select value={periodDays.toString()} onValueChange={(v) => setPeriodDays(parseInt(v))}>
-                  <SelectTrigger className="w-[160px] border-border bg-card">
-                    <Calendar className="h-4 w-4 mr-2 text-neutral-500" />
+                  <SelectTrigger className="w-[160px]">
+                    <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -102,7 +96,6 @@ const Reports = () => {
                   variant="outline" 
                   size="sm" 
                   onClick={handleRefresh}
-                  className="border-border hover:bg-neutral-100 dark:hover:bg-neutral-800"
                 >
                   <RefreshCcw className="h-4 w-4 mr-2" />
                   Atualizar
@@ -113,41 +106,39 @@ const Reports = () => {
                   size="sm" 
                   onClick={handleExportPDF} 
                   disabled={isExporting}
-                  className="border-brand-green-300 dark:border-brand-green-700 text-brand-green-700 dark:text-brand-green-400 hover:bg-brand-green-50 dark:hover:bg-brand-green-900/20"
                 >
                   <Download className="h-4 w-4 mr-2" />
                   {isExporting ? "Exportando..." : "Exportar"}
                 </Button>
               </div>
-            </div>
-          </header>
+            }
+          />
 
-          <main className="flex-1 p-6">
+          <main className="flex-1 overflow-auto p-6">
             <Tabs defaultValue="overview" className="w-full">
-              {/* Tabs Navigation - Professional Style */}
               <TabsList className="grid w-full grid-cols-4 bg-card border border-border p-1 rounded-lg h-auto">
                 <TabsTrigger 
                   value="overview"
-                  className="data-[state=active]:bg-brand-green-50 dark:data-[state=active]:bg-brand-green-900/20 data-[state=active]:text-brand-green-700 dark:data-[state=active]:text-brand-green-400 data-[state=active]:font-semibold transition-all py-2.5"
+                  className="py-2.5"
                 >
                   <BarChart3 className="h-4 w-4 mr-2" />
                   Visão Geral
                 </TabsTrigger>
                 <TabsTrigger 
                   value="sales"
-                  className="data-[state=active]:bg-brand-green-50 dark:data-[state=active]:bg-brand-green-900/20 data-[state=active]:text-brand-green-700 dark:data-[state=active]:text-brand-green-400 data-[state=active]:font-semibold transition-all py-2.5"
+                  className="py-2.5"
                 >
                   Vendas & Receita
                 </TabsTrigger>
                 <TabsTrigger 
                   value="performance"
-                  className="data-[state=active]:bg-brand-green-50 dark:data-[state=active]:bg-brand-green-900/20 data-[state=active]:text-brand-green-700 dark:data-[state=active]:text-brand-green-400 data-[state=active]:font-semibold transition-all py-2.5"
+                  className="py-2.5"
                 >
                   Performance
                 </TabsTrigger>
                 <TabsTrigger 
                   value="conversions"
-                  className="data-[state=active]:bg-brand-green-50 dark:data-[state=active]:bg-brand-green-900/20 data-[state=active]:text-brand-green-700 dark:data-[state=active]:text-brand-green-400 data-[state=active]:font-semibold transition-all py-2.5"
+                  className="py-2.5"
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Conversões
