@@ -75,22 +75,39 @@ const Pipelines = () => {
     }));
 
     // 🔍 DEBUG: Ver distribuição de deals por stage
-    console.log('📊 DEBUG Pipeline:', {
+    console.log('📊 DEBUG Pipeline DETALHADO:', {
       totalStages: stages.length,
       totalDeals: deals.length,
-      primeirosDeals: deals.slice(0, 3).map(d => ({
+      
+      // IDs DOS STAGES (primeiros 3)
+      stagesIds: stages.slice(0, 3).map(s => ({
+        name: s.name,
+        id: s.id,
+        tipo: typeof s.id
+      })),
+      
+      // IDS DOS DEALS (primeiros 3)
+      dealsStageIds: deals.slice(0, 3).map(d => ({
         titulo: d.title,
         stage_id: d.stage_id,
+        tipo: typeof d.stage_id,
         status: d.status
       })),
-      primeiroStage: stages[0] ? {
-        id: stages[0].id,
-        name: stages[0].name,
-        dealsNesseStage: deals.filter(d => d.stage_id === stages[0].id).length
+      
+      // TESTE DE MATCH MANUAL
+      primeiroMatch: stages[0] && deals[0] ? {
+        stage_id_do_stage: stages[0].id,
+        stage_id_do_deal: deals[0].stage_id,
+        sao_iguais: deals[0].stage_id === stages[0].id,
+        comparacao_string: String(deals[0].stage_id) === String(stages[0].id)
       } : null,
+      
+      // DISTRIBUIÇÃO FINAL
       distribuicao: grouped.map(s => ({
         stage: s.name,
-        quantidade: s.deals.length
+        stage_id: s.id,
+        quantidade: s.deals.length,
+        deals_titles: s.deals.map(d => d.title)
       }))
     });
 
