@@ -9,13 +9,11 @@ import { TasksWidget } from "@/components/TasksWidget";
 import { MeetingsWidget } from "@/components/MeetingsWidget";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Loader2, Brain, Zap, TrendingUp, ArrowRight, LayoutGrid } from "lucide-react";
+import { Loader2, TrendingUp, ArrowRight, LayoutGrid } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePipeline, useStages } from "@/hooks/usePipelines";
 import { useDeals } from "@/hooks/useDeals";
 import { useSubscription } from "@/hooks/useSubscription";
-import { SnapDoorAIDialog } from "@/components/SnapDoorAIDialog";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -26,8 +24,6 @@ const Dashboard = () => {
   const { data: stages } = useStages(pipeline?.id);
   const { data: deals, isLoading: dealsLoading } = useDeals(user?.id);
   const { data: subscription } = useSubscription(user?.id);
-  
-  const [isSnapDoorAIOpen, setIsSnapDoorAIOpen] = useState(false);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -35,19 +31,6 @@ const Dashboard = () => {
       navigate("/login");
     }
   }, [user, authLoading, navigate]);
-
-  // Keyboard shortcut for SnapDoor AI (Ctrl+K)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        setIsSnapDoorAIOpen(true);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
 
   // Loading state
   if (authLoading || dealsLoading) {
@@ -86,24 +69,6 @@ const Dashboard = () => {
               
               <div className="flex items-center gap-2">
                 <NotificationBell />
-                
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button 
-                        onClick={() => setIsSnapDoorAIOpen(true)}
-                        className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-                      >
-                        <Brain className="h-4 w-4 mr-2" />
-                        <Zap className="h-3 w-3 mr-1" />
-                        SnapDoor AI
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Prospecção inteligente com IA <kbd className="ml-2 px-1.5 py-0.5 text-xs rounded bg-muted">Ctrl+K</kbd></p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
               </div>
             </div>
           </header>
@@ -190,13 +155,6 @@ const Dashboard = () => {
             </div>
           </main>
         </div>
-
-        {/* SnapDoor AI Dialog */}
-        <SnapDoorAIDialog 
-          open={isSnapDoorAIOpen}
-          onOpenChange={setIsSnapDoorAIOpen}
-          pipelineId={pipeline?.id}
-        />
       </div>
     </SidebarProvider>
   );
