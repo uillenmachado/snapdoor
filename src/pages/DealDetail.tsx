@@ -27,6 +27,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -48,11 +61,14 @@ import {
   Clock,
   FileText,
   Loader2,
+  Check,
+  ChevronsUpDown,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { EmailIntegrationCard } from "@/components/EmailIntegrationCard";
 import {
   useDeal,
   useUpdateDeal,
@@ -84,6 +100,7 @@ export default function DealDetail() {
   const [selectedLeadId, setSelectedLeadId] = useState("");
   const [participantRole, setParticipantRole] = useState("participant");
   const [newNote, setNewNote] = useState("");
+  const [openLeadCombobox, setOpenLeadCombobox] = useState(false);
 
   // Formatar moeda
   const formatCurrency = (value: number) => {
@@ -381,6 +398,16 @@ export default function DealDetail() {
                 </TabsTrigger>
               </TabsList>
 
+              {/* Email Integration - Sempre visível acima das tabs */}
+              <EmailIntegrationCard 
+                dealId={id!}
+                participantEmails={participants
+                  .filter((p: any) => p.lead?.email)
+                  .map((p: any) => p.lead.email)
+                }
+                dealTitle={deal.title}
+              />
+
               {/* Participantes */}
               <TabsContent value="participants" className="space-y-4">
                 <Card>
@@ -408,24 +435,59 @@ export default function DealDetail() {
                           </DialogHeader>
                           <div className="space-y-4 py-4">
                             <div>
-                              <label className="text-sm font-medium">Lead</label>
-                              <Select value={selectedLeadId} onValueChange={setSelectedLeadId}>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Selecione um lead" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {allLeads
-                                    .filter(
-                                      (lead) =>
-                                        !participants.some((p: any) => p.lead_id === lead.id)
-                                    )
-                                    .map((lead) => (
-                                      <SelectItem key={lead.id} value={lead.id}>
-                                        {lead.name} - {lead.company || "Sem empresa"}
-                                      </SelectItem>
-                                    ))}
-                                </SelectContent>
-                              </Select>
+                              <label className="text-sm font-medium mb-2 block">Lead</label>
+                              <Popover open={openLeadCombobox} onOpenChange={setOpenLeadCombobox}>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    aria-expanded={openLeadCombobox}
+                                    className="w-full justify-between"
+                                  >
+                                    {selectedLeadId
+                                      ? allLeads.find((lead) => lead.id === selectedLeadId)?.name
+                                      : "Busque e selecione um lead..."}
+                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-full p-0">
+                                  <Command>
+                                    <CommandInput placeholder="Digite para buscar o lead..." />
+                                    <CommandList>
+                                      <CommandEmpty>Nenhum lead encontrado.</CommandEmpty>
+                                      <CommandGroup>
+                                        {allLeads
+                                          .filter(
+                                            (lead) =>
+                                              !participants.some((p: any) => p.lead_id === lead.id)
+                                          )
+                                          .map((lead) => (
+                                            <CommandItem
+                                              key={lead.id}
+                                              value={`${lead.name} ${lead.company || ""}`}
+                                              onSelect={() => {
+                                                setSelectedLeadId(lead.id);
+                                                setOpenLeadCombobox(false);
+                                              }}
+                                            >
+                                              <Check
+                                                className={`mr-2 h-4 w-4 ${
+                                                  selectedLeadId === lead.id ? "opacity-100" : "opacity-0"
+                                                }`}
+                                              />
+                                              <div className="flex flex-col">
+                                                <span className="font-medium">{lead.name}</span>
+                                                <span className="text-xs text-muted-foreground">
+                                                  {lead.company || "Sem empresa"} {lead.job_title ? `• ${lead.job_title}` : ""}
+                                                </span>
+                                              </div>
+                                            </CommandItem>
+                                          ))}
+                                      </CommandGroup>
+                                    </CommandList>
+                                  </Command>
+                                </PopoverContent>
+                              </Popover>
                             </div>
                             <div>
                               <label className="text-sm font-medium">Papel</label>

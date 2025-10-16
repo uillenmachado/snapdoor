@@ -284,6 +284,9 @@ export const useDeleteLead = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["leads"] });
       queryClient.invalidateQueries({ queryKey: ["leads", "stage", data.stageId] });
+      queryClient.invalidateQueries({ queryKey: ["dashboardMetrics"] });
+      queryClient.invalidateQueries({ queryKey: ["conversionFunnel"] });
+      queryClient.invalidateQueries({ queryKey: ["activityMetrics"] });
       toast.success("Lead excluído!");
     },
     onError: (error: Error) => {

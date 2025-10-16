@@ -182,6 +182,10 @@ export const useUpdateDeal = () => {
       queryClient.invalidateQueries({ queryKey: ["deals"] });
       queryClient.invalidateQueries({ queryKey: ["deal", data.id] });
       queryClient.invalidateQueries({ queryKey: ["deals", "stage", data.stage_id] });
+      queryClient.invalidateQueries({ queryKey: ["dashboardMetrics"] });
+      queryClient.invalidateQueries({ queryKey: ["conversionFunnel"] });
+      queryClient.invalidateQueries({ queryKey: ["revenueMetrics"] });
+      queryClient.invalidateQueries({ queryKey: ["salesTrend"] });
       toast.success("Negócio atualizado!");
     },
     onError: (error: Error) => {
@@ -206,6 +210,13 @@ export const useDeleteDeal = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["deals"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboardMetrics"] });
+      queryClient.invalidateQueries({ queryKey: ["conversionFunnel"] });
+      queryClient.invalidateQueries({ queryKey: ["revenueMetrics"] });
+      queryClient.invalidateQueries({ queryKey: ["revenueForecast"] });
+      queryClient.invalidateQueries({ queryKey: ["salesTrend"] });
+      queryClient.invalidateQueries({ queryKey: ["topPerformers"] });
+      queryClient.invalidateQueries({ queryKey: ["activityMetrics"] });
       toast.success("Negócio removido!");
     },
     onError: (error: Error) => {
@@ -282,6 +293,13 @@ export const useMarkDealAsWon = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["deals"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboardMetrics"] });
+      queryClient.invalidateQueries({ queryKey: ["conversionFunnel"] });
+      queryClient.invalidateQueries({ queryKey: ["revenueMetrics"] });
+      queryClient.invalidateQueries({ queryKey: ["revenueForecast"] });
+      queryClient.invalidateQueries({ queryKey: ["salesTrend"] });
+      queryClient.invalidateQueries({ queryKey: ["topPerformers"] });
+      queryClient.invalidateQueries({ queryKey: ["activityMetrics"] });
       toast.success("🎉 Negócio ganho! Parabéns!");
     },
     onError: (error: Error) => {
@@ -319,6 +337,13 @@ export const useMarkDealAsLost = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["deals"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboardMetrics"] });
+      queryClient.invalidateQueries({ queryKey: ["conversionFunnel"] });
+      queryClient.invalidateQueries({ queryKey: ["revenueMetrics"] });
+      queryClient.invalidateQueries({ queryKey: ["revenueForecast"] });
+      queryClient.invalidateQueries({ queryKey: ["salesTrend"] });
+      queryClient.invalidateQueries({ queryKey: ["topPerformers"] });
+      queryClient.invalidateQueries({ queryKey: ["activityMetrics"] });
       toast.success("Negócio marcado como perdido");
     },
     onError: (error: Error) => {
@@ -471,6 +496,7 @@ export const useDuplicateDeal = () => {
         .single();
 
       if (fetchError) throw fetchError;
+      if (!originalDeal) throw new Error("Deal não encontrado");
 
       // Create duplicate (remove id and timestamps, add " - Cópia" to title)
       const { id, created_at, updated_at, closed_date, ...dealData } = originalDeal;
@@ -485,11 +511,13 @@ export const useDuplicateDeal = () => {
           closed_date: null,
           lost_reason: null,
           is_favorite: false, // Don't carry favorite status
-        })
+        } as any)
         .select()
         .single();
 
       if (createError) throw createError;
+      if (!newDeal) throw new Error("Erro ao criar duplicata");
+      
       return newDeal as Deal;
     },
     onSuccess: (data) => {
@@ -498,6 +526,7 @@ export const useDuplicateDeal = () => {
       toast.success(`📋 Oportunidade duplicada: "${data.title}"`);
     },
     onError: (error: Error) => {
+      console.error("Erro ao duplicar deal:", error);
       toast.error(`Erro ao duplicar: ${error.message}`);
     },
   });

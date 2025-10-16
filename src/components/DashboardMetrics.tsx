@@ -126,7 +126,7 @@ export const DashboardMetrics = ({ leads, stages }: DashboardMetricsProps) => {
         return (
           <Card 
             key={index} 
-            className={`bg-white dark:bg-neutral-900 border ${metric.borderColor} hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 cursor-pointer group`}
+            className={`bg-card border ${metric.borderColor} hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 cursor-pointer group`}
           >
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">

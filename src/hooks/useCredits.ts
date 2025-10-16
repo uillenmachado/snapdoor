@@ -117,7 +117,7 @@ export const useCreditPackages = () => {
       const { data, error } = await supabase
         .from("credit_packages")
         .select("*")
-        .eq("active", true)
+        .eq("is_active", true)
         .order("credits", { ascending: true });
 
       if (error) throw error;
