@@ -101,6 +101,8 @@ export default function DealDetail() {
   const [participantRole, setParticipantRole] = useState("participant");
   const [newNote, setNewNote] = useState("");
   const [openLeadCombobox, setOpenLeadCombobox] = useState(false);
+  const [isLostDialogOpen, setIsLostDialogOpen] = useState(false);
+  const [lostReason, setLostReason] = useState("");
 
   // Formatar moeda
   const formatCurrency = (value: number) => {
@@ -196,7 +198,19 @@ export default function DealDetail() {
   // Marcar como perdido
   const handleMarkAsLost = async () => {
     if (!id) return;
-    await markAsLostMutation.mutateAsync({ dealId: id });
+    
+    if (!lostReason || lostReason.trim() === '') {
+      toast.error("É necessário informar o motivo da perda");
+      return;
+    }
+    
+    await markAsLostMutation.mutateAsync({ 
+      dealId: id,
+      lostReason: lostReason.trim()
+    });
+    
+    setIsLostDialogOpen(false);
+    setLostReason("");
   };
 
   // Obter iniciais
@@ -271,7 +285,7 @@ export default function DealDetail() {
                           <CheckCircle className="h-4 w-4 mr-2" />
                           Marcar como Ganho
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={handleMarkAsLost}>
+                        <DropdownMenuItem onClick={() => setIsLostDialogOpen(true)}>
                           <XCircle className="h-4 w-4 mr-2" />
                           Marcar como Perdido
                         </DropdownMenuItem>
@@ -619,6 +633,61 @@ export default function DealDetail() {
           </main>
         </div>
       </div>
+
+      {/* Dialog: Marcar como Perdido com Justificativa */}
+      <Dialog open={isLostDialogOpen} onOpenChange={setIsLostDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Marcar Oportunidade como Perdida</DialogTitle>
+            <DialogDescription>
+              Por favor, informe o motivo da perda. Esta informação é importante para análise e melhoria dos processos.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Motivo da Perda *</label>
+              <Textarea
+                placeholder="Ex: Preço muito alto, escolheu concorrente, timing não adequado, etc..."
+                value={lostReason}
+                onChange={(e) => setLostReason(e.target.value)}
+                rows={4}
+                className="resize-none"
+              />
+              {lostReason.trim() && (
+                <p className="text-xs text-green-600">✓ Motivo informado</p>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsLostDialogOpen(false);
+                setLostReason("");
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleMarkAsLost}
+              disabled={!lostReason.trim() || markAsLostMutation.isPending}
+            >
+              {markAsLostMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Marcando...
+                </>
+              ) : (
+                <>
+                  <XCircle className="h-4 w-4 mr-2" />
+                  Marcar como Perdido
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </SidebarProvider>
   );
 }

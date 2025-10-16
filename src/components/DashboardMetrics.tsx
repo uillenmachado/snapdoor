@@ -1,7 +1,15 @@
 import { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, TrendingUp, DollarSign, Target, Activity, Zap } from "lucide-react";
-import { Lead } from "@/hooks/useLeads";
+
+// Tipo genérico que funciona tanto para Lead quanto Deal
+interface DealOrLead {
+  status?: 'open' | 'won' | 'lost' | string;
+  deal_value?: number;
+  value?: number;
+  probability?: number;
+  updated_at: string;
+}
 
 interface Stage {
   id: string;
@@ -10,42 +18,42 @@ interface Stage {
 }
 
 interface DashboardMetricsProps {
-  leads: Lead[];
+  leads: DealOrLead[]; // Aceita tanto leads quanto deals
   stages: Stage[];
 }
 
 export const DashboardMetrics = ({ leads, stages }: DashboardMetricsProps) => {
   const metrics = useMemo(() => {
     const totalDeals = leads.length;
-    const activeDeals = leads.filter(lead => lead.status !== 'won' && lead.status !== 'lost').length;
+    const activeDeals = leads.filter(item => item.status !== 'won' && item.status !== 'lost').length;
     
-    // Calculate VALOR TOTAL DO PIPELINE (soma dos deal_value)
+    // Calculate VALOR TOTAL DO PIPELINE (soma dos deal_value ou value)
     const pipelineValue = leads
-      .filter(lead => lead.status !== 'won' && lead.status !== 'lost')
-      .reduce((sum, lead) => sum + (lead.deal_value || 0), 0);
+      .filter(item => item.status !== 'won' && item.status !== 'lost')
+      .reduce((sum, item) => sum + ((item.deal_value || item.value) || 0), 0);
     
     // Calculate VALOR PONDERADO (weighted value = valor × probabilidade)
     const weightedValue = leads
-      .filter(lead => lead.status !== 'won' && lead.status !== 'lost')
-      .reduce((sum, lead) => sum + ((lead.deal_value || 0) * (lead.probability || 50) / 100), 0);
+      .filter(item => item.status !== 'won' && item.status !== 'lost')
+      .reduce((sum, item) => sum + (((item.deal_value || item.value) || 0) * (item.probability || 50) / 100), 0);
     
     // Calculate TICKET MÉDIO (valor médio dos negócios)
     const avgDealValue = activeDeals > 0 ? pipelineValue / activeDeals : 0;
     
     // Calculate TAXA DE CONVERSÃO (won / total)
-    const wonDeals = leads.filter(lead => lead.status === 'won').length;
-    const lostDeals = leads.filter(lead => lead.status === 'lost').length;
+    const wonDeals = leads.filter(item => item.status === 'won').length;
+    const lostDeals = leads.filter(item => item.status === 'lost').length;
     const closedDeals = wonDeals + lostDeals;
     const conversionRate = closedDeals > 0 ? ((wonDeals / closedDeals) * 100).toFixed(1) : 0;
     
     // Calculate RECEITA FECHADA (soma dos valores ganhos)
     const wonRevenue = leads
-      .filter(lead => lead.status === 'won')
-      .reduce((sum, lead) => sum + (lead.deal_value || 0), 0);
+      .filter(item => item.status === 'won')
+      .reduce((sum, item) => sum + ((item.deal_value || item.value) || 0), 0);
     
     // Calculate activity rate (deals with recent activity)
-    const recentDeals = leads.filter(lead => {
-      const updatedAt = new Date(lead.updated_at);
+    const recentDeals = leads.filter(item => {
+      const updatedAt = new Date(item.updated_at);
       const now = new Date();
       const daysDiff = Math.floor((now.getTime() - updatedAt.getTime()) / (1000 * 60 * 60 * 24));
       return daysDiff <= 7;
@@ -131,13 +139,13 @@ export const DashboardMetrics = ({ leads, stages }: DashboardMetricsProps) => {
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
-                  <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-2">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                     {metric.title}
                   </p>
-                  <h3 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-1.5 group-hover:text-brand-green-600 dark:group-hover:text-brand-green-500 transition-colors">
+                  <h3 className="text-3xl font-bold text-foreground mb-1.5 group-hover:text-brand-green-600 dark:group-hover:text-brand-green-500 transition-colors">
                     {metric.value}
                   </h3>
-                  <p className="text-xs text-neutral-600 dark:text-neutral-400 font-medium">
+                  <p className="text-xs text-muted-foreground font-medium">
                     {metric.subtitle}
                   </p>
                 </div>
@@ -145,7 +153,7 @@ export const DashboardMetrics = ({ leads, stages }: DashboardMetricsProps) => {
                   <Icon className={`h-6 w-6 ${metric.color}`} />
                 </div>
               </div>
-              <div className="flex items-center gap-1.5 pt-3 border-t border-neutral-100 dark:border-neutral-800">
+              <div className="flex items-center gap-1.5 pt-3 border-t border-border">
                 {metric.trendUp ? (
                   <TrendingUp className="h-3.5 w-3.5 text-success-600 dark:text-success-500" />
                 ) : (
@@ -154,7 +162,7 @@ export const DashboardMetrics = ({ leads, stages }: DashboardMetricsProps) => {
                 <span className={`text-xs font-semibold ${metric.trendUp ? 'text-success-600 dark:text-success-500' : 'text-danger-600 dark:text-danger-500'}`}>
                   {metric.trend}
                 </span>
-                <span className="text-xs text-neutral-500 dark:text-neutral-400 ml-0.5">vs último mês</span>
+                <span className="text-xs text-muted-foreground ml-0.5">vs último mês</span>
               </div>
             </CardContent>
           </Card>

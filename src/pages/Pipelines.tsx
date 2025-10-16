@@ -5,8 +5,9 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { DealKanbanBoard } from "@/components/DealKanbanBoard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Search, Filter, Plus, Loader2, TrendingUp, Home } from "lucide-react";
+import { Search, Filter, Plus, Loader2, TrendingUp, Home, XCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -55,6 +56,9 @@ const Pipelines = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [editingStageId, setEditingStageId] = useState<string | null>(null);
   const [newStageName, setNewStageName] = useState("");
+  const [isLostDialogOpen, setIsLostDialogOpen] = useState(false);
+  const [lostDealId, setLostDealId] = useState<string | null>(null);
+  const [lostReason, setLostReason] = useState("");
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -148,7 +152,24 @@ const Pipelines = () => {
   };
 
   const handleMarkAsLost = async (dealId: string) => {
-    await markDealAsLostMutation.mutateAsync({ dealId });
+    setLostDealId(dealId);
+    setIsLostDialogOpen(true);
+  };
+
+  const confirmMarkAsLost = async () => {
+    if (!lostDealId || !lostReason.trim()) {
+      toast.error("É necessário informar o motivo da perda");
+      return;
+    }
+
+    await markDealAsLostMutation.mutateAsync({ 
+      dealId: lostDealId,
+      lostReason: lostReason.trim()
+    });
+    
+    setIsLostDialogOpen(false);
+    setLostDealId(null);
+    setLostReason("");
   };
 
   const handleDuplicateDeal = async (deal: Deal) => {
@@ -352,6 +373,63 @@ const Pipelines = () => {
                   Salvar
                 </Button>
               </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Dialog: Marcar como Perdido com Justificativa */}
+        <Dialog open={isLostDialogOpen} onOpenChange={setIsLostDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Marcar Oportunidade como Perdida</DialogTitle>
+              <DialogDescription>
+                Por favor, informe o motivo da perda. Esta informação é importante para análise e melhoria dos processos.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="lostReason">Motivo da Perda *</Label>
+                <Textarea
+                  id="lostReason"
+                  placeholder="Ex: Preço muito alto, escolheu concorrente, timing não adequado, etc..."
+                  value={lostReason}
+                  onChange={(e) => setLostReason(e.target.value)}
+                  rows={4}
+                  className="resize-none"
+                />
+                {lostReason.trim() && (
+                  <p className="text-xs text-green-600">✓ Motivo informado</p>
+                )}
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsLostDialogOpen(false);
+                  setLostDealId(null);
+                  setLostReason("");
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={confirmMarkAsLost}
+                disabled={!lostReason.trim() || markDealAsLostMutation.isPending}
+              >
+                {markDealAsLostMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Marcando...
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="h-4 w-4 mr-2" />
+                    Marcar como Perdido
+                  </>
+                )}
+              </Button>
             </div>
           </DialogContent>
         </Dialog>

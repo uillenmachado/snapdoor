@@ -318,14 +318,19 @@ export const useMarkDealAsLost = () => {
       lostReason,
     }: {
       dealId: string;
-      lostReason?: string;
+      lostReason: string; // Agora obrigatório
     }) => {
+      // Validar que a razão foi fornecida
+      if (!lostReason || lostReason.trim() === '') {
+        throw new Error("É necessário informar o motivo da perda");
+      }
+
       const { data, error } = await supabase
         .from("deals")
         .update({
           status: 'lost',
           probability: 0,
-          lost_reason: lostReason,
+          lost_reason: lostReason.trim(),
           closed_date: new Date().toISOString(),
         })
         .eq("id", dealId)
