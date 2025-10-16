@@ -134,6 +134,19 @@ export default function Leads() {
     ).values()
   );
 
+  // 🔍 DEBUG: Ver dados que chegaram do Supabase
+  console.log('📊 DEBUG Leads:', {
+    totalLeads: leads.length,
+    primeirosLeads: leads.slice(0, 3).map(l => ({
+      nome: l.full_name,
+      company_id: l.company_id,
+      companies: l.companies,
+      companiesName: l.companies?.name
+    })),
+    totalCompanies: companies.length,
+    companies: companies.map(c => c.name)
+  });
+
   // Função para exportar CSV
   const handleExportCSV = () => {
     const headers = ["Nome", "Empresa", "Cargo", "Email", "Telefone", "Status", "Criado em"];

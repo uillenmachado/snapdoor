@@ -69,10 +69,32 @@ const Pipelines = () => {
   const stagesWithDeals = useMemo(() => {
     if (!stages || !deals) return [];
     
-    return stages.map((stage) => ({
+    const grouped = stages.map((stage) => ({
       ...stage,
       deals: deals.filter((deal) => deal.stage_id === stage.id),
     }));
+
+    // 🔍 DEBUG: Ver distribuição de deals por stage
+    console.log('📊 DEBUG Pipeline:', {
+      totalStages: stages.length,
+      totalDeals: deals.length,
+      primeirosDeals: deals.slice(0, 3).map(d => ({
+        titulo: d.title,
+        stage_id: d.stage_id,
+        status: d.status
+      })),
+      primeiroStage: stages[0] ? {
+        id: stages[0].id,
+        name: stages[0].name,
+        dealsNesseStage: deals.filter(d => d.stage_id === stages[0].id).length
+      } : null,
+      distribuicao: grouped.map(s => ({
+        stage: s.name,
+        quantidade: s.deals.length
+      }))
+    });
+
+    return grouped;
   }, [stages, deals]);
 
   // Filter stages based on search
