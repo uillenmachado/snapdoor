@@ -1,5 +1,6 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,17 +14,13 @@ const Help = () => {
       <div className="min-h-screen flex w-full bg-background">
         <AppSidebar />
 
-        <div className="flex-1 flex flex-col">
-          <header className="border-b border-border bg-card sticky top-0 z-10">
-            <div className="flex items-center justify-between p-4">
-              <div className="flex items-center gap-4">
-                <SidebarTrigger />
-                <h1 className="text-2xl font-bold text-foreground">Ajuda & Tutoriais</h1>
-              </div>
-            </div>
-          </header>
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <PageHeader
+            title="Ajuda & Tutoriais"
+            description="Guias, tutoriais e respostas para suas dúvidas"
+          />
 
-          <main className="flex-1 p-6 space-y-6">
+          <main className="flex-1 overflow-auto p-6 space-y-6">
             {/* Início Rápido */}
             <Card>
               <CardHeader>
