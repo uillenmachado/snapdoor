@@ -6,7 +6,7 @@ import { DealKanbanBoard } from "@/components/DealKanbanBoard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Search, Filter, Plus, Loader2, TrendingUp } from "lucide-react";
+import { Search, Filter, Plus, Loader2, TrendingUp, Home } from "lucide-react";
 import {
   Dialog,
   DialogContent,
