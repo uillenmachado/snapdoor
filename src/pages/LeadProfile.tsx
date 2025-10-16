@@ -6,6 +6,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/AppSidebar';
+import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -86,25 +89,36 @@ export default function LeadProfile() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6 max-w-6xl flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full bg-background">
+          <AppSidebar />
+          <div className="flex-1 flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        </div>
+      </SidebarProvider>
     );
   }
 
   if (!lead) {
     return (
-      <div className="container mx-auto p-6 max-w-6xl">
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <p className="text-muted-foreground">Lead não encontrado</p>
-            <Button onClick={() => navigate('/dashboard')} className="mt-4">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Voltar
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full bg-background">
+          <AppSidebar />
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <PageHeader
+              title="Lead não encontrado"
+              description="O lead que você procura não existe"
+              actions={
+                <Button onClick={() => navigate('/leads')} variant="outline">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Voltar para Leads
+                </Button>
+              }
+            />
+          </div>
+        </div>
+      </SidebarProvider>
     );
   }
 
@@ -139,34 +153,41 @@ export default function LeadProfile() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl space-y-6">
-      {/* Header com botão voltar */}
-      <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate('/dashboard')}
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold">Perfil do Lead</h1>
-          <p className="text-muted-foreground">Visualize e gerencie todas as informações</p>
-        </div>
-        <Button
-          onClick={handleEnrich}
-          disabled={isEnriching}
-        >
-          {isEnriching ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          ) : (
-            <Sparkles className="w-4 h-4 mr-2" />
-          )}
-          {isEnriching ? 'Enriquecendo...' : 'Enriquecer'}
-        </Button>
-      </div>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-background">
+        <AppSidebar />
+        
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <PageHeader
+            title={lead.full_name || `${lead.first_name || ''} ${lead.last_name || ''}`.trim() || 'Perfil do Lead'}
+            description={lead.job_title && lead.company ? `${lead.job_title} • ${lead.company}` : 'Visualize e gerencie todas as informações'}
+            actions={
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/leads')}
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Voltar
+                </Button>
+                <Button
+                  onClick={handleEnrich}
+                  disabled={isEnriching}
+                >
+                  {isEnriching ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-4 h-4 mr-2" />
+                  )}
+                  {isEnriching ? 'Enriquecendo...' : 'Enriquecer'}
+                </Button>
+              </div>
+            }
+          />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <main className="flex-1 overflow-auto p-6">
+            <div className="max-w-6xl mx-auto">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Coluna Esquerda - Card Principal */}
         <div className="lg:col-span-1 space-y-6">
           {/* Card de Perfil */}
@@ -481,8 +502,11 @@ export default function LeadProfile() {
           {/* Seção de Tarefas */}
           <RelatedTasksSection leadId={lead.id} title="Tarefas do Lead" />
         </div>
+              </div>
+            </div>
+          </main>
+        </div>
       </div>
-
-    </div>
+    </SidebarProvider>
   );
 }
