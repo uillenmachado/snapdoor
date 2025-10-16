@@ -111,7 +111,7 @@ export default function Leads() {
       const { data, error } = await query;
 
       if (error) throw error;
-      return data as Lead[];
+      return (data || []) as any as Lead[];
     },
     enabled: !!user?.id,
   });

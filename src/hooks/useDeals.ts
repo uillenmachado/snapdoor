@@ -438,7 +438,7 @@ export const useToggleFavoriteDeal = () => {
     mutationFn: async ({ dealId, isFavorite }: { dealId: string; isFavorite: boolean }) => {
       const { data, error } = await supabase
         .from("deals")
-        .update({ is_favorite: !isFavorite })
+        .update({ is_favorite: !isFavorite } as any)
         .eq("id", dealId)
         .select()
         .single();

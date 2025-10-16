@@ -156,7 +156,7 @@ export const useLeadsByStage = (stageId: string | undefined) => {
         .order("position", { ascending: true });
 
       if (error) throw error;
-      return data as Lead[];
+      return (data || []) as any as Lead[];
     },
     enabled: !!stageId,
   });
@@ -214,7 +214,7 @@ export const useUpdateLead = () => {
     }) => {
       const { data, error } = await supabase
         .from("leads")
-        .update(updates)
+        .update(updates as any)
         .eq("id", id)
         .select()
         .single();
@@ -251,13 +251,13 @@ export const useMoveLead = () => {
     }) => {
       const { data, error } = await supabase
         .from("leads")
-        .update({ stage_id: newStageId, position: newPosition })
+        .update({ stage_id: newStageId, position: newPosition as any })
         .eq("id", leadId)
         .select()
         .single();
 
       if (error) throw error;
-      return data as Lead;
+      return data as any as Lead;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["leads"] });

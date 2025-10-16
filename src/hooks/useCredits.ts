@@ -103,7 +103,7 @@ export const useCreditUsageHistory = (userId: string | undefined, limit: number 
         .limit(limit);
 
       if (error) throw error;
-      return data as CreditUsageHistory[];
+      return (data || []) as any as CreditUsageHistory[];
     },
     enabled: !!userId,
   });
@@ -117,11 +117,11 @@ export const useCreditPackages = () => {
       const { data, error } = await supabase
         .from("credit_packages")
         .select("*")
-        .eq("is_active", true)
+        .eq("active", true)
         .order("credits", { ascending: true });
 
       if (error) throw error;
-      return data as CreditPackage[];
+      return (data || []) as any as CreditPackage[];
     },
   });
 };
@@ -140,7 +140,7 @@ export const useCreditPurchases = (userId: string | undefined) => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as CreditPurchase[];
+      return (data || []) as any as CreditPurchase[];
     },
     enabled: !!userId,
   });
@@ -161,7 +161,7 @@ export const useDebitCredits = () => {
     }) => {
       const credits = CREDIT_COSTS[params.operationType];
 
-      const { data, error } = await supabase.rpc("debit_credits", {
+      const { data, error } = await (supabase as any).rpc("debit_credits", {
         p_user_id: params.userId,
         p_credits: credits,
         p_operation_type: params.operationType.toLowerCase(),
@@ -206,7 +206,7 @@ export const useAddCredits = () => {
       credits: number;
       purchaseId?: string;
     }) => {
-      const { data, error } = await supabase.rpc("add_credits", {
+      const { data, error } = await (supabase as any).rpc("add_credits", {
         p_user_id: params.userId,
         p_credits: params.credits,
         p_purchase_id: params.purchaseId || null,
