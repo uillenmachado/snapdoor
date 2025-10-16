@@ -4,8 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useDebounce } from "@/hooks/useDebounce";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { PageHeader } from "@/components/PageHeader";
+import { MetricCard } from "@/components/MetricCard";
 import {
   Table,
   TableBody,
@@ -193,101 +195,91 @@ export default function Leads() {
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen w-full overflow-hidden">
+      <div className="min-h-screen flex w-full bg-background">
         <AppSidebar />
-        <main className="flex-1 overflow-y-auto">
-          <div className="container mx-auto px-4 py-8 space-y-6">
-            {/* Header com Trigger e Título */}
-            <div className="flex items-center gap-4">
-              <SidebarTrigger />
-              <div className="flex-1">
-                <h1 className="text-3xl font-bold mb-2">Todos os Leads</h1>
-                <p className="text-muted-foreground">Visão completa do seu banco de dados de leads</p>
-              </div>
+        
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Header Padronizado */}
+          <PageHeader
+            title="Leads"
+            description="Gerencie seus leads e oportunidades"
+            actions={
+              <>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowImportWizard(true)}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Importar
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowExportDialog(true)}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Exportar
+                </Button>
+              </>
+            }
+          />
+
+          {/* Main Content */}
+          <main className="flex-1 overflow-auto p-6">
+            {/* Cards de Métricas Padronizados */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5 mb-6">
+              <MetricCard
+                title="Total de Leads"
+                value={stats.total}
+                icon={<Users className="h-4 w-4" />}
+              />
+              
+              <MetricCard
+                title="Ativos"
+                value={stats.active}
+                icon={<Target className="h-4 w-4" />}
+                variant="info"
+              />
+              
+              <MetricCard
+                title="Ganhos"
+                value={stats.won}
+                icon={<TrendingUp className="h-4 w-4" />}
+                variant="success"
+              />
+              
+              <MetricCard
+                title="Perdidos"
+                value={stats.lost}
+                icon={<DollarSign className="h-4 w-4" />}
+                variant="danger"
+              />
+              
+              <MetricCard
+                title="Taxa de Conversão"
+                value={`${stats.conversionRate}%`}
+              />
             </div>
 
-      {/* Cards de Estatísticas - Pipedrive Style */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card className="border border-border bg-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Total de Leads
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{stats.total}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-border bg-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider flex items-center gap-2">
-              <Target className="h-4 w-4 text-info-600 dark:text-info-500" />
-              Ativos
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-info-600 dark:text-info-500">{stats.active}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-success-200 dark:border-success-800 bg-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-success-600 dark:text-success-500" />
-              Ganhos
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-success-600 dark:text-success-500">{stats.won}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-danger-200 dark:border-danger-800 bg-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-danger-600 dark:text-danger-500" />
-              Perdidos
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-danger-600 dark:text-danger-500">{stats.lost}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-brand-purple-200 dark:border-brand-purple-800 bg-card hover:shadow-md transition-shadow">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
-              Taxa de Conversão
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-brand-purple-600 dark:text-brand-purple-500">{stats.conversionRate}%</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Filtros e Busca - Pipedrive Style */}
-      <Card className="border border-border bg-card">
+            {/* Filtros e Busca */}
+            <Card className="bg-card border-border">
         <CardHeader className="border-b border-border">
           <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
             <div className="flex-1 w-full md:w-auto">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400 dark:text-neutral-500" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Buscar por nome, email ou empresa..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 border-neutral-300 dark:border-neutral-700 focus:border-brand-green-500 dark:focus:border-brand-green-500"
+                  className="pl-10"
                 />
               </div>
             </div>
 
             <div className="flex gap-2 w-full md:w-auto flex-wrap">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full md:w-[180px] border-neutral-300 dark:border-neutral-700">
-                  <Filter className="h-4 w-4 mr-2 text-neutral-500" />
+                <SelectTrigger className="w-full md:w-[180px]">
+                  <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -299,8 +291,8 @@ export default function Leads() {
               </Select>
 
               <Select value={companyFilter} onValueChange={setCompanyFilter}>
-                <SelectTrigger className="w-full md:w-[180px] border-neutral-300 dark:border-neutral-700">
-                  <Building2 className="h-4 w-4 mr-2 text-neutral-500" />
+                <SelectTrigger className="w-full md:w-[180px]">
+                  <Building2 className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Empresa" />
                 </SelectTrigger>
                 <SelectContent>
@@ -312,24 +304,6 @@ export default function Leads() {
                   ))}
                 </SelectContent>
               </Select>
-
-              <Button 
-                variant="outline" 
-                onClick={() => setShowImportWizard(true)}
-                className="border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                Importar
-              </Button>
-
-              <Button 
-                variant="outline" 
-                onClick={() => setShowExportDialog(true)}
-                className="border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Exportar
-              </Button>
             </div>
           </div>
         </CardHeader>
@@ -343,15 +317,15 @@ export default function Leads() {
                 {leads.length} {leads.length === 1 ? 'lead encontrado' : 'leads encontrados'}.
               </caption>
               <TableHeader>
-                <TableRow className="bg-neutral-100 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-900">
-                  <TableHead className="w-12 font-semibold text-neutral-900 dark:text-neutral-100"></TableHead>
-                  <TableHead className="font-semibold text-neutral-900 dark:text-neutral-100">Nome</TableHead>
-                  <TableHead className="font-semibold text-neutral-900 dark:text-neutral-100">Empresa</TableHead>
-                  <TableHead className="font-semibold text-neutral-900 dark:text-neutral-100">Cargo</TableHead>
-                  <TableHead className="font-semibold text-neutral-900 dark:text-neutral-100">Contato</TableHead>
-                  <TableHead className="font-semibold text-neutral-900 dark:text-neutral-100">Status</TableHead>
-                  <TableHead className="font-semibold text-neutral-900 dark:text-neutral-100">Atualizado</TableHead>
-                  <TableHead className="w-24 font-semibold text-neutral-900 dark:text-neutral-100">Ações</TableHead>
+                <TableRow>
+                  <TableHead className="w-12"></TableHead>
+                  <TableHead className="font-medium text-muted-foreground">Nome</TableHead>
+                  <TableHead className="font-medium text-muted-foreground">Empresa</TableHead>
+                  <TableHead className="font-medium text-muted-foreground">Cargo</TableHead>
+                  <TableHead className="font-medium text-muted-foreground">Contato</TableHead>
+                  <TableHead className="font-medium text-muted-foreground">Status</TableHead>
+                  <TableHead className="font-medium text-muted-foreground">Atualizado</TableHead>
+                  <TableHead className="w-24 font-medium text-muted-foreground">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -466,8 +440,8 @@ export default function Leads() {
           company: companyFilter !== "all" ? companyFilter : undefined,
         }}
       />
-          </div>
-        </main>
+          </main>
+        </div>
       </div>
     </SidebarProvider>
   );
