@@ -1,5 +1,3 @@
-import { Building2 } from "lucide-react";
-
 interface LogoProps {
   className?: string;
   size?: "sm" | "md" | "lg" | "xl";
@@ -28,25 +26,26 @@ export function Logo({ className = "", size = "md", variant = "full" }: LogoProp
     xl: "text-3xl"
   };
 
-  // Quando o usuário adicionar logo.png no public/, descomente a linha abaixo e remova o fallback
-  // return <img src="/logo.png" alt="SnapDoor" className={`${sizeClasses[size]} ${className}`} />;
-
-  // Fallback com logo SVG personalizado
+  // Logo com favicon.svg
   if (variant === "icon-only") {
     return (
-      <div className={`flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg ${className}`}>
-        <Building2 className={`${iconSizes[size]} text-white`} />
-      </div>
+      <img 
+        src="/favicon.svg" 
+        alt="SnapDoor" 
+        className={`${iconSizes[size]} ${className}`} 
+      />
     );
   }
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <div className="flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg p-1.5">
-        <Building2 className={`${iconSizes[size]} text-white`} />
-      </div>
-      <span className={`font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent ${textSizes[size]}`}>
-        SnapDoor
+      <img 
+        src="/favicon.svg" 
+        alt="snapdoor" 
+        className={iconSizes[size]} 
+      />
+      <span className={`font-bold text-primary ${textSizes[size]}`}>
+        snapdoor
       </span>
     </div>
   );

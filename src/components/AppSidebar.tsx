@@ -15,6 +15,7 @@ import {
   GitBranch,
   Building2,
   TrendingUp,
+  History,
 } from "lucide-react";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
@@ -50,6 +51,7 @@ import { getAccountStatus } from "@/lib/devAccount";
 const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Pipeline", url: "/pipelines", icon: TrendingUp },
+  { title: "Histórico", url: "/deals/history", icon: History },
   { title: "Leads", url: "/leads", icon: Users },
   { title: "Empresas", url: "/companies", icon: Building2 },
   { title: "Atividades", url: "/activities", icon: FileText },

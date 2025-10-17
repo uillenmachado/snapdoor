@@ -2,7 +2,7 @@
  * RelatedTasksSection Component
  * 
  * Seção para exibir e gerenciar tarefas relacionadas a um lead, company ou deal.
- * Usado em páginas de detalhes (LeadProfile, CompanyDetail, DealDetail).
+ * Usado em páginas de detalhes (LeadDetailEnhanced, CompanyDetail, DealDetail).
  */
 
 import { useState } from "react";

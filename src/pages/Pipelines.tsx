@@ -93,10 +93,12 @@ const Pipelines = () => {
 
   // Calculate metrics
   const metrics = useMemo(() => {
-    const totalDeals = deals?.length || 0;
-    const totalValue = deals?.reduce((sum, deal) => sum + (deal.value || 0), 0) || 0;
+    const openDeals = deals?.filter(d => d.status === 'open') || [];
+    const totalDeals = openDeals.length;
+    const totalValue = openDeals.reduce((sum, deal) => sum + (deal.value || 0), 0);
     const wonDeals = deals?.filter(d => d.status === 'won').length || 0;
-    const conversionRate = totalDeals > 0 ? ((wonDeals / totalDeals) * 100).toFixed(1) : '0';
+    const allDealsCount = deals?.length || 0;
+    const conversionRate = allDealsCount > 0 ? ((wonDeals / allDealsCount) * 100).toFixed(1) : '0';
 
     return { totalDeals, totalValue, wonDeals, conversionRate };
   }, [deals]);

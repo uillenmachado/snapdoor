@@ -27,19 +27,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -61,8 +48,6 @@ import {
   Clock,
   FileText,
   Loader2,
-  Check,
-  ChevronsUpDown,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -71,6 +56,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { EmailIntegrationCard } from "@/components/EmailIntegrationCard";
 import { ParticipantCard } from "@/components/deals/ParticipantCard";
 import { CompanyDetails } from "@/components/deals/CompanyDetails";
+import { LeadDetails } from "@/components/deals/LeadDetails";
+import { EmailComposer } from "@/components/EmailComposer";
+import { ActivityTimeline } from "@/components/ActivityTimeline";
 import {
   useDeal,
   useUpdateDeal,
@@ -79,7 +67,8 @@ import {
   Deal,
 } from "@/hooks/useDeals";
 import { useDealParticipants, useAddDealParticipant, useRemoveDealParticipant } from "@/hooks/useDeals";
-import { useLeads } from "@/hooks/useLeads";
+import { useLeads, useCreateLead } from "@/hooks/useLeads";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function DealDetail() {
   const { id } = useParams<{ id: string }>();
@@ -89,20 +78,42 @@ export default function DealDetail() {
   const { data: deal, isLoading: dealLoading } = useDeal(id);
   const { data: participants = [], isLoading: participantsLoading, refetch: refetchParticipants } = useDealParticipants(id);
   const { data: allLeads = [] } = useLeads(user?.id);
+  
+  // Debug - ver estrutura dos leads
+  console.log('📊 Total de leads:', allLeads.length);
+  console.log('📋 Primeiros 3 leads:', allLeads.slice(0, 3).map(l => ({
+    id: l.id,
+    name: l.name,
+    email: l.email,
+    company: l.company,
+    job_title: l.job_title
+  })));
+  
+  // Primeiro participante é o principal
+  const primaryParticipant = participants[0];
 
   const updateDealMutation = useUpdateDeal();
   const markAsWonMutation = useMarkDealAsWon();
   const markAsLostMutation = useMarkDealAsLost();
   const addParticipantMutation = useAddDealParticipant();
   const removeParticipantMutation = useRemoveDealParticipant();
+  const createLeadMutation = useCreateLead();
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
   const [isAddParticipantOpen, setIsAddParticipantOpen] = useState(false);
+  const [participantMode, setParticipantMode] = useState<"select" | "create">("select");
   const [selectedLeadId, setSelectedLeadId] = useState("");
   const [participantRole, setParticipantRole] = useState("participant");
+  
+  // Estados para criar novo lead
+  const [newLeadName, setNewLeadName] = useState("");
+  const [newLeadEmail, setNewLeadEmail] = useState("");
+  const [newLeadPhone, setNewLeadPhone] = useState("");
+  const [newLeadCompany, setNewLeadCompany] = useState("");
+  const [newLeadPosition, setNewLeadPosition] = useState("");
+  
   const [newNote, setNewNote] = useState("");
-  const [openLeadCombobox, setOpenLeadCombobox] = useState(false);
   const [isLostDialogOpen, setIsLostDialogOpen] = useState(false);
   const [lostReason, setLostReason] = useState("");
 
@@ -163,22 +174,87 @@ export default function DealDetail() {
 
   // Adicionar participante
   const handleAddParticipant = async () => {
-    if (!selectedLeadId || !id || !user?.id) {
-      toast.error("Selecione um lead");
-      return;
+    if (!id || !user?.id) return;
+
+    try {
+      let leadId = selectedLeadId;
+
+      // Modo: Criar novo lead
+      if (participantMode === "create") {
+        // Validação
+        if (!newLeadName && !newLeadEmail) {
+          toast.error("Preencha pelo menos o nome ou email do lead");
+          return;
+        }
+
+        // Separar nome em first_name e last_name
+        const nameParts = (newLeadName || newLeadEmail || '').trim().split(/\s+/);
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+
+        // Criar o lead primeiro - usar estrutura do banco
+        const leadData: any = {
+          first_name: firstName,
+          last_name: lastName || firstName, // Se não tiver sobrenome, duplica o primeiro
+          name: newLeadName || newLeadEmail, // Campo computado para compatibilidade
+          full_name: newLeadName || newLeadEmail,
+          email: newLeadEmail || null,
+          phone: newLeadPhone || null,
+          company: newLeadCompany || null,
+          title: newLeadPosition || null, // cargo/função (coluna correta)
+          job_title: newLeadPosition || null, // compatibilidade
+          status: "lead",
+          source: "manual",
+          user_id: user.id,
+        };
+
+        const { data: newLead, error } = await supabase
+          .from('leads')
+          .insert(leadData)
+          .select()
+          .single();
+
+        if (error) throw error;
+        
+        const displayName = newLead.name || newLead.email || "Novo Lead";
+        leadId = newLead.id;
+        toast.success(`Lead "${displayName}" criado com sucesso!`);
+      }
+
+      // Modo: Selecionar existente
+      if (participantMode === "select" && !selectedLeadId) {
+        toast.error("Selecione um lead");
+        return;
+      }
+
+      // Adicionar como participante
+      await addParticipantMutation.mutateAsync({
+        dealId: id,
+        leadId: leadId,
+        userId: user.id,
+        role: participantRole,
+        isPrimary: participants.length === 0, // Primeiro é primário
+      });
+
+      toast.success("Participante adicionado!");
+      
+      // Reset form
+      setIsAddParticipantOpen(false);
+      setSelectedLeadId("");
+      setParticipantRole("participant");
+      setParticipantMode("select");
+      setNewLeadName("");
+      setNewLeadEmail("");
+      setNewLeadPhone("");
+      setNewLeadCompany("");
+      setNewLeadPosition("");
+      
+      // Refresh participants
+      refetchParticipants();
+    } catch (error: any) {
+      console.error("Erro ao adicionar participante:", error);
+      toast.error(error.message || "Erro ao adicionar participante");
     }
-
-    await addParticipantMutation.mutateAsync({
-      dealId: id,
-      leadId: selectedLeadId,
-      userId: user.id,
-      role: participantRole,
-      isPrimary: participants.length === 0, // Primeiro é primário
-    });
-
-    setIsAddParticipantOpen(false);
-    setSelectedLeadId("");
-    setParticipantRole("participant");
   };
 
   // Remover participante
@@ -280,6 +356,18 @@ export default function DealDetail() {
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Voltar
                 </Button>
+                
+                {/* Botão de Enviar Email */}
+                {deal.status === "open" && primaryParticipant?.lead?.email && (
+                  <EmailComposer
+                    dealId={deal.id}
+                    leadId={primaryParticipant.lead_id}
+                    companyId={deal.company_id}
+                    defaultTo={primaryParticipant.lead.email}
+                    defaultSubject={`Re: ${deal.title}`}
+                  />
+                )}
+                
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm">
@@ -390,8 +478,16 @@ export default function DealDetail() {
                 </Card>
               </div>
 
-              {/* Company Details Section */}
-              <div className="mt-6">
+              {/* Lead Principal & Company Details - Duas Colunas */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                {/* Coluna Esquerda - Lead Principal */}
+                <LeadDetails 
+                  lead={primaryParticipant?.lead || null}
+                  role={primaryParticipant?.role}
+                  onLeadUpdate={refetchParticipants}
+                />
+
+                {/* Coluna Direita - Empresa */}
                 <CompanyDetails
                   company={deal.companies}
                   companyId={deal.company_id}
@@ -444,94 +540,172 @@ export default function DealDetail() {
                             Adicionar
                           </Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="max-w-2xl">
                           <DialogHeader>
                             <DialogTitle>Adicionar Participante</DialogTitle>
                             <DialogDescription>
-                              Adicione uma pessoa ao negócio
+                              Selecione um lead existente ou crie um novo
                             </DialogDescription>
                           </DialogHeader>
-                          <div className="space-y-4 py-4">
-                            <div>
-                              <label className="text-sm font-medium mb-2 block">Lead</label>
-                              <Popover open={openLeadCombobox} onOpenChange={setOpenLeadCombobox}>
-                                <PopoverTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    role="combobox"
-                                    aria-expanded={openLeadCombobox}
-                                    className="w-full justify-between"
-                                  >
-                                    {selectedLeadId
-                                      ? allLeads.find((lead) => lead.id === selectedLeadId)?.name
-                                      : "Busque e selecione um lead..."}
-                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                  </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-full p-0">
-                                  <Command>
-                                    <CommandInput placeholder="Digite para buscar o lead..." />
-                                    <CommandList>
-                                      <CommandEmpty>Nenhum lead encontrado.</CommandEmpty>
-                                      <CommandGroup>
-                                        {allLeads
-                                          .filter(
-                                            (lead) =>
-                                              !participants.some((p: any) => p.lead_id === lead.id)
-                                          )
-                                          .map((lead) => (
-                                            <CommandItem
-                                              key={lead.id}
-                                              value={`${lead.name} ${lead.company || ""}`}
-                                              onSelect={() => {
-                                                setSelectedLeadId(lead.id);
-                                                setOpenLeadCombobox(false);
-                                              }}
-                                            >
-                                              <Check
-                                                className={`mr-2 h-4 w-4 ${
-                                                  selectedLeadId === lead.id ? "opacity-100" : "opacity-0"
-                                                }`}
-                                              />
-                                              <div className="flex flex-col">
-                                                <span className="font-medium">{lead.name}</span>
-                                                <span className="text-xs text-muted-foreground">
-                                                  {lead.company || "Sem empresa"} {lead.job_title ? `• ${lead.job_title}` : ""}
-                                                </span>
-                                              </div>
-                                            </CommandItem>
-                                          ))}
-                                      </CommandGroup>
-                                    </CommandList>
-                                  </Command>
-                                </PopoverContent>
-                              </Popover>
-                            </div>
-                            <div>
-                              <label className="text-sm font-medium">Papel</label>
-                              <Select value={participantRole} onValueChange={setParticipantRole}>
-                                <SelectTrigger>
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="decision_maker">Decisor</SelectItem>
-                                  <SelectItem value="influencer">Influenciador</SelectItem>
-                                  <SelectItem value="user">Usuário</SelectItem>
-                                  <SelectItem value="technical">Técnico</SelectItem>
-                                  <SelectItem value="champion">Defensor</SelectItem>
-                                  <SelectItem value="participant">Participante</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
+
+                          {/* Tabs: Selecionar ou Criar */}
+                          <Tabs value={participantMode} onValueChange={(v) => setParticipantMode(v as "select" | "create")}>
+                            <TabsList className="grid w-full grid-cols-2">
+                              <TabsTrigger value="select">Selecionar Existente</TabsTrigger>
+                              <TabsTrigger value="create">+ Criar Novo</TabsTrigger>
+                            </TabsList>
+
+                            {/* Tab: Selecionar Lead Existente */}
+                            <TabsContent value="select" className="space-y-4">
+                              <div>
+                                <label className="text-sm font-medium mb-2 block">Lead</label>
+                                <Select value={selectedLeadId} onValueChange={setSelectedLeadId}>
+                                  <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Selecione um lead..." />
+                                  </SelectTrigger>
+                                  <SelectContent className="max-h-[300px]">
+                                    {allLeads.length === 0 && (
+                                      <div className="p-4 text-center text-sm text-muted-foreground">
+                                        Nenhum lead disponível. Crie um novo ao lado →
+                                      </div>
+                                    )}
+                                    {allLeads
+                                      .filter((lead) => !participants.some((p: any) => p.lead_id === lead.id))
+                                      .map((lead) => {
+                                        // Tentar múltiplas fontes para o nome
+                                        const fullName = lead.name || 
+                                                        (lead.first_name && lead.last_name 
+                                                          ? `${lead.first_name} ${lead.last_name}` 
+                                                          : lead.first_name || lead.last_name) ||
+                                                        lead.full_name;
+                                        
+                                        const displayName = fullName || lead.email || "Lead sem nome";
+                                        
+                                        // Informações secundárias
+                                        const jobInfo = lead.title || lead.job_title || lead.position || lead.headline;
+                                        const companyInfo = lead.companies?.name || lead.company;
+                                        
+                                        const secondaryInfo = [
+                                          companyInfo,
+                                          jobInfo,
+                                          fullName ? lead.email : null
+                                        ].filter(Boolean).join(" • ");
+                                        
+                                        return (
+                                          <SelectItem key={lead.id} value={lead.id}>
+                                            <div className="flex flex-col py-1">
+                                              <span className="font-medium text-sm">{displayName}</span>
+                                              {secondaryInfo && (
+                                                <span className="text-xs text-muted-foreground">{secondaryInfo}</span>
+                                              )}
+                                            </div>
+                                          </SelectItem>
+                                        );
+                                      })}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </TabsContent>
+
+                            {/* Tab: Criar Novo Lead */}
+                            <TabsContent value="create" className="space-y-4">
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="col-span-2">
+                                  <label className="text-sm font-medium">Nome *</label>
+                                  <Input
+                                    placeholder="Ex: João Silva"
+                                    value={newLeadName}
+                                    onChange={(e) => setNewLeadName(e.target.value)}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">Email</label>
+                                  <Input
+                                    type="email"
+                                    placeholder="joao@empresa.com"
+                                    value={newLeadEmail}
+                                    onChange={(e) => setNewLeadEmail(e.target.value)}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">Telefone</label>
+                                  <Input
+                                    placeholder="(11) 99999-9999"
+                                    value={newLeadPhone}
+                                    onChange={(e) => setNewLeadPhone(e.target.value)}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">Empresa</label>
+                                  <Input
+                                    placeholder="Empresa XYZ"
+                                    value={newLeadCompany}
+                                    onChange={(e) => setNewLeadCompany(e.target.value)}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">Cargo</label>
+                                  <Input
+                                    placeholder="CEO, Gerente, etc."
+                                    value={newLeadPosition}
+                                    onChange={(e) => setNewLeadPosition(e.target.value)}
+                                  />
+                                </div>
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                * Preencha pelo menos o nome ou email
+                              </p>
+                            </TabsContent>
+                          </Tabs>
+
+                          {/* Papel do Participante (comum para ambos os modos) */}
+                          <div>
+                            <label className="text-sm font-medium">Papel no Negócio</label>
+                            <Select value={participantRole} onValueChange={setParticipantRole}>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="decision_maker">Decisor</SelectItem>
+                                <SelectItem value="influencer">Influenciador</SelectItem>
+                                <SelectItem value="user">Usuário</SelectItem>
+                                <SelectItem value="technical">Técnico</SelectItem>
+                                <SelectItem value="champion">Defensor</SelectItem>
+                                <SelectItem value="participant">Participante</SelectItem>
+                              </SelectContent>
+                            </Select>
                           </div>
+
+                          {/* Botões */}
                           <div className="flex justify-end gap-2">
                             <Button
                               variant="outline"
-                              onClick={() => setIsAddParticipantOpen(false)}
+                              onClick={() => {
+                                setIsAddParticipantOpen(false);
+                                setParticipantMode("select");
+                                setSelectedLeadId("");
+                                setNewLeadName("");
+                                setNewLeadEmail("");
+                                setNewLeadPhone("");
+                                setNewLeadCompany("");
+                                setNewLeadPosition("");
+                              }}
                             >
                               Cancelar
                             </Button>
-                            <Button onClick={handleAddParticipant}>Adicionar</Button>
+                            <Button 
+                              onClick={handleAddParticipant}
+                              disabled={addParticipantMutation.isPending || createLeadMutation.isPending}
+                            >
+                              {addParticipantMutation.isPending || createLeadMutation.isPending ? (
+                                <>
+                                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                  {participantMode === "create" ? "Criando..." : "Adicionando..."}
+                                </>
+                              ) : (
+                                "Adicionar"
+                              )}
+                            </Button>
                           </div>
                         </DialogContent>
                       </Dialog>
@@ -564,19 +738,7 @@ export default function DealDetail() {
 
               {/* Atividades */}
               <TabsContent value="activities">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Timeline de Atividades</CardTitle>
-                    <CardDescription>
-                      Histórico de interações com este negócio
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-8 text-muted-foreground">
-                      Sistema de atividades em desenvolvimento
-                    </div>
-                  </CardContent>
-                </Card>
+                <ActivityTimeline dealId={id!} />
               </TabsContent>
 
               {/* Notas */}

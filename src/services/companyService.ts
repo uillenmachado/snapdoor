@@ -281,9 +281,9 @@ export async function fetchCompanies(
 
   console.log('✅ Empresas buscadas:', { total: count, empresas: data?.map(c => c.name) });
 
-  // ✅ Retornar no formato correto: { companies: [], count: 0 }
+  // ✅ Retornar no formato correto: { data: [], count: 0 }
   return { 
-    companies: (data || []) as Company[], 
+    data: (data || []) as Company[], 
     count: count || 0 
   };
 }

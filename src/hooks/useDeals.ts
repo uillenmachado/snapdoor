@@ -270,6 +270,7 @@ export const useDeleteDeal = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["deals"] });
+      queryClient.invalidateQueries({ queryKey: ["deals-history"] });
       queryClient.invalidateQueries({ queryKey: ["dashboardMetrics"] });
       queryClient.invalidateQueries({ queryKey: ["conversionFunnel"] });
       queryClient.invalidateQueries({ queryKey: ["revenueMetrics"] });
@@ -343,6 +344,7 @@ export const useMarkDealAsWon = () => {
           status: 'won',
           probability: 100,
           closed_date: closedDate || new Date().toISOString(),
+          won_at: new Date().toISOString(),
         })
         .eq("id", dealId)
         .select()
@@ -353,6 +355,7 @@ export const useMarkDealAsWon = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["deals"] });
+      queryClient.invalidateQueries({ queryKey: ["deals-history"] });
       queryClient.invalidateQueries({ queryKey: ["dashboardMetrics"] });
       queryClient.invalidateQueries({ queryKey: ["conversionFunnel"] });
       queryClient.invalidateQueries({ queryKey: ["revenueMetrics"] });
@@ -392,6 +395,7 @@ export const useMarkDealAsLost = () => {
           probability: 0,
           lost_reason: lostReason.trim(),
           closed_date: new Date().toISOString(),
+          lost_at: new Date().toISOString(),
         })
         .eq("id", dealId)
         .select()
@@ -402,6 +406,7 @@ export const useMarkDealAsLost = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["deals"] });
+      queryClient.invalidateQueries({ queryKey: ["deals-history"] });
       queryClient.invalidateQueries({ queryKey: ["dashboardMetrics"] });
       queryClient.invalidateQueries({ queryKey: ["conversionFunnel"] });
       queryClient.invalidateQueries({ queryKey: ["revenueMetrics"] });
@@ -436,7 +441,16 @@ export const useDealParticipants = (dealId: string | undefined) => {
         .from("deal_participants")
         .select(`
           *,
-          lead:leads(*)
+          lead:leads(
+            *,
+            companies:company_id (
+              id,
+              name,
+              domain,
+              logo_url,
+              industry
+            )
+          )
         `)
         .eq("deal_id", dealId);
 

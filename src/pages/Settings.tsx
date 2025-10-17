@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile, useUpdateProfile, useUploadAvatar, useUpdatePassword } from "@/hooks/useProfile";
 import { useSubscription, PLAN_LIMITS } from "@/hooks/useSubscription";
+import { EmailIntegrationSettings } from "@/components/EmailIntegrationSettings";
 
 const Settings = () => {
   const { user } = useAuth();
@@ -264,7 +265,11 @@ const Settings = () => {
               </TabsContent>
 
               <TabsContent value="integration" className="mt-6">
-                <Card>
+                {/* Integração de Email */}
+                <EmailIntegrationSettings />
+                
+                {/* Integração com LinkedIn */}
+                <Card className="mt-6">
                   <CardHeader>
                     <CardTitle>Integração com LinkedIn</CardTitle>
                     <CardDescription>

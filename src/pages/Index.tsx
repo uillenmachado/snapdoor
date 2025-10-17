@@ -7,7 +7,10 @@ const Index = () => {
       {/* Header */}
       <header className="border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="text-2xl font-bold text-primary">snapdoor</div>
+          <div className="flex items-center gap-2">
+            <img src="/favicon.svg" alt="snapdoor" className="h-8 w-8" />
+            <span className="text-2xl font-bold text-primary">snapdoor</span>
+          </div>
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => window.location.href = "/pricing"}>
               Preços
@@ -27,11 +30,10 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl font-bold mb-6 text-foreground">
-              O CRM que transforma leads do LinkedIn em clientes
+              Conecte. Gerencie. Negocie. Tudo em um só lugar.
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Capture perfis do LinkedIn, gerencie seu funil de vendas e feche mais negócios.
-              Simples, visual e poderoso.
+              O SnapDoor transforma suas conexões em oportunidades reais, com um CRM visual e rápido como um clique.
             </p>
             <div className="flex items-center justify-center gap-4">
           <Button

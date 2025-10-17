@@ -104,7 +104,9 @@ const Dashboard = () => {
                       <TrendingUp className="h-4 w-4 text-blue-600" />
                       <span className="text-sm font-medium">Total de Negócios</span>
                     </div>
-                    <div className="text-3xl font-bold">{deals?.length || 0}</div>
+                    <div className="text-3xl font-bold">
+                      {deals?.filter(d => d.status === 'open').length || 0}
+                    </div>
                     <p className="text-xs text-muted-foreground mt-1">
                       {stages?.length || 0} etapas ativas
                     </p>
@@ -121,7 +123,7 @@ const Dashboard = () => {
                         currency: 'BRL',
                         minimumFractionDigits: 0,
                       }).format(
-                        deals?.reduce((sum, deal) => sum + (deal.value || 0), 0) || 0
+                        deals?.filter(d => d.status === 'open').reduce((sum, deal) => sum + (deal.value || 0), 0) || 0
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">

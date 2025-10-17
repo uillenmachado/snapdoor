@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ThemeProvider } from "@/components/theme-provider";
+import { useOAuthCallback } from "@/hooks/useOAuthCallback";
 import { Loader2 } from "lucide-react";
 
 // Eager load: Critical pages (landing, auth)
@@ -21,6 +22,7 @@ import NotFound from "./pages/NotFound";
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Pipelines = lazy(() => import("./pages/Pipelines"));
 const DealDetail = lazy(() => import("./pages/DealDetail"));
+const DealsHistory = lazy(() => import("./pages/DealsHistory"));
 const Activities = lazy(() => import("./pages/Activities"));
 const Reports = lazy(() => import("./pages/Reports"));
 const Settings = lazy(() => import("./pages/Settings"));
@@ -58,21 +60,25 @@ const queryClient = new QueryClient({
   },
 });
 
-const App = () => (
-  <ErrorBoundary>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system" storageKey="snapdoor-theme">
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter
-            future={{
-              v7_startTransition: true,
-              v7_relativeSplatPath: true,
-            }}
-          >
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
+const App = () => {
+  // Monitora OAuth callbacks e salva tokens automaticamente
+  useOAuthCallback();
+
+  return (
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider defaultTheme="system" storageKey="snapdoor-theme">
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter
+              future={{
+                v7_startTransition: true,
+                v7_relativeSplatPath: true,
+              }}
+            >
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
                 {/* Public routes */}
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<Login />} />
@@ -94,6 +100,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Pipelines />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/deals/history"
+            element={
+              <ProtectedRoute>
+                <DealsHistory />
               </ProtectedRoute>
             }
           />
@@ -214,11 +228,12 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
             </Suspense>
-      </BrowserRouter>
-    </TooltipProvider>
+          </BrowserRouter>
+        </TooltipProvider>
       </ThemeProvider>
-  </QueryClientProvider>
+    </QueryClientProvider>
   </ErrorBoundary>
-);
+  );
+};
 
 export default App;
