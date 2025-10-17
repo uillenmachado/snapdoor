@@ -43,6 +43,19 @@ export interface Deal {
   // Timestamps
   created_at: string;
   updated_at: string;
+  
+  // Relações
+  companies?: {
+    id: string;
+    name: string;
+    domain?: string;
+    website?: string;
+    industry?: string;
+    size?: string;
+    location?: string;
+    logo_url?: string;
+    employee_count?: number;
+  };
 }
 
 export interface DealParticipant {
@@ -98,21 +111,38 @@ export const useDealsByStage = (stageId: string | undefined) => {
 
 // Fetch single deal
 export const useDeal = (dealId: string | undefined) => {
+  // Validar se o ID é um UUID válido (evita queries com "new:1" do realtime)
+  const isValidUUID = dealId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(dealId);
+  
   return useQuery({
     queryKey: ["deal", dealId],
     queryFn: async () => {
       if (!dealId) throw new Error("Deal ID required");
+      if (!isValidUUID) throw new Error("Invalid deal ID format");
 
       const { data, error } = await supabase
         .from("deals")
-        .select("*")
+        .select(`
+          *,
+          companies:company_id (
+            id,
+            name,
+            domain,
+            website,
+            industry,
+            size,
+            location,
+            logo_url,
+            employee_count
+          )
+        `)
         .eq("id", dealId)
         .single();
 
       if (error) throw error;
-      return data as Deal;
+      return data as unknown as Deal;
     },
-    enabled: !!dealId,
+    enabled: !!dealId && isValidUUID,
   });
 };
 
@@ -136,21 +166,51 @@ export const useCreateDeal = () => {
       tags?: string[];
       position?: number;
     }) => {
+      console.log('🔍 Criando deal:', newDeal);
+      
+      const dealData = {
+        user_id: newDeal.user_id,
+        pipeline_id: newDeal.pipeline_id,
+        stage_id: newDeal.stage_id,
+        title: newDeal.title,
+        value: newDeal.value || 0,
+        company_id: newDeal.company_id || null,
+        expected_close_date: newDeal.expected_close_date || null,
+        probability: newDeal.probability || 50,
+        description: newDeal.description || null,
+        // source: newDeal.source || 'manual', // ❌ Coluna não existe no banco
+        position: newDeal.position || 0,
+        status: 'open',
+      };
+
       const { data, error } = await supabase
         .from("deals")
-        .insert(newDeal as any)
+        .insert(dealData)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Erro ao criar deal:', error);
+        console.error('❌ Detalhes do erro:', JSON.stringify(error, null, 2));
+        console.error('❌ Dados enviados:', JSON.stringify(dealData, null, 2));
+        throw new Error(error.message || 'Erro ao criar deal');
+      }
+      
+      console.log('✅ Deal criado com sucesso:', data);
       return data as Deal;
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["deals"] });
-      queryClient.invalidateQueries({ queryKey: ["deals", "stage", data.stage_id] });
-      toast.success("Negócio criado com sucesso!");
+    onSuccess: async (data) => {
+      console.log('✅ Deal criado, invalidando queries...');
+      
+      // Invalidar todas as queries relacionadas
+      await queryClient.invalidateQueries({ queryKey: ["deals"] });
+      await queryClient.invalidateQueries({ queryKey: ["deals", "stage", data.stage_id] });
+      await queryClient.invalidateQueries({ queryKey: ["analytics"] });
+      
+      // Não mostrar toast aqui, deixar o componente mostrar
     },
     onError: (error: Error) => {
+      console.error('❌ Erro na mutation de deal:', error);
       toast.error(`Erro ao criar negócio: ${error.message}`);
     },
   });
@@ -363,10 +423,14 @@ export const useMarkDealAsLost = () => {
 
 // Fetch participants of a deal
 export const useDealParticipants = (dealId: string | undefined) => {
+  // Validar se o ID é um UUID válido
+  const isValidUUID = dealId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(dealId);
+  
   return useQuery({
     queryKey: ["deal-participants", dealId],
     queryFn: async () => {
       if (!dealId) throw new Error("Deal ID required");
+      if (!isValidUUID) throw new Error("Invalid deal ID format");
 
       const { data, error } = await supabase
         .from("deal_participants")
@@ -379,7 +443,7 @@ export const useDealParticipants = (dealId: string | undefined) => {
       if (error) throw error;
       return data;
     },
-    enabled: !!dealId,
+    enabled: !!dealId && isValidUUID,
   });
 };
 
@@ -401,27 +465,39 @@ export const useAddDealParticipant = () => {
       role?: string;
       isPrimary?: boolean;
     }) => {
+      console.log('🔍 Adicionando participante:', { dealId, leadId, userId, role, isPrimary });
+      
       const { data, error } = await supabase
         .from("deal_participants")
-        .insert({
+        .insert([{
           deal_id: dealId,
           lead_id: leadId,
           user_id: userId,
           role: role || 'participant',
           is_primary: isPrimary || false,
-        })
-        .select()
+        }])
+        .select('*')
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Erro ao adicionar participante:', error);
+        throw error;
+      }
+      
+      console.log('✅ Participante adicionado:', data);
       return data;
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["deal-participants", variables.dealId] });
-      toast.success("Participante adicionado ao negócio!");
+    onSuccess: async (_, variables) => {
+      console.log('✅ Participante adicionado, invalidando queries...');
+      await queryClient.invalidateQueries({ queryKey: ["deal-participants", variables.dealId] });
+      await queryClient.invalidateQueries({ queryKey: ["deals"] });
+      
+      // Não mostrar toast aqui, deixar o componente mostrar
     },
     onError: (error: Error) => {
-      toast.error(`Erro: ${error.message}`);
+      console.error('❌ Erro na mutation de participante:', error);
+      // Não mostrar toast de erro aqui, o componente vai tratar
+      throw error; // Re-throw para o componente tratar
     },
   });
 };

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <style>
+      :root {
+        --sd-green: #22C55E; /* accent */
+        --sd-dark: #0B0F14;  /* dark */
+      }
+    </style>
+  </defs>
+  <g fill="none" fill-rule="evenodd">
+    <!-- Frame -->
+    <rect x="28" y="28" width="200" height="200" rx="20" stroke="var(--sd-green)" stroke-width="18"/>
+    <!-- Door (slightly open) -->
+    <path d="M84 64 L84 192 L172 176 L172 80 Z" fill="var(--sd-dark)"/>
+    <!-- Knob -->
+    <circle cx="112" cy="128" r="9" fill="var(--sd-green)"/>
+  </g>
+</svg>

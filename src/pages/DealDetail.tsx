@@ -69,6 +69,8 @@ import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { EmailIntegrationCard } from "@/components/EmailIntegrationCard";
+import { ParticipantCard } from "@/components/deals/ParticipantCard";
+import { CompanyDetails } from "@/components/deals/CompanyDetails";
 import {
   useDeal,
   useUpdateDeal,
@@ -85,7 +87,7 @@ export default function DealDetail() {
   const { user } = useAuth();
 
   const { data: deal, isLoading: dealLoading } = useDeal(id);
-  const { data: participants = [], isLoading: participantsLoading } = useDealParticipants(id);
+  const { data: participants = [], isLoading: participantsLoading, refetch: refetchParticipants } = useDealParticipants(id);
   const { data: allLeads = [] } = useLeads(user?.id);
 
   const updateDealMutation = useUpdateDeal();
@@ -187,6 +189,12 @@ export default function DealDetail() {
       participantId,
       dealId: id,
     });
+  };
+
+  // Marcar participante como principal
+  const handleSetPrimary = async (participantId: string) => {
+    toast.info("Marcar como principal - em desenvolvimento");
+    // TODO: Implementar mutation para atualizar is_primary
   };
 
   // Marcar como ganho
@@ -344,7 +352,7 @@ export default function DealDetail() {
               </div>
 
               {/* Quick Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>
                   <CardContent className="pt-6">
                     <div className="flex items-center gap-2">
@@ -370,28 +378,24 @@ export default function DealDetail() {
                 <Card>
                   <CardContent className="pt-6">
                     <div className="flex items-center gap-2">
-                      <Building2 className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">Empresa</span>
-                    </div>
-                    <div className="text-lg font-semibold mt-2 truncate">
-                      {deal.company_name || "Não informado"}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm text-muted-foreground">Previsão</span>
                     </div>
                     <div className="text-lg font-semibold mt-2">
                       {deal.expected_close_date
-                        ? format(new Date(deal.expected_close_date), "dd MMM yyyy", { locale: ptBR })
+                        ? format(new Date(deal.expected_close_date), "dd 'de' MMM", { locale: ptBR })
                         : "Não definida"}
                     </div>
                   </CardContent>
                 </Card>
+              </div>
+
+              {/* Company Details Section */}
+              <div className="mt-6">
+                <CompanyDetails
+                  company={deal.companies}
+                  companyId={deal.company_id}
+                />
               </div>
             </div>
 
@@ -539,44 +543,18 @@ export default function DealDetail() {
                         Nenhum participante ainda. Adicione pessoas ao negócio.
                       </div>
                     ) : (
-                      <div className="space-y-3">
+                      <div className="grid gap-3">
                         {participants.map((participant: any) => (
-                          <div
+                          <ParticipantCard
                             key={participant.id}
-                            className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50"
-                          >
-                            <div className="flex items-center gap-3">
-                              <Avatar>
-                                <AvatarFallback>
-                                  {participant.lead?.name
-                                    ? getInitials(participant.lead.name)
-                                    : "??"}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <div className="font-medium">
-                                  {participant.lead?.name || "Nome não disponível"}
-                                  {participant.is_primary && (
-                                    <Badge variant="secondary" className="ml-2 text-xs">
-                                      Principal
-                                    </Badge>
-                                  )}
-                                </div>
-                                <div className="text-sm text-muted-foreground">
-                                  {translateRole(participant.role)}
-                                  {participant.lead?.position && ` • ${participant.lead.position}`}
-                                  {participant.lead?.company && ` @ ${participant.lead.company}`}
-                                </div>
-                              </div>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleRemoveParticipant(participant.id)}
-                            >
-                              <Trash className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </div>
+                            participant={participant}
+                            onRemove={handleRemoveParticipant}
+                            onSetPrimary={handleSetPrimary}
+                            onChangeRole={() => {
+                              // Refetch participants após edição
+                              refetchParticipants();
+                            }}
+                          />
                         ))}
                       </div>
                     )}

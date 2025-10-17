@@ -5,19 +5,16 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { DealCard } from "@/components/DealCard";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { NotificationBell } from "@/components/NotificationBell";
+import { CreateDealDialog } from "@/components/CreateDealDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Search, Plus, Loader2, Filter, TrendingUp, DollarSign } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { usePipeline, useStages, useCreateStage, useUpdateStage, useDeleteStage } from "@/hooks/usePipelines";
 import { 
   useDeals, 
-  useCreateDeal, 
   useUpdateDeal, 
   useDeleteDeal,
   useMoveDeal,
@@ -39,7 +36,6 @@ const Deals = () => {
   const createStageMutation = useCreateStage();
   const updateStageMutation = useUpdateStage();
   const deleteStageMutation = useDeleteStage();
-  const createDealMutation = useCreateDeal();
   const updateDealMutation = useUpdateDeal();
   const deleteDealMutation = useDeleteDeal();
   const moveDealMutation = useMoveDeal();
@@ -51,16 +47,6 @@ const Deals = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [editingStageId, setEditingStageId] = useState<string | null>(null);
   const [newStageName, setNewStageName] = useState("");
-  
-  // Form state for new deal
-  const [newDealForm, setNewDealForm] = useState({
-    title: "",
-    value: "",
-    company_name: "",
-    probability: "50",
-    expected_close_date: "",
-    description: "",
-  });
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -135,42 +121,7 @@ const Deals = () => {
     navigate(`/deals/${deal.id}`);
   };
 
-  const handleCreateDeal = async () => {
-    if (!user?.id || !pipeline?.id || !stages || stages.length === 0) {
-      toast.error("Pipeline não configurado");
-      return;
-    }
 
-    if (!newDealForm.title.trim()) {
-      toast.error("Título do negócio é obrigatório");
-      return;
-    }
-
-    const firstStage = stages[0];
-    
-    await createDealMutation.mutateAsync({
-      user_id: user.id,
-      pipeline_id: pipeline.id,
-      stage_id: firstStage.id,
-      title: newDealForm.title,
-      value: parseFloat(newDealForm.value) || 0,
-      company_name: newDealForm.company_name || null,
-      probability: parseInt(newDealForm.probability) || 50,
-      expected_close_date: newDealForm.expected_close_date || null,
-      description: newDealForm.description || null,
-    });
-
-    // Reset form
-    setNewDealForm({
-      title: "",
-      value: "",
-      company_name: "",
-      probability: "50",
-      expected_close_date: "",
-      description: "",
-    });
-    setIsAddDealOpen(false);
-  };
 
   const handleEditStage = (stageId: string) => {
     const stage = stages?.find((s) => s.id === stageId);
@@ -229,7 +180,15 @@ const Deals = () => {
   };
 
   const handleMarkAsLost = async (dealId: string) => {
-    await markDealAsLostMutation.mutateAsync({ dealId });
+    // Solicitar motivo da perda
+    const lostReason = window.prompt("Por que esta oportunidade foi perdida?\n\nIsso ajuda na análise futura:");
+    
+    if (!lostReason || lostReason.trim() === '') {
+      toast.error("É necessário informar o motivo da perda");
+      return;
+    }
+    
+    await markDealAsLostMutation.mutateAsync({ dealId, lostReason: lostReason.trim() });
   };
 
   const formatCurrency = (value: number) => {
@@ -411,94 +370,16 @@ const Deals = () => {
         </div>
       </div>
 
-      {/* Add Deal Dialog */}
-      <Dialog open={isAddDealOpen} onOpenChange={setIsAddDealOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Criar Novo Negócio</DialogTitle>
-            <DialogDescription>
-              Adicione um novo negócio ao pipeline
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <Label htmlFor="title">Título do Negócio *</Label>
-              <Input
-                id="title"
-                placeholder="Ex: Venda para Empresa X"
-                value={newDealForm.title}
-                onChange={(e) => setNewDealForm({ ...newDealForm, title: e.target.value })}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="value">Valor (R$)</Label>
-                <Input
-                  id="value"
-                  type="number"
-                  placeholder="0.00"
-                  value={newDealForm.value}
-                  onChange={(e) => setNewDealForm({ ...newDealForm, value: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="probability">Probabilidade (%)</Label>
-                <Select
-                  value={newDealForm.probability}
-                  onValueChange={(value) => setNewDealForm({ ...newDealForm, probability: value })}
-                >
-                  <SelectTrigger id="probability">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="10">10%</SelectItem>
-                    <SelectItem value="25">25%</SelectItem>
-                    <SelectItem value="50">50%</SelectItem>
-                    <SelectItem value="75">75%</SelectItem>
-                    <SelectItem value="90">90%</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="company">Empresa</Label>
-              <Input
-                id="company"
-                placeholder="Nome da empresa"
-                value={newDealForm.company_name}
-                onChange={(e) => setNewDealForm({ ...newDealForm, company_name: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="expected_close_date">Data Prevista de Fechamento</Label>
-              <Input
-                id="expected_close_date"
-                type="date"
-                value={newDealForm.expected_close_date}
-                onChange={(e) => setNewDealForm({ ...newDealForm, expected_close_date: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="description">Descrição</Label>
-              <Input
-                id="description"
-                placeholder="Detalhes do negócio..."
-                value={newDealForm.description}
-                onChange={(e) => setNewDealForm({ ...newDealForm, description: e.target.value })}
-              />
-            </div>
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsAddDealOpen(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={handleCreateDeal} disabled={createDealMutation.isPending}>
-              {createDealMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Criar Negócio
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Create Deal Dialog - Enterprise Level */}
+      {user && pipeline && stages && (
+        <CreateDealDialog
+          isOpen={isAddDealOpen}
+          onClose={() => setIsAddDealOpen(false)}
+          userId={user.id}
+          pipelineId={pipeline.id}
+          stages={stages}
+        />
+      )}
     </SidebarProvider>
   );
 };

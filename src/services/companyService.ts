@@ -232,13 +232,19 @@ export async function fetchCompanies(
     size?: string;
     sortBy?: 'name' | 'created_at' | 'updated_at';
     sortOrder?: 'asc' | 'desc';
+    userId?: string; // ✅ Adicionar userId nos filtros
   },
   page = 1,
   pageSize = 20
-): Promise<{ data: Company[]; count: number }> {
+): Promise<{ companies: Company[]; count: number }> { // ✅ Corrigir tipo de retorno
   let query = supabase
     .from('companies')
     .select('*', { count: 'exact' });
+
+  // ✅ FILTRAR POR USER_ID (obrigatório para RLS)
+  if (filters?.userId) {
+    query = query.eq('user_id', filters.userId);
+  }
 
   // Aplicar busca
   if (filters?.search) {
@@ -273,7 +279,13 @@ export async function fetchCompanies(
     throw new Error(`Erro ao buscar empresas: ${error.message}`);
   }
 
-  return { data: (data || []) as Company[], count: count || 0 };
+  console.log('✅ Empresas buscadas:', { total: count, empresas: data?.map(c => c.name) });
+
+  // ✅ Retornar no formato correto: { companies: [], count: 0 }
+  return { 
+    companies: (data || []) as Company[], 
+    count: count || 0 
+  };
 }
 
 /**

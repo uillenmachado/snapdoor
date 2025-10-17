@@ -168,16 +168,16 @@ export default function Leads() {
     });
   };
 
-  // Função para obter badge de status - Pipedrive Style
+  // Função para obter badge de status - Padrão do Dashboard
   const getStatusBadge = (lead: Lead) => {
     if (lead.temperature === "hot") {
-      return <Badge className="bg-success-100 dark:bg-success-900/30 text-success-700 dark:text-success-400 hover:bg-success-100 dark:hover:bg-success-900/30 border-0 font-medium">Quente</Badge>;
+      return <Badge className="bg-danger-50 dark:bg-danger-900/20 text-danger-600 dark:text-danger-500 border-danger-200 dark:border-danger-800 font-medium">Quente</Badge>;
     } else if (lead.temperature === "cold") {
-      return <Badge className="bg-danger-100 dark:bg-danger-900/30 text-danger-700 dark:text-danger-400 hover:bg-danger-100 dark:hover:bg-danger-900/30 border-0 font-medium">Frio</Badge>;
+      return <Badge className="bg-info-50 dark:bg-info-900/20 text-info-600 dark:text-info-500 border-info-200 dark:border-info-800 font-medium">Frio</Badge>;
     } else if (lead.temperature === "warm") {
-      return <Badge className="bg-warning-100 dark:bg-warning-900/30 text-warning-700 dark:text-warning-400 hover:bg-warning-100 dark:hover:bg-warning-900/30 border-0 font-medium">Morno</Badge>;
+      return <Badge className="bg-warning-50 dark:bg-warning-900/20 text-warning-600 dark:text-warning-500 border-warning-200 dark:border-warning-800 font-medium">Morno</Badge>;
     }
-    return <Badge className="bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 border-0 font-medium">Neutro</Badge>;
+    return <Badge className="bg-muted text-muted-foreground border font-medium">Neutro</Badge>;
   };
 
   if (isLoading) {
@@ -343,7 +343,7 @@ export default function Leads() {
                   leads.map((lead) => (
                     <TableRow
                       key={lead.id}
-                      className="cursor-pointer border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
+                      className="cursor-pointer border-b border-border bg-card hover:bg-muted/50 transition-colors"
                       onClick={() => navigate(`/leads/${lead.id}`)}
                     >
                       <TableCell className="py-4">
@@ -351,50 +351,50 @@ export default function Leads() {
                           <img
                             src={lead.avatar_url}
                             alt={`${lead.first_name} ${lead.last_name}`}
-                            className="h-9 w-9 rounded-full object-cover ring-2 ring-neutral-200 dark:ring-neutral-800"
+                            className="h-9 w-9 rounded-full object-cover ring-2 ring-brand-green-200 dark:ring-brand-green-800/50"
                           />
                         ) : (
-                          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-brand-green-100 to-brand-green-200 dark:from-brand-green-900/30 dark:to-brand-green-800/30 flex items-center justify-center text-xs font-semibold text-brand-green-700 dark:text-brand-green-400 ring-2 ring-brand-green-200 dark:ring-brand-green-800/50">
+                          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-brand-green-500 to-brand-green-600 flex items-center justify-center text-xs font-semibold text-white shadow-sm">
                             {lead.first_name.charAt(0)}
                             {lead.last_name.charAt(0)}
                           </div>
                         )}
                       </TableCell>
-                      <TableCell className="font-medium text-neutral-900 dark:text-neutral-100 py-4">
+                      <TableCell className="font-medium text-foreground py-4">
                         <div className="flex flex-col">
                           <span className="font-semibold">{lead.full_name || `${lead.first_name} ${lead.last_name}`}</span>
                           {lead.location && (
-                            <span className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">{lead.location}</span>
+                            <span className="text-xs text-muted-foreground mt-0.5">{lead.location}</span>
                           )}
                         </div>
                       </TableCell>
                       <TableCell className="py-4">
-                        <div className="flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
-                          <Building2 className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
+                        <div className="flex items-center gap-2 text-foreground">
+                          <Building2 className="h-4 w-4 text-muted-foreground" />
                           <span className="font-medium">{lead.companies?.name || "-"}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-sm text-neutral-900 dark:text-neutral-100 py-4 font-medium">
+                      <TableCell className="text-sm text-foreground py-4 font-medium">
                         {lead.title || lead.headline || "-"}
                       </TableCell>
                       <TableCell className="py-4">
                         <div className="flex flex-col gap-1.5 text-xs">
                           {lead.email && (
-                            <div className="flex items-center gap-1.5 text-neutral-700 dark:text-neutral-300">
-                              <Mail className="h-3.5 w-3.5 text-neutral-500 dark:text-neutral-400" />
+                            <div className="flex items-center gap-1.5 text-foreground">
+                              <Mail className="h-3.5 w-3.5 text-muted-foreground" />
                               <span className="truncate max-w-[150px] font-medium">{lead.email}</span>
                             </div>
                           )}
                           {lead.phone && (
-                            <div className="flex items-center gap-1.5 text-neutral-700 dark:text-neutral-300">
-                              <Phone className="h-3.5 w-3.5 text-neutral-500 dark:text-neutral-400" />
+                            <div className="flex items-center gap-1.5 text-foreground">
+                              <Phone className="h-3.5 w-3.5 text-muted-foreground" />
                               <span className="font-medium">{lead.phone}</span>
                             </div>
                           )}
                         </div>
                       </TableCell>
                       <TableCell className="py-4">{getStatusBadge(lead)}</TableCell>
-                      <TableCell className="text-sm text-neutral-700 dark:text-neutral-300 py-4 font-medium">
+                      <TableCell className="text-sm text-foreground py-4 font-medium">
                         {formatDate(lead.updated_at)}
                       </TableCell>
                       <TableCell className="py-4">

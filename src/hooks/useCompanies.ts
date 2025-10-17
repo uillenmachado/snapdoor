@@ -27,9 +27,15 @@ export function useCompanies(
 ) {
   const { user } = useAuth();
 
+  // ✅ Adicionar userId aos filtros
+  const filtersWithUserId = {
+    ...filters,
+    userId: user?.id,
+  };
+
   return useQuery({
-    queryKey: [COMPANIES_QUERY_KEY, 'list', filters, page, pageSize],
-    queryFn: () => fetchCompanies(filters, page, pageSize),
+    queryKey: [COMPANIES_QUERY_KEY, 'list', filtersWithUserId, page, pageSize],
+    queryFn: () => fetchCompanies(filtersWithUserId, page, pageSize),
     enabled: !!user,
     staleTime: 1000 * 60 * 5, // 5 minutos
   });

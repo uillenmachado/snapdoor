@@ -44,6 +44,7 @@ export interface CompanyFilters {
   size?: string;
   sortBy?: 'name' | 'created_at' | 'updated_at';
   sortOrder?: 'asc' | 'desc';
+  userId?: string; // ✅ Adicionar userId
 }
 
 // Tamanhos de empresa padronizados

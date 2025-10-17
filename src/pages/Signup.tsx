@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Chrome } from "lucide-react";
@@ -82,7 +83,9 @@ const Signup = () => {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
-          <div className="text-3xl font-bold text-primary mb-2">snapdoor</div>
+          <div className="flex justify-center mb-4">
+            <Logo size="xl" />
+          </div>
           <CardTitle className="text-2xl">Criar conta</CardTitle>
           <CardDescription>
             Comece seu teste grátis de 14 dias

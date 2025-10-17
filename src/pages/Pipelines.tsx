@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { DealKanbanBoard } from "@/components/DealKanbanBoard";
+import { CreateDealDialog } from "@/components/CreateDealDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -247,9 +248,9 @@ const Pipelines = () => {
                   <Filter className="h-4 w-4" />
                 </Button>
 
-                <Button onClick={() => navigate('/deals/new')}>
+                <Button onClick={() => setIsAddDealOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Novo Negócio
+                  Nova Oportunidade
                 </Button>
               </div>
             </div>
@@ -433,6 +434,17 @@ const Pipelines = () => {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Create Deal Dialog - Enterprise Level */}
+        {user && pipeline && stages && (
+          <CreateDealDialog
+            isOpen={isAddDealOpen}
+            onClose={() => setIsAddDealOpen(false)}
+            userId={user.id}
+            pipelineId={pipeline.id}
+            stages={stages}
+          />
+        )}
       </div>
     </SidebarProvider>
   );

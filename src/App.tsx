@@ -27,7 +27,7 @@ const Settings = lazy(() => import("./pages/Settings"));
 const TeamSettings = lazy(() => import("./pages/TeamSettings"));
 const ScraperLogs = lazy(() => import("./pages/ScraperLogs"));
 const Help = lazy(() => import("./pages/Help"));
-const LeadProfile = lazy(() => import("./pages/LeadProfile"));
+const LeadProfile = lazy(() => import("./pages/LeadDetailEnhanced"));
 const Leads = lazy(() => import("./pages/Leads"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Companies = lazy(() => import("./pages/Companies"));

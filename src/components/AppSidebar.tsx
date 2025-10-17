@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { Logo } from "@/components/Logo";
 import {
   Sidebar,
   SidebarContent,
@@ -69,11 +70,7 @@ export function AppSidebar() {
   return (
     <Sidebar className="border-r border-border bg-card">
       <SidebarHeader className="border-b border-border p-6">
-        <div className="flex items-center gap-2">
-          <div className="text-2xl font-bold bg-gradient-to-r from-brand-green-600 to-brand-green-700 bg-clip-text text-transparent dark:from-brand-green-400 dark:to-brand-green-500">
-            snapdoor
-          </div>
-        </div>
+        <Logo size="md" />
       </SidebarHeader>
       <SidebarContent className="px-3 py-4">
         <SidebarGroup>
